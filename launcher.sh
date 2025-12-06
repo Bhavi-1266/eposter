@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE="/home/eposter"
+BASE="/home/bhavy/eposter"
 PY_SCRIPT="$BASE/show_eposters.py"
 
 # --- Settings ---
