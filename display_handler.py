@@ -90,6 +90,7 @@ def show_waiting_message(screen, scr_w, scr_h, message="Waiting for posters...")
     try:
         font = pygame.font.SysFont("Arial", 28)
         surf = font.render(message, True, (255, 255, 255))
+        surf = pygame.transform.rotate(surf, -90)
         screen.blit(surf, ((scr_w - surf.get_width()) // 2, (scr_h - surf.get_height()) // 2))
         pygame.display.flip()
     except Exception:
