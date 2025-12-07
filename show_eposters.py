@@ -168,15 +168,9 @@ def main():
                         reverse=True
                     )
 
-                    # Extract URLs in sorted order
-                    urls = []
-                    for entry in posters:
-                        url = entry.get("eposter_file") or entry.get("file") or None
-                        if url:
-                            urls.append(url)
-
-                    # Sync cache (only these files stay)
-                    image_paths = cache_handler.sync_cache(urls)
+                    # Sync cache (pass full poster data, not just URLs)
+                    # Cache handler will name files by ID and convert to landscape
+                    image_paths = cache_handler.sync_cache(posters)
 
                     if not image_paths:
                         print("[main] No poster images found in API.")
