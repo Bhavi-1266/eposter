@@ -8,12 +8,17 @@ Images are named by their ID and converted to landscape orientation.
 from pathlib import Path
 import os
 import requests
+import json
 from PIL import Image
 
 # Configuration
-REQUEST_TIMEOUT = int(os.environ.get("REQUEST_TIMEOUT", "10"))
+with open(os.environ.get("CONFIG_FILE", "config.json")) as f:
+    config = json.load(f)
+
+REQUEST_TIMEOUT = config.get("api", {}).get("request_timeout", 10)
+DEVICE_ID = config.get("display", {}).get("device_id", "default_device")
 SCRIPT_DIR = Path(__file__).parent
-CACHE_DIR = SCRIPT_DIR / "eposter_cache"
+CACHE_DIR = SCRIPT_DIR / "eposter_cache"    
 
 
 def ensure_cache():
@@ -21,7 +26,7 @@ def ensure_cache():
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def expected_filenames_from_posters(posters):
+def expected_filenames_from_posters(records):
     """
     Extracts expected filenames from poster data (by ID).
     
@@ -32,13 +37,14 @@ def expected_filenames_from_posters(posters):
         set: Set of expected filenames (e.g., {"6.png", "7.png"})
     """
     names = set()
-    for poster in posters:
-        if not isinstance(poster, dict):
-            continue
-        poster_id = poster.get("PosterId") or poster.get("id")
+    if not records:
+        return names
+    for record in records:
+        poster_id = record.get("PosterId") or record.get("id")
         if poster_id:
             names.add(f"{poster_id}.png")
     return names
+
 
 
 def convert_to_landscape(img):
@@ -84,7 +90,11 @@ def sync_cache(posters):
     if not posters:
         return []
     
-    expected_names = expected_filenames_from_posters(posters)
+    screens = posters.get("screens", [])
+    myScreen = screens.get(DEVICE_ID, {})
+    records = myScreen.get("records", [])
+    
+    expected_names = expected_filenames_from_posters(records)
 
     # Delete extras (files not in expected list)
     for f in CACHE_DIR.iterdir():
@@ -102,7 +112,7 @@ def sync_cache(posters):
     # Download and process images
     cached_paths = []
     print(f"[sync_cache] Processing {len(posters)} posters...")
-    for poster in posters:
+    for poster in records:
         if not isinstance(poster, dict):
             print(f"[sync_cache] Warning: Poster is not a dict: {type(poster)}")
             continue

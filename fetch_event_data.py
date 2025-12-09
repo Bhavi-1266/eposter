@@ -13,8 +13,11 @@ import requests
 from datetime import datetime
 
 # Configuration
-EVENT_API_URL = os.environ.get("EVENT_API_URL", "https://posterbridge.incandescentsolution.com/api/v1/event-data")
-REQUEST_TIMEOUT = int(os.environ.get("REQUEST_TIMEOUT", "10"))
+with open(os.environ.get("CONFIG_FILE", "$BASE/config.json")) as f:
+    config = json.load(f)
+
+EVENT_API_URL = config.get("api", {}).get("event_api_url", "https://posterbridge.incandescentsolution.com/api/v1/event-data")
+REQUEST_TIMEOUT = config.get("api", {}).get("request_timeout", 10)
 SCRIPT_DIR = Path(__file__).parent
 EVENT_DATA_JSON = SCRIPT_DIR / "event_data.json"
 

@@ -1,0 +1,22 @@
+{
+  "wifi": {
+    "ssid1": "BHAVY",
+    "password1": "Bms@1266",
+    "ssid2": "BHAVY2",
+    "password2": "Bms@1266",
+    "connect_timeout": 60
+  },
+  "api": {
+    "poster_token": "A9993E364706816ABA3E25717850C26C9CD0D89D",
+    "poster_api_url": "https://posterbridge.incandescentsolution.com/api/v1/eposter-list",
+    "event_api_url": "https://posterbridge.incandescentsolution.com/api/v1/event-data",
+    "event_api_token": "",
+    "request_timeout": 10
+  },
+  "display": {
+    "cache_refresh": 60,
+    "rotation_degree": 0,
+    "device_id" : 1
+  }
+}
+

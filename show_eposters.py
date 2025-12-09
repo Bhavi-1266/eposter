@@ -17,13 +17,17 @@ import api_handler
 import cache_handler
 import display_handler
 import fetch_event_data
+import json
 
 # -------------------------
 # Configuration (via env)
 # -------------------------
-POSTER_TOKEN = os.environ.get("POSTER_TOKEN")              # required
-CACHE_REFRESH = int(os.environ.get("CACHE_REFRESH", "60"))  # seconds
-DISPLAY_TIME = int(os.environ.get("DISPLAY_TIME", "5"))     # seconds
+with open(Path(__file__).parent / 'config.json', 'r') as f:
+    config = json.load(f)
+
+POSTER_TOKEN = config.get('api', {}).get('poster_token')
+CACHE_REFRESH = int(config.get('display', {}).get('cache_refresh', 60))
+DISPLAY_TIME = int(config.get('display', {}).get('display_time', 5))
 
 SCRIPT_DIR = Path(__file__).parent
 EVENT_DATA_JSON = SCRIPT_DIR / "event_data.json"  # JSON file with event data
@@ -34,7 +38,7 @@ def load_event_data():
     Loads event data from event_data.json file.
     Returns a single event dict or None on failure.
     """
-    import json
+    
     try:
         if not EVENT_DATA_JSON.exists():
             print(f"[load_event_data] Event data file not found: {EVENT_DATA_JSON}")
@@ -42,7 +46,7 @@ def load_event_data():
         with open(EVENT_DATA_JSON, 'r', encoding='utf-8') as f:
             data = json.load(f)
             # If it's already a dict with event fields, return it directly
-            if isinstance(data, dict) and ("event_id" in data or "status" in data):
+            if isinstance(data, dict) and ("screens" in data or "status" in data):
                 return data
             # Otherwise return None
             return None

@@ -7,25 +7,36 @@ Handles displaying poster images using pygame.
 from pathlib import Path
 import os
 import time
+import json
 from PIL import Image
 import pygame
 
+# Configuration
+with open(Path(__file__).parent / 'config.json', 'r') as f:
+    config = json.load(f)
+    ROTATION_DEGREE = int(config.get('display', {}).get('rotationDegree', 0))
 
-def make_landscape_and_fit(img: Image.Image, target_w: int, target_h: int) -> Image.Image:
+
+def make_landscape_and_fit(img: Image.Image, target_w: int, target_h: int, rotation: int = None) -> Image.Image:
     """
-    Rotates image to portrait if needed and fits it to target dimensions.
+    Rotates image and fits it to target dimensions.
     
     Args:
         img: PIL Image object
         target_w: Target width
         target_h: Target height
+        rotation: Rotation degree (defaults to ROTATION_DEGREE env var)
     
     Returns:
         Image: Processed image
     """
+    if rotation is None:
+        rotation = ROTATION_DEGREE
+    
     iw, ih = img.size
-    img = img.rotate(-90, expand=True)
-    iw, ih = img.size
+    if rotation != 0:
+        img = img.rotate(rotation, expand=True)
+        iw, ih = img.size
     scale = min(target_w / iw, target_h / ih)
     nw = max(1, int(iw * scale))
     nh = max(1, int(ih * scale))
