@@ -175,6 +175,7 @@ def main():
                 posters = api_handler.fetch_posters(POSTER_TOKEN)
             with open("api_data.json", 'r') as f:
                 poster_data = json.load(f)
+                print("poster data", len(poster_data))
                 posters = poster_data.get("data", [])
 
                 if posters is None:
