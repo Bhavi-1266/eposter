@@ -15,7 +15,7 @@
   },
   "display": {
     "cache_refresh": 60,
-    "rotation_degree": 0,
+    "rotation_degree": 90,
     "device_id" : 1
   }
 }
