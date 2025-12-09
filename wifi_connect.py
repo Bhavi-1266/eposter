@@ -10,6 +10,8 @@ import time
 import shutil
 import subprocess
 import requests
+from pathlib import Path
+import json
 
 # Configuration
 with open(Path(__file__).parent / 'config.json', 'r') as f:
