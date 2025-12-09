@@ -12,7 +12,7 @@ import json
 from PIL import Image
 
 # Configuration
-with open(os.environ.get("CONFIG_FILE", "config.json")) as f:
+with open(Path(__file__).parent / 'config.json', 'r') as f:
     config = json.load(f)
 
 REQUEST_TIMEOUT = config.get("api", {}).get("request_timeout", 10)

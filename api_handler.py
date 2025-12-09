@@ -11,7 +11,7 @@ import requests
 from datetime import datetime
 
 # Configuration
-with open(os.environ.get("CONFIG_FILE", "$BASE/config.json")) as f:
+with open(Path(__file__).parent / 'config.json', 'r') as f:
     config = json.load(f)
 
 API_BASE = config.get("api", {}).get("poster_api_url", "https://posterbridge.incandescentsolution.com/api/v1/eposter-list")
