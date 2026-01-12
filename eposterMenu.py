@@ -38,11 +38,28 @@ with open(CONFIG_FILE, 'r') as f:
 POSTER_TOKEN = config.get('api', {}).get('poster_token')
 API_REFRESH_INTERVAL = 30  # Fetch from API every 30 seconds if WiFi connected
 DEFAULT_DISPLAY_TIME = int(config.get('display', {}).get('display_time', 5))
-DEVICE_ID = config.get('display', {}).get('device_id', 'default_device')
 
 # -------------------------
 # Utility Functions
 # -------------------------
+
+
+def get_device_id():
+    """
+    Get the current device ID from config file.
+    Reloads config each time to ensure fresh value.
+    
+    Returns:
+        str: Device ID
+    """
+    try:
+        with open(CONFIG_FILE, 'r') as f:
+            config = json.load(f)
+        device_id = config.get('display', {}).get('device_id', 'default_device')
+        return device_id
+    except Exception as e:
+        log(f"[get_device_id] Error reading config: {e}", "ERROR")
+        return 'default_device'
 
 
 def log(message, level="INFO"):
@@ -214,6 +231,10 @@ def fetch_and_cache_posters(wifi_connected):
     """
     func_name = "fetch_and_cache_posters"
     
+    # Get fresh device ID each time
+    device_id = get_device_id()
+    log(f"[{func_name}] Using device ID: {device_id}", "DEBUG")
+    
     if wifi_connected:
         log(f"[{func_name}] WiFi connected, fetching from API...", "INFO")
         try:
@@ -226,7 +247,8 @@ def fetch_and_cache_posters(wifi_connected):
                     json.dump(poster_data, f, indent=2)
                 
                 # Extract screen config
-                records, display_time = get_screen_config(poster_data, DEVICE_ID)
+                records, display_time = get_screen_config(poster_data, device_id)
+                log(f"[{func_name}] Extracted screen config for device {device_id}, {len(records) if records else 0} records", "INFO")
                 
                 if records:
                     # Parse times
@@ -246,7 +268,7 @@ def fetch_and_cache_posters(wifi_connected):
     cached_data = load_cached_api_data()
     
     if cached_data:
-        records, display_time = get_screen_config(cached_data, DEVICE_ID)
+        records, display_time = get_screen_config(cached_data, device_id)
         if records:
             records = parse_poster_times(records)
             log(f"[{func_name}] Loaded {len(records)} records from cache", "INFO")
@@ -446,6 +468,11 @@ def main():
     current_poster = None   # Current poster being displayed
     poster_display_end_time = 0  # When to switch to next poster (optimization)
     
+    # Device ID change detection
+    current_device_id = get_device_id()
+    next_device_check_time = time.time() + 1  # Check device ID every 1 second
+    log(f"[{func_name}] Initial device ID: {current_device_id}", "INFO")
+    
     try:
         while running:
             # -------------------------
@@ -502,17 +529,43 @@ def main():
             # -------------------------
             # Automatic Poster Display Mode
             # -------------------------
+            current_time = time.time()
+            # Check if device ID has changed (every 1 second)
+            if current_time >= next_device_check_time:
+                new_device_id = get_device_id()
+                
+                if new_device_id != current_device_id:
+                    log(f"[{func_name}] Device ID changed from '{current_device_id}' to '{new_device_id}' - reloading data", "INFO")
+                    current_device_id = new_device_id
+                    
+                    # Force immediate data refresh with new device ID
+                    wifi_connected = wifi_connect.ensure_wifi_connection()
+                    new_records, new_display_time, new_source = fetch_and_cache_posters(wifi_connected)
+                    
+                    if new_records:
+                        records = new_records
+                        display_time = new_display_time
+                        data_source = new_source
+                        log(f"[{func_name}] Data reloaded for new device ID: {len(records)} records", "INFO")
+                        
+                        # Force poster re-evaluation on next frame
+                        poster_display_end_time = 0
+                    else:
+                        log(f"[{func_name}] Failed to reload data for new device ID", "ERROR")
+                
+                # Schedule next device ID check (1 second from now)
+                next_device_check_time = current_time + 1
             
             # Check if it's time to refresh data from API
             # (Optimization: only check once per interval, not every frame)
-            current_time = time.time()
+            
             if current_time >= next_refresh_time:
                 log(f"[{func_name}] Refresh interval reached, fetching new data", "DEBUG")
                 
                 # Check WiFi status
                 wifi_connected = wifi_connect.ensure_wifi_connection()
                 
-                # Fetch and cache new data
+                # Fetch and cache new data (device_id is retrieved fresh inside this function)
                 new_records, new_display_time, new_source = fetch_and_cache_posters(wifi_connected)
                 
                 # Update records if fetch was successful

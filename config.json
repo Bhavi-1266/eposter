@@ -1,4 +1,5 @@
 {
+  "ID": 1,
   "wifi": {
     "ssid1": "BHAVY",
     "password1": "Bms@1266",
@@ -15,8 +16,7 @@
   },
   "display": {
     "cache_refresh": 60,
-    "rotation_degree": 90,
-    "device_id" : 1
+    "rotation_degree": 270,
+    "device_id": 3
   }
 }
-

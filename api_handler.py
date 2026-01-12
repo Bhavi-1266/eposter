@@ -74,7 +74,7 @@ def fetch_posters(token):
             return None
         
         data = r.json()
-        print(data , f"[fetch_posters] Successfully fetched posters from API")
+        print( f"[fetch_posters] Successfully fetched posters from API")
         # Get current system date/time
         current_dt = get_current_datetime()
         

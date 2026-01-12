@@ -94,7 +94,7 @@ def sync_cache(records):
     # myScreen = next((s for s in screens if s.get("screen_number") == DEVICE_ID), {})
     # records = myScreen.get("records", [])
     
-    
+    DEVICE_ID = config.get("display", {}).get("device_id", "default_device")
     print(f"[sync_cache] Syncing cache with {len(records)} posters (device {DEVICE_ID})")
     expected_names = expected_filenames_from_posters(records)
     print(f"[sync_cache] Expected filenames: {expected_names}")
