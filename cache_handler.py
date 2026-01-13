@@ -1,221 +1,137 @@
 #!/usr/bin/env python3
 """
 cache_handler.py
-
-Handles caching and syncing of poster images.
-Images are named by their ID and converted to landscape orientation.
 """
 from pathlib import Path
 import os
 import requests
 import json
 from PIL import Image
+import shutil
 
 # Configuration
-with open(Path(__file__).parent / 'config.json', 'r') as f:
-    config = json.load(f)
+try:
+    with open(Path(__file__).parent / 'config.json', 'r') as f:
+        config = json.load(f)
+except Exception as e:
+    print(f"!! CRITICAL: Could not load config.json: {e}")
+    config = {}
 
-REQUEST_TIMEOUT = config.get("api", {}).get("request_timeout", 10)
-DEVICE_ID = config.get("display", {}).get("device_id", "default_device")
+REQUEST_TIMEOUT = config.get("api", {}).get("request_timeout", 20)
 SCRIPT_DIR = Path(__file__).parent
 CACHE_DIR = SCRIPT_DIR / "eposter_cache"    
 
-
 def ensure_cache():
     """Creates cache directory if it doesn't exist."""
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    if not CACHE_DIR.exists():
+        print(f"[cache] Creating directory: {CACHE_DIR}")
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
+def get_image_path(poster_id):
+    """Finds image for ID regardless of extension."""
+    ensure_cache()
+    # Check for specific extensions to avoid directory confusion
+    for ext in ["png", "jpg", "jpeg", "bmp", "gif"]:
+        path = CACHE_DIR / f"{poster_id}.{ext}"
+        if path.exists() and path.is_file():
+            return path
+    return None
 
-def expected_filenames_from_posters(records):
+def sync_cache(records, timeout=REQUEST_TIMEOUT):
     """
-    Extracts expected filenames from poster data (by ID).
-    
-    Args:
-        posters: List of poster dicts with PosterId or id
-    
-    Returns:
-        set: Set of expected filenames (e.g., {"6.png", "7.png"})
-    """
-    names = set()
-    if not records:
-        return names
-    for record in records:
-        poster_id = record.get("PosterId") or record.get("id")
-        if poster_id:
-            names.add(f"{poster_id}.png")
-    return names
-
-
-
-def convert_to_landscape(img):
-    """
-    Converts image to landscape orientation (width > height).
-    Rotates if necessary.
-    
-    Args:
-        img: PIL Image object
-    
-    Returns:
-        PIL Image: Landscape-oriented image
-    """
-    # width, height = img.size
-    
-    # If already landscape, return as is
-    # if width > height:
-    #     return img
-    
-    # # If portrait, rotate 90 degrees counter-clockwise (expand=True keeps full image)
-    # if height > width:
-    #     rotated = img.rotate(-90, expand=True)
-    #     print(f"[convert_to_landscape] Rotated from {width}x{height} to {rotated.size[0]}x{rotated.size[1]}")
-    #     return rotated
-    
-    # If square, return as is
-    return img
-
-
-def sync_cache(records):
-    """
-    Syncs cache directory with poster data.
-    Downloads images, names them by ID, and converts to landscape.
-    
-    Args:
-        posters: List of poster dicts with PosterId/id and eposter_file/file URL
-    
-    Returns:
-        list: List of cached file paths, sorted by ID (newest first)
+    Syncs cache directory. Downloads missing images.
     """
     ensure_cache()
-    print("[sync_cache] Starting cache sync..." , len(records) if records else 0)
+    print(f"--- SYNC START: Received {len(records) if records else 0} records ---")
+    
     if not records:
+        print("[cache] No records provided to sync. Cache will not change.")
         return []
     
-    # screens = posters.get("screens", [])
-    # myScreen = next((s for s in screens if s.get("screen_number") == DEVICE_ID), {})
-    # records = myScreen.get("records", [])
-    
-    DEVICE_ID = config.get("display", {}).get("device_id", "default_device")
-    print(f"[sync_cache] Syncing cache with {len(records)} posters (device {DEVICE_ID})")
-    expected_names = expected_filenames_from_posters(records)
-    print(f"[sync_cache] Expected filenames: {expected_names}")
-    # Delete extras (files not in expected list)
-    for f in CACHE_DIR.iterdir():
-        if not f.is_file():
-            continue
-        if f.name.startswith("."):
-            continue
-        if f.name not in expected_names:
-            try:
-                os.remove(f) 
-                print("[sync_cache] deleted old file:", f.name)
-            except Exception as e:
-                print("[sync_cache] failed delete:", f.name, e)
-
-    # Download and process images
-    cached_paths = []
-    print(f"[sync_cache] Processing {len(records)} posters...")
-    for poster in records:
-        if not isinstance(poster, dict):
-            print(f"[sync_cache] Warning: Poster is not a dict: {type(poster)}")
-            continue
-        
-        # Debug: print poster keys to help diagnose
-        if len(cached_paths) == 0:  # Only print for first poster
-            print(f"[sync_cache] Sample poster keys: {list(poster.keys())}")
-        
-        # Get poster ID (convert to string/int for consistency)
-        poster_id = poster.get("PosterId") or poster.get("id")
-        if poster_id is None:
-            print(f"[sync_cache] Warning: No ID found for poster: {poster}")
-            continue
-        
-        # Convert ID to int then string for consistent naming
-        try:
-            poster_id = int(poster_id)
-        except (ValueError, TypeError):
-            print(f"[sync_cache] Warning: Invalid ID '{poster_id}', skipping")
-            continue
-        
-        # Get image URL
-        url = poster.get("eposter_file") or poster.get("file") or None
-        if not url:
-            print(f"[sync_cache] Warning: No URL found for poster ID {poster_id}")
-            continue
-        
-        # Create filename from ID
-        fname = f"{poster_id}.png"
-        dest = CACHE_DIR / fname
-        
-        # Always reprocess to ensure landscape (remove old file if exists)
-        if dest.exists():
-            try:
-               
-                    # Already landscape, just add to list
-                cached_paths.append((poster_id, dest))
-                continue
-            except Exception as e:
-                print(f"[sync_cache] Error checking existing file {fname}: {e}, will reprocess")
-                try:
-                    dest.unlink()
-                except:
-                    pass
-        
-        # Download and process image
-        tmp = None
-        try:
-            print(f"[sync_cache] Downloading poster ID {poster_id}...")
-            r = requests.get(url, stream=True, timeout=REQUEST_TIMEOUT)
-            r.raise_for_status()
+    # 1. Valid IDs
+    valid_ids = set()
+    for r in records:
+        pid = r.get("PosterId") or r.get("id")
+        if pid:
+            valid_ids.add(str(pid))
             
-            # Save to temporary file first
-            tmp = dest.with_suffix(".tmp")
-            with open(tmp, "wb") as fh:
+    # 2. Cleanup Old Files
+    print(f"[cache] Cleaning up files not in: {valid_ids}")
+    for f in CACHE_DIR.iterdir():
+        if f.is_file() and not f.name.startswith("."):
+            if f.stem not in valid_ids and "_temp" not in f.name:
+                try:
+                    print(f"[cache] Deleting old file: {f.name}")
+                    os.remove(f)
+                except Exception as e:
+                    print(f"[cache] Error deleting {f.name}: {e}")
+
+    # 3. Download Process
+    cached_paths = []
+    
+    for poster in records:
+        # Get ID
+        poster_id = poster.get("PosterId") or poster.get("id")
+        if not poster_id:
+            print("[cache] Skipping record with missing ID")
+            continue
+            
+        poster_id_str = str(poster_id)
+        
+        # Check if exists
+        existing_file = get_image_path(poster_id_str)
+        if existing_file:
+            print(f"[cache] ID {poster_id}: Found existing file ({existing_file.name}). Skipping download.")
+            cached_paths.append(existing_file)
+            continue
+
+        # Get URL
+        url = poster.get("eposter_file") or poster.get("file")
+        if not url:
+            print(f"[cache] ID {poster_id}: No URL found in record!")
+            continue
+
+        print(f"[cache] ID {poster_id}: Downloading from {url}...")
+
+        # Download
+        tmp_path = CACHE_DIR / f"{poster_id}_temp"
+        try:
+            # Added verify=False in case of SSL issues, but use with caution
+            r = requests.get(url, stream=True, timeout=timeout)
+            
+            if r.status_code != 200:
+                print(f"[cache] ID {poster_id}: Download Failed (Status code {r.status_code})")
+                continue
+
+            with open(tmp_path, "wb") as fh:
                 for chunk in r.iter_content(8192):
                     if chunk:
                         fh.write(chunk)
             
-            # Open image, convert to landscape, and save as PNG
-            img = Image.open(tmp)
-            original_size = img.size
-            print(f"[sync_cache] Original image size: {original_size[0]}x{original_size[1]}")
-            
-            # Convert to RGB if necessary (for PNG compatibility)
-            if img.mode in ('RGBA', 'LA', 'P'):
-                # Create white background for transparency
-                rgb_img = Image.new('RGB', img.size, (255, 255, 255))
-                if img.mode == 'P':
-                    img = img.convert('RGBA')
-                if img.mode in ('RGBA', 'LA'):
-                    rgb_img.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
-                img = rgb_img
-            else:
-                img = img.convert('RGB')
-            
-            # Convert to landscape
-            # img = convert_to_landscape(img)
-            final_size = img.size
-            print(f"[sync_cache] Final image size: {final_size[0]}x{final_size[1]} (landscape: {final_size[0] > final_size[1]})")
-            
-            # Save as PNG
-            img.save(dest, 'PNG', optimize=True)
-            
-            # Remove temp file
-            if tmp.exists():
-                tmp.unlink()
-            
-            print(f"[sync_cache] Saved: {fname} (ID: {poster_id}, size: {final_size[0]}x{final_size[1]})")
-            cached_paths.append((poster_id, dest))
-            
-        except Exception as e:
-            print(f"[sync_cache] Failed to process poster ID {poster_id}: {e}")
+            # Identify format
             try:
-                if tmp and tmp.exists():
-                    tmp.unlink()
-            except Exception:
-                pass
+                img = Image.open(tmp_path)
+                ext = (img.format or "PNG").lower()
+                if ext == "jpeg": ext = "jpg"
+                
+                final_path = CACHE_DIR / f"{poster_id_str}.{ext}"
+                
+                # Close image before moving
+                img.close()
+                
+                shutil.move(str(tmp_path), str(final_path))
+                print(f"[cache] ID {poster_id}: Successfully saved as {final_path.name}")
+                cached_paths.append(final_path)
+                
+            except Exception as img_err:
+                print(f"[cache] ID {poster_id}: Downloaded file is not a valid image. {img_err}")
+                if tmp_path.exists(): os.remove(tmp_path)
+
+        except Exception as e:
+            print(f"[cache] ID {poster_id}: Network/Write Error: {e}")
+            if tmp_path.exists():
+                try: os.remove(tmp_path)
+                except: pass
     
-    # Sort by ID (newest first) and return just the paths
-    cached_paths.sort(key=lambda x: x[0], reverse=True)
-    return [path for _, path in cached_paths]
-
-
+    print(f"--- SYNC END: {len(cached_paths)} images ready ---")
+    return cached_paths

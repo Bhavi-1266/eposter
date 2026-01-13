@@ -56,7 +56,7 @@ def get_current_datetime():
     }
 
 
-def fetch_posters(token):
+def fetch_posters(token , api = API_BASE , timeout = REQUEST_TIMEOUT):
     """
     Fetches poster data from API and saves it to api_data.json.
     Handles the new API response structure with status, message, and data array.
@@ -68,7 +68,7 @@ def fetch_posters(token):
         list: List of poster dicts or None on failure
     """
     try:
-        r = requests.get(API_BASE, params={"key": token}, timeout=REQUEST_TIMEOUT)
+        r = requests.get(api, params={"key": token}, timeout=timeout)
         if r.status_code != 200:
             print(f"[fetch_posters] API returned status {r.status_code}")
             return None
