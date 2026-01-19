@@ -456,6 +456,10 @@ def main():
         cfg = load_config()
         mode = cfg.get('display', {}).get('Mode', 'Menu')
         
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                sys.exit()
         if mode == "Menu":
             pygame.mouse.set_visible(True)
             run_menu_mode(screen, clock)

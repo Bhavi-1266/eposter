@@ -1,0 +1,21 @@
+[Unit]
+Description=ePoster Admin Web Interface
+After=network.target
+
+[Service]
+# We need root to bind Port 80 and change Hostname
+User=root
+Group=root
+
+# Set the working directory to your project folder
+WorkingDirectory=/home/bhavy/Projects/eposter
+
+# Command to start the script
+ExecStart=/usr/bin/python3 /home/bhavy/Projects/eposter/config_portal.py
+
+# Restart automatically if it crashes
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
