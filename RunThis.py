@@ -148,6 +148,7 @@ def run_time_mode(screen, clock):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_q: sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN: 
                 update_config_mode("Menu")
                 return
@@ -231,6 +232,7 @@ def run_scroll_mode(screen, clock):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_q: sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN: 
                 update_config_mode("Menu")
                 return
@@ -370,6 +372,8 @@ def run_menu_mode(screen, clock):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                sys.exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 update_config_mode("Time")
                 return

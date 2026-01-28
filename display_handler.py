@@ -112,17 +112,32 @@ def show_waiting_message(screen, scr_w, scr_h, message="Waiting...", rotation=0)
         pygame.display.flip()
 
 def display_image(screen, image_path, scr_w, scr_h, rotation=0):
-    """Displays an image on the screen with rotation applied."""
+    """Displays an image on the screen with a black background."""
     try:
         img = Image.open(image_path).convert("RGBA")
-        canvas = make_landscape_and_fit(img, scr_w, scr_h, rotation=rotation)
-        surf = pil_to_surface(canvas)
+
+        canvas = make_landscape_and_fit(
+            img, scr_w, scr_h, rotation=rotation
+        )
+
+        # Create black background
+        bg = Image.new("RGBA", canvas.size, (0, 0, 0, 255))
+        bg.paste(canvas, (0, 0), canvas)
+
+        # Convert to pygame surface
+        surf = pil_to_surface(bg)
+
         screen.blit(surf, (0, 0))
         pygame.display.flip()
+
+        bg.save("output.png")
+
         return True
+
     except Exception as e:
         print(f"[display] Failed to display image {image_path}: {e}")
         return False
+
 
 def display_connecting_wifi(screen, scr_w, scr_h, rotation=0):
     """Wrapper to show wifi message with rotation."""

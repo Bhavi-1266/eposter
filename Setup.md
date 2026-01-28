@@ -22,6 +22,12 @@ Designed for unattended operation in conference rooms, meeting spaces, and event
 
 ---
 
+
+
+sudo systemctl status  eposter-admin.service
+
+
+
 ## System Requirements
 
 ### Hardware

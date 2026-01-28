@@ -17,5 +17,5 @@ ExecStart=/usr/bin/python3 /home/bhavy/Projects/eposter/config_portal.py
 Restart=always
 RestartSec=5
 
-[Install]
+[Install]bhavy
 WantedBy=multi-user.target

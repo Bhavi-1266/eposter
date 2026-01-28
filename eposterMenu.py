@@ -1,616 +1,476 @@
 #!/usr/bin/env python3
 """
-show_eposters.py
+eposterNoMenu.py (Master Display Controller)
 
-Streamlined ePoster display system with time-based scheduling.
-Displays posters based on their start/end times, falls back to cache if WiFi unavailable.
+Features:
+- Startup: Connect WiFi -> Fetch API -> Sync Cache -> Init Display.
+- Modes: Time (Nearest Logic), Scroll, and Interactive Menu.
+- Hot-Swap: Detects Device ID changes.
+- Rotated Menu: UI renders to a virtual surface and maps mouse inputs accordingly.
 """
+
 import os
 import sys
 import time
-from pathlib import Path
-import pygame
 import json
-from datetime import datetime, timedelta
+import pygame
+from pathlib import Path
+from datetime import datetime
 
-
-#importing module menu 
-from menu import run_menu
-
-
-# Import our modules
+# --- Custom Modules ---
 import wifi_connect
 import api_handler
 import cache_handler
 import display_handler
 
 # -------------------------
-# Configuration
+# Configuration & Constants
 # -------------------------
 SCRIPT_DIR = Path(__file__).parent
 CONFIG_FILE = SCRIPT_DIR / 'config.json'
 API_DATA_JSON = SCRIPT_DIR / "api_data.json"
-
-# Load configuration
-with open(CONFIG_FILE, 'r') as f:
-    config = json.load(f)
-
-POSTER_TOKEN = config.get('api', {}).get('poster_token')
-API_REFRESH_INTERVAL = 30  # Fetch from API every 30 seconds if WiFi connected
-DEFAULT_DISPLAY_TIME = int(config.get('display', {}).get('display_time', 5))
-DEVICE_ID = config.get('display', {}).get('device_id', 'default_device')
+CACHE_DIR = SCRIPT_DIR / "eposter_cache"
 
 # -------------------------
 # Utility Functions
 # -------------------------
-
-
 def log(message, level="INFO"):
-    """
-    Centralized logging function with timestamp and level.
-    
-    Args:
-        message: Log message
-        level: Log level (INFO, ERROR, DEBUG, WARNING)
-    """
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{timestamp}] [{level}] {message}")
 
+def load_config():
+    try:
+        with open(CONFIG_FILE, 'r') as f: return json.load(f)
+    except: return {}
+
+def update_config_mode(new_mode):
+    """Updates only the mode in config.json."""
+    try:
+        data = load_config()
+        if 'display' not in data: data['display'] = {}
+        data['display']['Mode'] = new_mode
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+        log(f"Config updated: Mode set to {new_mode}", "INFO")
+    except Exception as e:
+        log(f"Config write error: {e}", "ERROR")
 
 def parse_datetime(date_str, fmt="%d-%m-%Y %H:%M:%S"):
-    """
-    Parse datetime string safely.
-    
-    Args:
-        date_str: DateTime string to parse
-        fmt: Format string
-    
-    Returns:
-        datetime object or None if parsing fails
-    """
+    try: return datetime.strptime(date_str, fmt)
+    except: return None
+
+# ---------------------------------------------------------
+# DATA & SYNC HELPER
+# ---------------------------------------------------------
+def get_device_records(device_id):
+    if not API_DATA_JSON.exists(): return [], 5
     try:
-        return datetime.strptime(date_str, fmt)
+        with open(API_DATA_JSON, 'r') as f: data = json.load(f)
+        screens = data.get("screens", [])
+        my_screen = next((s for s in screens if str(s.get("screen_number")) == str(device_id)), None)
+        if not my_screen: return [], 5
+        records = []
+        for r in my_screen.get("records", []):
+            s = parse_datetime(r.get("start_date_time"))
+            e = parse_datetime(r.get("end_date_time"))
+            if s and e:
+                r["start_dt"] = s
+                r["end_dt"] = e
+                records.append(r)
+        return records, my_screen.get("minutes_per_record", 5)
     except Exception as e:
-        log(f"[parse_datetime] Failed to parse '{date_str}': {e}", "ERROR")
-        return None
+        log(f"Error parsing records: {e}", "ERROR")
+        return [], 5
 
+def refresh_data_and_cache(poster_token, device_id):
+    log(f"--- Refreshing Data for Device: {device_id} ---", "INFO")
+    if wifi_connect.ensure_wifi_connection():
+        new_data = api_handler.fetch_posters(poster_token)
+        if new_data:
+            with open(API_DATA_JSON, 'w') as f: json.dump(new_data, f)
+    records, duration = get_device_records(device_id)
+    cache_handler.sync_cache(records if records else [])
+    return records, duration
 
-def load_cached_api_data():
-    """
-    Load previously cached API data from api_data.json.
-    
-    Returns:
-        dict: Cached API data or None if not available
-    """
-    func_name = "load_cached_api_data"
-    try:
-        if not API_DATA_JSON.exists():
-            log(f"[{func_name}] No cached API data found", "DEBUG")
-            return None
-        
-        with open(API_DATA_JSON, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
-        log(f"[{func_name}] Loaded cached API data", "DEBUG")
-        return data
-        
-    except Exception as e:
-        log(f"[{func_name}] Error loading cached API data: {e}", "ERROR")
-        return None
+# ---------------------------------------------------------
+# STARTUP SEQUENCE
+# ---------------------------------------------------------
+def system_startup_check(screen):
+    scr_w, scr_h = screen.get_size()
+    cfg = load_config()
+    rotation = int(cfg.get('display', {}).get('rotation_degree', 0))
+    token = cfg.get('api', {}).get('poster_token')
+    dev_id = cfg.get('display', {}).get('device_id')
 
+    display_handler.show_waiting_message(screen, scr_w, scr_h, "System Startup...\nChecking WiFi & Syncing Data", rotation)
+    refresh_data_and_cache(token, dev_id)
+    display_handler.show_waiting_message(screen, scr_w, scr_h, "Startup Complete!\nStarting Mode...", rotation)
+    time.sleep(1)
 
-def get_screen_config(poster_data, device_id):
-    """
-    Extract screen configuration for this device.
+# ---------------------------------------------------------
+# MODE 1: TIME (Nearest/Active Logic)
+# ---------------------------------------------------------
+def run_time_mode(screen, clock):
+    log(">>> Entering TIME Mode", "INFO")
+    cfg = load_config()
+    device_id = cfg.get('display', {}).get('device_id')
+    token = cfg.get('api', {}).get('poster_token')
+    rotation = int(cfg.get('display', {}).get('rotation_degree', 0))
+    scr_w, scr_h = screen.get_size()
+    records, duration = get_device_records(device_id)
     
-    Args:
-        poster_data: Full API response data
-        device_id: This device's ID
-    
-    Returns:
-        tuple: (records, display_time) or (None, default_time)
-    """
-    func_name = "get_screen_config"
-    try:
-        screens = poster_data.get("screens", [])
-        my_screen = next((s for s in screens if s.get("screen_number") == device_id), None)
-        
-        if not my_screen:
-            log(f"[{func_name}] No configuration found for device: {device_id}", "WARNING")
-            return None, DEFAULT_DISPLAY_TIME
-        
-        records = my_screen.get("records", [])
-        display_time = my_screen.get("minutes_per_record", DEFAULT_DISPLAY_TIME)
-        
-        log(f"[{func_name}] Found {len(records)} records, display_time={display_time}s", "DEBUG")
-        return records, display_time
-        
-    except Exception as e:
-        log(f"[{func_name}] Error extracting screen config: {e}", "ERROR")
-        return None, DEFAULT_DISPLAY_TIME
+    poster_end_time = 0
+    next_sync_time = time.time() + 30 
+    last_config_check = time.time()
 
-
-def parse_poster_times(records):
-    """
-    Parse start and end datetime strings in poster records.
-    
-    Args:
-        records: List of poster records
-    
-    Returns:
-        list: Records with parsed datetime objects
-    """
-    func_name = "parse_poster_times"
-    parsed_records = []
-    
-    for record in records:
-        start_str = record.get("start_date_time")
-        end_str = record.get("end_date_time")
-        
-        start_dt = parse_datetime(start_str)
-        end_dt = parse_datetime(end_str)
-        
-        if start_dt and end_dt:
-            record["start_dt"] = start_dt
-            record["end_dt"] = end_dt
-            parsed_records.append(record)
-        else:
-            log(f"[{func_name}] Skipping record {record.get('id')} due to invalid dates", "WARNING")
-    
-    log(f"[{func_name}] Parsed {len(parsed_records)}/{len(records)} records successfully", "DEBUG")
-    return parsed_records
-
-
-def find_current_poster(records):
-    """
-    Find the poster that should be displayed right now based on time.
-    
-    Args:
-        records: List of poster records with parsed datetimes
-    
-    Returns:
-        dict: Current poster record or None
-    """
-    func_name = "find_current_poster"
-    now = datetime.now()
-    
-    # First pass: find any poster that's currently active
-    for record in records:
-        if record.get("start_dt") <= now <= record.get("end_dt"):
-            log(f"[{func_name}] Active poster found: ID={record.get('id')}, Title={record.get('poster_title', 'N/A')}", "INFO")
-            return record
-    
-    log(f"[{func_name}] No active poster at {now.strftime('%H:%M:%S')}, finding closest", "DEBUG")
-    
-    # Second pass: find the closest upcoming poster
-    upcoming = [r for r in records if r.get("start_dt") > now]
-    if upcoming:
-        closest = min(upcoming, key=lambda r: r.get("start_dt"))
-        time_until = (closest.get("start_dt") - now).total_seconds()
-        log(f"[{func_name}] Closest upcoming poster: ID={closest.get('id')}, starts in {time_until:.0f}s", "INFO")
-        return closest
-    
-    # Third pass: find the most recent past poster
-    past = [r for r in records if r.get("end_dt") < now]
-    if past:
-        closest = max(past, key=lambda r: r.get("end_dt"))
-        log(f"[{func_name}] Using most recent past poster: ID={closest.get('id')}", "INFO")
-        return closest
-    
-    log(f"[{func_name}] No suitable poster found", "WARNING")
-    return None
-
-
-def fetch_and_cache_posters(wifi_connected):
-    """
-    Fetch posters from API if WiFi is connected, otherwise use cache.
-    
-    Args:
-        wifi_connected: Boolean indicating WiFi status
-    
-    Returns:
-        tuple: (records, display_time, data_source)
-               data_source is 'api' or 'cache'
-    """
-    func_name = "fetch_and_cache_posters"
-    
-    if wifi_connected:
-        log(f"[{func_name}] WiFi connected, fetching from API...", "INFO")
-        try:
-            # Fetch from API
-            poster_data = api_handler.fetch_posters(POSTER_TOKEN)
-            
-            if poster_data:
-                # Save to cache
-                with open(API_DATA_JSON, 'w', encoding='utf-8') as f:
-                    json.dump(poster_data, f, indent=2)
-                
-                # Extract screen config
-                records, display_time = get_screen_config(poster_data, DEVICE_ID)
-                
-                if records:
-                    # Parse times
-                    records = parse_poster_times(records)
-                    # Sync image cache
-                    image_paths = cache_handler.sync_cache(records)
-                    log(f"[{func_name}] API fetch successful: {len(records)} records, {len(image_paths)} images cached", "INFO")
-                    return records, display_time, 'api'
-            
-            log(f"[{func_name}] API fetch failed, falling back to cache", "WARNING")
-        
-        except Exception as e:
-            log(f"[{func_name}] Exception during API fetch: {e}, falling back to cache", "ERROR")
-    
-    # Fall back to cached data
-    log(f"[{func_name}] Using cached data", "INFO")
-    cached_data = load_cached_api_data()
-    
-    if cached_data:
-        records, display_time = get_screen_config(cached_data, DEVICE_ID)
-        if records:
-            records = parse_poster_times(records)
-            log(f"[{func_name}] Loaded {len(records)} records from cache", "INFO")
-            return records, display_time, 'cache'
-    
-    log(f"[{func_name}] No data available (API or cache)", "ERROR")
-    return None, DEFAULT_DISPLAY_TIME, 'none'
-
-
-def print_poster_info(poster, image_index):
-    """
-    Print current poster information to console.
-    
-    Args:
-        poster: Poster record dictionary
-        image_index: Current image index
-    """
-    print("\n" + "="*70)
-    print(f"DISPLAYING POSTER #{image_index}")
-    print("="*70)
-    print(f"Poster ID:       {poster.get('id', 'N/A')}")
-    print(f"Title:           {poster.get('poster_title', 'N/A')}")
-    print(f"Topic:           {poster.get('topic', 'N/A')}")
-    print(f"Presenter:       {poster.get('main_presenter', 'N/A')}")
-    print(f"Institute:       {poster.get('institute', 'N/A')}")
-    print(f"Start Time:      {poster.get('start_date_time', 'N/A')}")
-    print(f"End Time:        {poster.get('end_date_time', 'N/A')}")
-    
-    now = datetime.now()
-    start_dt = poster.get('start_dt')
-    end_dt = poster.get('end_dt')
-    
-    if start_dt and end_dt:
-        if start_dt <= now <= end_dt:
-            remaining = (end_dt - now).total_seconds()
-            print(f"Status:          ACTIVE (ends in {remaining/60:.1f} minutes)")
-        elif start_dt > now:
-            until_start = (start_dt - now).total_seconds()
-            print(f"Status:          UPCOMING (starts in {until_start/60:.1f} minutes)")
-        else:
-            print(f"Status:          PAST")
-    
-    print("="*70 + "\n")
-
-
-def calculate_poster_display_duration(current_poster, display_time):
-    """
-    Calculate how long the current poster should be displayed.
-    
-    Optimizes display duration based on poster schedule:
-    - Active posters: show until end time or display_time (whichever is shorter)
-    - Upcoming posters: show until start time or display_time
-    - Past posters: show for display_time
-    
-    Args:
-        current_poster: Current poster dictionary with start_dt and end_dt
-        display_time: Default display time in seconds
-    
-    Returns:
-        float: Duration in seconds to display this poster
-    """
-    func_name = "calculate_poster_display_duration"
-    now_dt = datetime.now()
-    start_dt = current_poster.get('start_dt')
-    end_dt = current_poster.get('end_dt')
-    
-    # Calculate duration based on poster timing status
-    if start_dt <= now_dt <= end_dt:
-        # Currently active - show until end time or display_time, whichever is shorter
-        time_until_end = (end_dt - now_dt).total_seconds()
-        show_duration = min(display_time, time_until_end)
-        log(f"[{func_name}] Active poster: showing for {show_duration:.0f}s (until end or display_time)", "DEBUG")
-    elif start_dt > now_dt:
-        # Upcoming - show until start time or display_time
-        time_until_start = (start_dt - now_dt).total_seconds()
-        show_duration = min(display_time, time_until_start)
-        log(f"[{func_name}] Upcoming poster: showing for {show_duration:.0f}s (until start or display_time)", "DEBUG")
-    else:
-        # Past - just show for display_time
-        show_duration = display_time
-        log(f"[{func_name}] Past poster: showing for {show_duration:.0f}s", "DEBUG")
-    
-    return show_duration
-
-
-def display_manual_image(screen, image_path, scr_w, scr_h):
-    """
-    Display a manually selected image from the menu.
-    
-    Args:
-        screen: Pygame screen surface
-        image_path: Path to image file
-        scr_w: Screen width
-        scr_h: Screen height
-    
-    Returns:
-        bool: True if image displayed successfully, False if not found
-    """
-    func_name = "display_manual_image"
-    
-    if image_path.exists():
-        display_handler.display_image(screen, image_path, scr_w, scr_h)
-        pygame.display.flip()
-        log(f"[{func_name}] Manual image displayed: {image_path.name}", "INFO")
-        return True
-    else:
-        display_handler.show_waiting_message(screen, scr_w, scr_h, message="Image not found")
-        pygame.display.flip()
-        log(f"[{func_name}] Manual image not found: {image_path}", "WARNING")
-        time.sleep(2)
-        return False
-
-
-# -------------------------
-# Main Function
-# -------------------------
-
-def main():
-    """
-    Main application loop with optimized timing and efficient event handling.
-    
-    Flow:
-    1. Initialize display (essential first step)
-    2. Attempt WiFi connection (non-blocking)
-    3. Load data (API if WiFi, else cache)
-    4. Display posters based on schedule
-    5. Refresh data at calculated intervals (no redundant checks)
-    
-    Optimizations:
-    - Pre-calculate next refresh time to avoid constant time checks
-    - Pre-calculate poster display duration to avoid repeated datetime operations
-    - Single main loop without nested sub-loops for better control flow
-    - Event-driven menu handling via right-click
-    """
-    func_name = "main"
-    log(f"[{func_name}] ========== ePoster Display System Starting ==========", "INFO")
-    
-    # Validate configuration
-    if not POSTER_TOKEN:
-        log(f"[{func_name}] ERROR: POSTER_TOKEN not configured", "ERROR")
-        sys.exit(1)
-    
-    # -------------------------
-    # STEP 1: Initialize Display (Priority)
-    # -------------------------
-    log(f"[{func_name}] STEP 1: Initializing display...", "INFO")
-    display_result = display_handler.init_display()
-    
-    if display_result is None:
-        log(f"[{func_name}] Failed to initialize display. Exiting.", "ERROR")
-        sys.exit(1)
-    
-    screen, clock, scr_w, scr_h = display_result
-    log(f"[{func_name}] Display initialized: {scr_w}x{scr_h}", "INFO")
-    
-    # -------------------------
-    # STEP 2: Attempt WiFi Connection (Non-blocking)
-    # -------------------------
-    log(f"[{func_name}] STEP 2: Attempting WiFi connection...", "INFO")
-    display_handler.show_waiting_message(screen, scr_w, scr_h, message="Connecting to WiFi...")
-    pygame.display.flip()
-    
-    wifi_connected = wifi_connect.ensure_wifi_connection()
-    
-    if wifi_connected:
-        log(f"[{func_name}] WiFi connected successfully", "INFO")
-    else:
-        log(f"[{func_name}] WiFi connection failed, will use cached data", "WARNING")
-        display_handler.show_waiting_message(screen, scr_w, scr_h, message="WiFi unavailable - Using cached data")
-        pygame.display.flip()
-        time.sleep(2)
-    
-    # -------------------------
-    # STEP 3: Initialize API Handler
-    # -------------------------
-    log(f"[{func_name}] STEP 3: Initializing API handler...", "INFO")
-    api_handler.ensure_api_json()
-    
-    # -------------------------
-    # STEP 4: Initial Data Load
-    # -------------------------
-    log(f"[{func_name}] STEP 4: Performing initial data load", "INFO")
-    records, display_time, data_source = fetch_and_cache_posters(wifi_connected)
-    
-    # Calculate next refresh time (optimization: avoid checking time.time() every frame)
-    next_refresh_time = time.time() + API_REFRESH_INTERVAL
-    log(f"[{func_name}] Next data refresh scheduled at: {datetime.fromtimestamp(next_refresh_time).strftime('%H:%M:%S')}", "DEBUG")
-    
-    # -------------------------
-    # Main Display Loop Variables
-    # -------------------------
-    log(f"[{func_name}] STEP 5: Entering main display loop", "INFO")
-    
     running = True
-    display_manual = False  # Flag: are we showing a manually selected image?
-    manual_image_path = ""  # Path to manually selected image
-    current_poster = None   # Current poster being displayed
-    poster_display_end_time = 0  # When to switch to next poster (optimization)
-    
-    try:
-        while running:
-            # -------------------------
-            # Event Handling (Must happen every frame)
-            # -------------------------
-            for event in pygame.event.get():
-                # Window close event
-                if event.type == pygame.QUIT:
-                    running = False
-                    break
-                
-                # Right-click: Open menu for manual control
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-                    log(f"[{func_name}] Right-click detected, opening menu", "INFO")
-                    
-                    # Run menu and get user action
-                    action, payload = run_menu()
-                    
-                    # Process menu action
-                    if action == "TIMED_POSTER":
-                        # Return to automatic time-based display
-                        display_manual = False
-                        manual_image_path = ""
-                        display_handler.show_waiting_message(screen, scr_w, scr_h, message="Returning to timed poster display...")
-                        log(f"[{func_name}] Returning to timed poster display", "INFO")
-                    
-                    elif action == "IMAGE_SELECTED":
-                        # Switch to manual image display
-                        display_manual = True
-                        manual_image_path = payload
-                        log(f"[{func_name}] Manual image selected: {payload}", "INFO")
-                    
-                    elif action == "EXIT":
-                        # Exit application
-                        log(f"[{func_name}] Exit requested from menu", "INFO")
-                        running = False
-                        break
-            
-            # Convert manual_image_path to Path object if needed
-            manual_image_path = Path(manual_image_path) if manual_image_path else Path("")
-            
-            # -------------------------
-            # Manual Image Display Mode
-            # -------------------------
-            if display_manual:
-                # Display manually selected image
-                # If display fails (image not found), mode will automatically switch off
-                display_manual = display_manual_image(screen, manual_image_path, scr_w, scr_h)
-                
-                # Continue to next frame (skip automatic poster display logic)
-                clock.tick(30)  # Limit to 30 FPS
-                continue
-            
-            # -------------------------
-            # Automatic Poster Display Mode
-            # -------------------------
-            
-            # Check if it's time to refresh data from API
-            # (Optimization: only check once per interval, not every frame)
-            current_time = time.time()
-            if current_time >= next_refresh_time:
-                log(f"[{func_name}] Refresh interval reached, fetching new data", "DEBUG")
-                
-                # Check WiFi status
-                wifi_connected = wifi_connect.ensure_wifi_connection()
-                
-                # Fetch and cache new data
-                new_records, new_display_time, new_source = fetch_and_cache_posters(wifi_connected)
-                
-                # Update records if fetch was successful
-                if new_records:
-                    records = new_records
-                    display_time = new_display_time
-                    data_source = new_source
-                    log(f"[{func_name}] Data refreshed from {data_source}: {len(records)} records", "INFO")
-                    
-                    # Force poster re-evaluation on next frame
-                    poster_display_end_time = 0
-                
-                # Schedule next refresh
-                next_refresh_time = current_time + API_REFRESH_INTERVAL
-                log(f"[{func_name}] Next refresh scheduled at: {datetime.fromtimestamp(next_refresh_time).strftime('%H:%M:%S')}", "DEBUG")
-            
-            # -------------------------
-            # Check if we have poster data
-            # -------------------------
-            if not records:
-                log(f"[{func_name}] No poster data available", "WARNING")
-                display_handler.show_waiting_message(
-                    screen, scr_w, scr_h, 
-                    message="No poster data available\nWaiting for data..."
-                )
-                pygame.display.flip()
-                time.sleep(5)
-                continue
-            
-            # -------------------------
-            # Check if it's time to find/switch to next poster
-            # (Optimization: only recalculate when display time expires)
-            # -------------------------
-            if current_time >= poster_display_end_time:
-                # Find the poster that should be displayed right now
-                current_poster = find_current_poster(records)
-                
-                if not current_poster:
-                    log(f"[{func_name}] No suitable poster found for current time", "WARNING")
-                    display_handler.show_waiting_message(
-                        screen, scr_w, scr_h,
-                        message="No posters scheduled at this time"
-                    )
-                    pygame.display.flip()
-                    time.sleep(5)
-                    continue
-                
-                # Get poster details
-                poster_id = current_poster.get('id')
-                image_path = SCRIPT_DIR / "eposter_cache" / f"{poster_id}.png"
-                
-                # Print poster info to console
-                print_poster_info(current_poster, poster_id)
-                
-                # Check if image file exists
-                if not image_path.exists():
-                    log(f"[{func_name}] Image not found for poster {poster_id}: {image_path}", "ERROR")
-                    display_handler.show_waiting_message(
-                        screen, scr_w, scr_h,
-                        message=f"Image not found for poster {poster_id}"
-                    )
-                    pygame.display.flip()
-                    time.sleep(5)
-                    continue
-                
-                # Display the poster image
-                if not display_handler.display_image(screen, str(image_path), scr_w, scr_h):
-                    log(f"[{func_name}] Failed to display image: {image_path}", "ERROR")
-                    time.sleep(1)
-                    continue
-                
-                pygame.display.flip()
-                
-                # Calculate how long to display this poster
-                # (Optimization: calculate once, reuse until time expires)
-                show_duration = calculate_poster_display_duration(current_poster, display_time)
-                poster_display_end_time = current_time + show_duration
-                
-                log(f"[{func_name}] Poster display scheduled until: {datetime.fromtimestamp(poster_display_end_time).strftime('%H:%M:%S')}", "DEBUG")
-            
-            # -------------------------
-            # Frame Rate Control
-            # -------------------------
-            # Limit frame rate to reduce CPU usage
-            clock.tick(30)  # 30 FPS is sufficient for a display system
+    while running:
+        current_time = time.time()
         
-    except KeyboardInterrupt:
-        log(f"[{func_name}] KeyboardInterrupt received, shutting down gracefully", "INFO")
-    
-    except Exception as e:
-        log(f"[{func_name}] Unexpected error in main loop: {e}", "ERROR")
-        import traceback
-        traceback.print_exc()
-    
-    finally:
-        log(f"[{func_name}] ========== ePoster Display System Shutting Down ==========", "INFO")
-        pygame.quit()
+        # Check Config / Device ID
+        if current_time - last_config_check > 2:
+            check_cfg = load_config()
+            if check_cfg.get('display', {}).get('Mode') != "Time": return
+            rotation = int(check_cfg.get('display', {}).get('rotation_degree', 0))
+            new_id = check_cfg.get('display', {}).get('device_id')
+            if str(new_id) != str(device_id):
+                display_handler.show_waiting_message(screen, scr_w, scr_h, "Device ID Changed\nRefetching Data...", rotation)
+                device_id = new_id
+                records, duration = refresh_data_and_cache(token, device_id)
+                poster_end_time = 0 
+            last_config_check = current_time
 
+        # Auto Sync
+        if current_time > next_sync_time:
+            records, duration = refresh_data_and_cache(token, device_id)
+            next_sync_time = current_time + 30
+            poster_end_time = 0 
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN: 
+                update_config_mode("Menu")
+                return
+
+        if not records:
+            display_handler.show_waiting_message(screen, scr_w, scr_h, f"No Schedule for Device {device_id}", rotation)
+            pygame.display.flip()
+            time.sleep(1)
+            continue
+            
+        if current_time >= poster_end_time:
+            now = datetime.now()
+            def get_dist(r):
+                if r["start_dt"] <= now <= r["end_dt"]: return 0
+                elif now < r["start_dt"]: return (r["start_dt"] - now).total_seconds()
+                else: return (now - r["end_dt"]).total_seconds()
+            
+            active = min(records, key=get_dist)
+            if active:
+                pid = active.get("id") or active.get("PosterId")
+                path = cache_handler.get_image_path(pid)
+                if path and path.exists():
+                    display_handler.display_image(screen, path, scr_w, scr_h, rotation)
+                    poster_end_time = current_time + (max(5, min(duration, (active["end_dt"]-now).total_seconds())) if get_dist(active)==0 else 5)
+                else:
+                    display_handler.show_waiting_message(screen, scr_w, scr_h, f"Downloading ID: {pid}...", rotation)
+                    cache_handler.sync_cache([active]) 
+                    poster_end_time = current_time + 2
+            else:
+                display_handler.show_waiting_message(screen, scr_w, scr_h, "No Posters Scheduled", rotation)
+                poster_end_time = current_time + 5
+        clock.tick(30)
+
+# ---------------------------------------------------------
+# MODE 2: SCROLL
+# ---------------------------------------------------------
+def run_scroll_mode(screen, clock):
+    log(">>> Entering SCROLL Mode", "INFO")
+    cfg = load_config()
+    device_id = cfg.get('display', {}).get('device_id')
+    token = cfg.get('api', {}).get('poster_token')
+    scroll_delay = int(cfg.get('display', {}).get('Auto_Scroll', 5))
+    rotation = int(cfg.get('display', {}).get('rotation_degree', 0))
+    scr_w, scr_h = screen.get_size()
+
+    def get_valid_images(recs):
+        if recs:
+            ids = [str(r.get("id") or r.get("PosterId")) for r in recs]
+            imgs = [p for i in ids if (p := cache_handler.get_image_path(i))]
+            return imgs
+        return sorted([f for f in CACHE_DIR.glob('*') if f.suffix.lower() in ['.png', '.jpg', '.jpeg']])
+
+    records, _ = get_device_records(device_id)
+    images = get_valid_images(records)
+    index = 0
+    next_switch = 0
+    next_sync_time = time.time() + 30
+    last_config_check = time.time()
+
+    running = True
+    while running:
+        current_time = time.time()
+        if current_time - last_config_check > 2:
+            check_cfg = load_config()
+            if check_cfg.get('display', {}).get('Mode') != "Scroll": return
+            rotation = int(check_cfg.get('display', {}).get('rotation_degree', 0))
+            scroll_delay = int(check_cfg.get('display', {}).get('Auto_Scroll', 5))
+            new_id = check_cfg.get('display', {}).get('device_id')
+            if str(new_id) != str(device_id):
+                display_handler.show_waiting_message(screen, scr_w, scr_h, "Device ID Changed...", rotation)
+                device_id = new_id
+                records, _ = refresh_data_and_cache(token, device_id)
+                images = get_valid_images(records)
+                index = 0
+            last_config_check = current_time
+
+        if current_time > next_sync_time:
+            records, _ = refresh_data_and_cache(token, device_id)
+            images = get_valid_images(records)
+            next_sync_time = current_time + 30
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN: 
+                update_config_mode("Menu")
+                return
+
+        if not images:
+            display_handler.show_waiting_message(screen, scr_w, scr_h, f"No Images (ID: {device_id})", rotation)
+            pygame.display.flip()
+            time.sleep(2)
+            images = get_valid_images(records)
+            continue
+
+        if current_time >= next_switch:
+            if index >= len(images): index = 0
+            if images[index].exists():
+                display_handler.display_image(screen, images[index], scr_w, scr_h, rotation)
+                pygame.display.flip()
+            index = (index + 1) % len(images)
+            next_switch = current_time + scroll_delay
+        clock.tick(30)
+
+# ---------------------------------------------------------
+# MODE 3: MENU (Rotated Interactive)
+# ---------------------------------------------------------
+def run_menu_mode(screen, clock):
+    log(">>> Entering MENU Mode", "INFO")
+    
+    cfg = load_config()
+    device_id = cfg.get('display', {}).get('device_id')
+    token = cfg.get('api', {}).get('poster_token')
+    rotation = int(cfg.get('display', {}).get('rotation_degree', 0))
+
+    # --- SETUP ROTATED COORDINATES ---
+    PHY_W, PHY_H = screen.get_size()
+
+    # Define the "Logical" (Virtual) screen size based on rotation
+    # If 90 or 270, we swap dimensions for drawing, then rotate at end
+    if rotation in [90, 270]:
+        UI_W, UI_H = PHY_H, PHY_W
+    else:
+        UI_W, UI_H = PHY_W, PHY_H
+
+    # Create Virtual Surface for Drawing
+    ui_surface = pygame.Surface((UI_W, UI_H))
+
+    # --- STYLE CONSTANTS ---
+    BG_COLOR = (18, 18, 18)
+    TOPBAR_COLOR = (28, 28, 28)
+    BUTTON_COLOR = (50, 90, 160)
+    BUTTON_HOVER = (70, 120, 200)
+    ITEM_BG = (35, 35, 35)
+    HOVER_COLOR = (60, 60, 60)
+    TEXT_COLOR = (230, 230, 230)
+    
+    # Adaptive layout based on Virtual Width
+    IMAGE_MAX_WIDTH = int(UI_W * 0.8)
+    IMAGE_MAX_HEIGHT = int(UI_H * 0.5)
+    TOPBAR_HEIGHT = 70
+    BUTTON_WIDTH = 220
+    BUTTON_HEIGHT = 45
+    ITEM_PADDING = 25
+    TEXT_HEIGHT = 30
+    SCROLL_SPEED = 50
+
+    font = pygame.font.SysFont("arial", 22)
+    button_font = pygame.font.SysFont("arial", 24, bold=True)
+    
+    button_rect = pygame.Rect(30, TOPBAR_HEIGHT//2 - BUTTON_HEIGHT//2, BUTTON_WIDTH, BUTTON_HEIGHT)
+
+    # Mouse coordinate mapper
+    def map_mouse(px, py):
+        """Maps physical screen click (px, py) to virtual UI coordinates (vx, vy)."""
+        if rotation == 0: return px, py
+        if rotation == 90: return py, PHY_W - px
+        if rotation == 180: return PHY_W - px, PHY_H - py
+        if rotation == 270: return PHY_H - py, px
+        return px, py
+
+    def load_menu_images():
+        loaded_items = []
+        if not CACHE_DIR.exists(): CACHE_DIR.mkdir()
+        files = sorted([f for f in CACHE_DIR.glob('*') if f.suffix.lower() in ['.png', '.jpg', '.jpeg']])
+        for path in files:
+            try:
+                img = pygame.image.load(path).convert_alpha()
+                w, h = img.get_size()
+                scale = min(IMAGE_MAX_WIDTH / w, IMAGE_MAX_HEIGHT / h)
+                img = pygame.transform.smoothscale(img, (int(w * scale), int(h * scale)))
+                h_final = img.get_height() + TEXT_HEIGHT + ITEM_PADDING * 2
+                loaded_items.append({"image": img, "path": path, "height": h_final})
+            except Exception as e:
+                log(f"Error loading {path.name}: {e}", "WARN")
+        return loaded_items
+
+    display_handler.show_waiting_message(screen, PHY_W, PHY_H, "Loading Menu...", rotation)
+    items = load_menu_images()
+    
+    scroll_y = 0
+    next_sync_time = time.time() + 30
+    last_config_check = time.time()
+
+    running = True
+    while running:
+        clock.tick(60)
+        ui_surface.fill(BG_COLOR)
+        
+        # 1. Input Handling
+        raw_mx, raw_my = pygame.mouse.get_pos()
+        mx, my = map_mouse(raw_mx, raw_my) # Virtual Coordinates
+        
+        current_time = time.time()
+
+        # Config Check
+        if current_time - last_config_check > 2:
+            check_cfg = load_config()
+            if check_cfg.get('display', {}).get('Mode') != "Menu": return
+            
+            # Check Device ID Change
+            new_id = check_cfg.get('display', {}).get('device_id')
+            if str(new_id) != str(device_id):
+                display_handler.show_waiting_message(screen, PHY_W, PHY_H, "Device ID Changed...", rotation)
+                device_id = new_id
+                refresh_data_and_cache(token, device_id)
+                items = load_menu_images()
+                scroll_y = 0
+
+            # Check Rotation Change (Requires restart of mode to recalc UI dimensions)
+            new_rot = int(check_cfg.get('display', {}).get('rotation_degree', 0))
+            if new_rot != rotation:
+                return # Exiting will restart the mode in main loop
+                
+            last_config_check = current_time
+
+        # Auto Sync
+        if current_time > next_sync_time:
+            refresh_data_and_cache(token, device_id)
+            next_sync_time = current_time + 30
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                update_config_mode("Time")
+                return
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # Use mapped virtual coordinates for logic
+                if event.button == 1:
+                    if button_rect.collidepoint(mx, my):
+                        update_config_mode("Time")
+                        return
+                    
+                    y_offset = scroll_y + TOPBAR_HEIGHT + 20
+                    for item in items:
+                        if y_offset + item['height'] > 0 and y_offset < UI_H:
+                            r = pygame.Rect(40, y_offset, UI_W-80, item['height'])
+                            if r.collidepoint(mx, my):
+                                # Display single image (Standard handler handles rotation)
+                                display_handler.display_image(screen, item['path'], PHY_W, PHY_H, rotation)
+                                waiting = True
+                                t_start = time.time()
+                                while waiting:
+                                    for e in pygame.event.get():
+                                        if e.type in [pygame.MOUSEBUTTONDOWN, pygame.KEYDOWN]: waiting = False
+                                    if time.time() - t_start > 60: waiting = False
+                                    clock.tick(30)
+                                break
+                        y_offset += item['height'] + 25
+                elif event.button == 4: scroll_y += SCROLL_SPEED
+                elif event.button == 5: scroll_y -= SCROLL_SPEED
+
+        # 2. Layout & Drawing (To Virtual Surface)
+        total_h = sum(i["height"] + 25 for i in items)
+        if total_h > 0:
+            max_s = max(0, total_h - (UI_H - TOPBAR_HEIGHT))
+            scroll_y = max(-max_s, min(0, scroll_y))
+        
+        # Draw Topbar
+        pygame.draw.rect(ui_surface, TOPBAR_COLOR, (0, 0, UI_W, TOPBAR_HEIGHT))
+        c = BUTTON_HOVER if button_rect.collidepoint(mx, my) else BUTTON_COLOR
+        pygame.draw.rect(ui_surface, c, button_rect, border_radius=8)
+        txt = button_font.render("Start Schedule", True, TEXT_COLOR)
+        ui_surface.blit(txt, (button_rect.centerx - txt.get_width()//2, button_rect.centery - txt.get_height()//2))
+
+        # Draw Items
+        y = scroll_y + TOPBAR_HEIGHT + 20
+        for item in items:
+            if y + item["height"] > 0 and y < UI_H:
+                rect = pygame.Rect(40, y, UI_W-80, item["height"])
+                bg = HOVER_COLOR if rect.collidepoint(mx, my) else ITEM_BG
+                pygame.draw.rect(ui_surface, bg, rect, border_radius=12)
+                img = item["image"]
+                ui_surface.blit(img, (UI_W//2 - img.get_width()//2, y + ITEM_PADDING))
+            y += item["height"] + 25
+
+        # 3. Final Rotation & Display
+        if rotation == 0:
+            screen.blit(ui_surface, (0, 0))
+        else:
+            # Rotate virtual surface to fit physical screen
+            # Note: Pygame rotates Counter-Clockwise.
+            # -rotation aligns it with the visual expectation.
+            rotated_surface = pygame.transform.rotate(ui_surface, -rotation)
+            
+            # Center it (handles slight aspect ratio weirdness if any, mostly for safety)
+            rx = (PHY_W - rotated_surface.get_width()) // 2
+            ry = (PHY_H - rotated_surface.get_height()) // 2
+            screen.blit(rotated_surface, (rx, ry))
+
+        pygame.display.flip()
+
+# ---------------------------------------------------------
+# MAIN
+# ---------------------------------------------------------
+def main():
+    log("========== Master Controller Started ==========", "INFO")
+    pygame.init()
+    pygame.mouse.set_visible(True)
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    clock = pygame.time.Clock()
+    
+    system_startup_check(screen)
+    
+    while True:
+        cfg = load_config()
+        mode = cfg.get('display', {}).get('Mode', 'Menu')
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                sys.exit()
+        if mode == "Menu":
+            pygame.mouse.set_visible(True)
+            run_menu_mode(screen, clock)
+        else:
+            pygame.mouse.set_visible(False)
+            if mode == "Time":
+                run_time_mode(screen, clock)
+            elif mode == "Scroll":
+                run_scroll_mode(screen, clock)
+            else:
+                update_config_mode("Menu")
 
 if __name__ == "__main__":
     main()
