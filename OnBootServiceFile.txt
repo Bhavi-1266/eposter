@@ -1,0 +1,22 @@
+[Unit]
+Description=ePoster Display Controller
+# Wait for the network and the graphical desktop to be ready
+After=network.target graphical.target
+
+[Service]
+User=rock
+Group=rock
+# The folder where your script and custom modules live
+WorkingDirectory=/home/rock/Desktop/eposter_latest/eposter-main
+# Path to your venv python followed by the script path
+ExecStart=/home/rock/Desktop/eposter_latest/eposter-main/venv/bin/python3 /home/rock/Desktop/eposter_latest/eposter-main/eposterNoMenu.py
+
+# Crucial for Pygame/GUI apps
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/rock/.Xauthority
+
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=graphical.target

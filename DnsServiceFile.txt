@@ -11,11 +11,11 @@ Group=root
 WorkingDirectory=/home/bhavy/Projects/eposter
 
 # Command to start the script
-ExecStart=/usr/bin/python3 /home/bhavy/Projects/eposter/config_portal.py
+ExecStart=/home/bhavy/Projects/e/config_portal.py
 
 # Restart automatically if it crashes
 Restart=always
 RestartSec=5
 
-[Install]bhavy
+[Install]
 WantedBy=multi-user.target
