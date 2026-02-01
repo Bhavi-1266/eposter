@@ -7,6 +7,7 @@
     "password2": "Bms@1266",
     "connect_timeout": 2
   },
+  "password": "hello",
   "api": {
     "poster_token": "A9993E364706816ABA3E25717850C26C9CD0D89D",
     "poster_api_url": "https://myeposter.com/api/v1/eposter-list",

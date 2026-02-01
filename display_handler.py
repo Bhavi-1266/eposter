@@ -10,7 +10,69 @@ import time
 import json
 from PIL import Image
 import pygame
+import socket
 
+def get_local_ip():
+    """Dynamically find the local IP address."""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except:
+        return "127.0.0.1"
+
+def display_url(screen, scr_w, scr_h, rotation=0):
+    """
+    Overlays a centered dark bar with grey text.
+    Removed .flip() to prevent flickering.
+    """
+    try:
+        import socket
+        def get_local_ip():
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                s.connect(("8.8.8.8", 80))
+                ip = s.getsockname()[0]
+                s.close()
+                return ip
+            except: return "127.0.0.1"
+
+        ip_addr = get_local_ip()
+        url_text = f"Admin Portal: http://{ip_addr}"
+        font = pygame.font.SysFont("Arial", 16, bold=True)
+        
+        if rotation in [90, 270]:
+            logical_w = scr_h
+        else:
+            logical_w = scr_w
+
+        bar_height = 25
+        bar_surface = pygame.Surface((logical_w, bar_height), pygame.SRCALPHA)
+        bar_surface.fill((20, 20, 20, 230)) 
+        
+        text_surf = font.render(url_text, True, (90, 90, 90))
+        text_rect = text_surf.get_rect(center=(logical_w // 2, bar_height // 2))
+        bar_surface.blit(text_surf, text_rect)
+        
+        if rotation == 0:
+            screen.blit(bar_surface, (0, scr_h - bar_height))
+        else:
+            rotated_bar = pygame.transform.rotate(bar_surface, -rotation)
+            if rotation == 90:
+                screen.blit(rotated_bar, (0, 0))
+            elif rotation == 180:
+                screen.blit(rotated_bar, (0, 0))
+            elif rotation == 270:
+                screen.blit(rotated_bar, (scr_w - rotated_bar.get_width(), 0))
+            else:
+                screen.blit(rotated_bar, (0, scr_h - bar_height))
+        # NO FLIP HERE
+    except Exception as e:
+        print(f"[display] Error overlaying URL: {e}")
+
+    
 def get_rotation_degree():
     """
     Get the current rotation degree from config file.
@@ -117,7 +179,7 @@ def display_image(screen, image_path, scr_w, scr_h, rotation=0):
         img = Image.open(image_path).convert("RGBA")
 
         canvas = make_landscape_and_fit(
-            img, scr_w, scr_h, rotation=rotation
+            img, scr_w, scr_h, rotation=-rotation
         )
 
         # Create black background

@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 """
 eposterNoMenu.py (Master Display Controller)
-
-Features:
-- Startup: Connect WiFi -> Fetch API -> Sync Cache -> Init Display.
-- Modes: Time (Nearest Logic), Scroll, and Interactive Menu.
-- Hot-Swap: Detects Device ID changes.
-- Rotated Menu: UI renders to a virtual surface and maps mouse inputs accordingly.
 """
 
 import os
@@ -16,6 +10,7 @@ import json
 import pygame
 from pathlib import Path
 from datetime import datetime
+import socket
 
 # --- Custom Modules ---
 import wifi_connect
@@ -44,7 +39,6 @@ def load_config():
     except: return {}
 
 def update_config_mode(new_mode):
-    """Updates only the mode in config.json."""
     try:
         data = load_config()
         if 'display' not in data: data['display'] = {}
@@ -126,8 +120,7 @@ def run_time_mode(screen, clock):
     running = True
     while running:
         current_time = time.time()
-        
-        # Check Config / Device ID
+    
         if current_time - last_config_check > 2:
             check_cfg = load_config()
             if check_cfg.get('display', {}).get('Mode') != "Time": return
@@ -140,7 +133,6 @@ def run_time_mode(screen, clock):
                 poster_end_time = 0 
             last_config_check = current_time
 
-        # Auto Sync
         if current_time > next_sync_time:
             records, duration = refresh_data_and_cache(token, device_id)
             next_sync_time = current_time + 30
@@ -149,12 +141,10 @@ def run_time_mode(screen, clock):
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_q: sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN: 
-                update_config_mode("Menu")
-                return
 
         if not records:
             display_handler.show_waiting_message(screen, scr_w, scr_h, f"No Schedule for Device {device_id}", rotation)
+            display_handler.display_url(screen, scr_w, scr_h, rotation)
             pygame.display.flip()
             time.sleep(1)
             continue
@@ -172,13 +162,19 @@ def run_time_mode(screen, clock):
                 path = cache_handler.get_image_path(pid)
                 if path and path.exists():
                     display_handler.display_image(screen, path, scr_w, scr_h, rotation)
+                    display_handler.display_url(screen, scr_w, scr_h, rotation)
+                    pygame.display.flip()
                     poster_end_time = current_time + (max(5, min(duration, (active["end_dt"]-now).total_seconds())) if get_dist(active)==0 else 5)
                 else:
                     display_handler.show_waiting_message(screen, scr_w, scr_h, f"Downloading ID: {pid}...", rotation)
+                    display_handler.display_url(screen, scr_w, scr_h, rotation)
+                    pygame.display.flip()
                     cache_handler.sync_cache([active]) 
                     poster_end_time = current_time + 2
             else:
                 display_handler.show_waiting_message(screen, scr_w, scr_h, "No Posters Scheduled", rotation)
+                display_handler.display_url(screen, scr_w, scr_h, rotation)
+                pygame.display.flip()
                 poster_end_time = current_time + 5
         clock.tick(30)
 
@@ -211,6 +207,7 @@ def run_scroll_mode(screen, clock):
     running = True
     while running:
         current_time = time.time()
+        
         if current_time - last_config_check > 2:
             check_cfg = load_config()
             if check_cfg.get('display', {}).get('Mode') != "Scroll": return
@@ -233,12 +230,10 @@ def run_scroll_mode(screen, clock):
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_q: sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN: 
-                update_config_mode("Menu")
-                return
 
         if not images:
             display_handler.show_waiting_message(screen, scr_w, scr_h, f"No Images (ID: {device_id})", rotation)
+            display_handler.display_url(screen, scr_w, scr_h, rotation)
             pygame.display.flip()
             time.sleep(2)
             images = get_valid_images(records)
@@ -248,6 +243,7 @@ def run_scroll_mode(screen, clock):
             if index >= len(images): index = 0
             if images[index].exists():
                 display_handler.display_image(screen, images[index], scr_w, scr_h, rotation)
+                display_handler.display_url(screen, scr_w, scr_h, rotation)
                 pygame.display.flip()
             index = (index + 1) % len(images)
             next_switch = current_time + scroll_delay
@@ -258,52 +254,27 @@ def run_scroll_mode(screen, clock):
 # ---------------------------------------------------------
 def run_menu_mode(screen, clock):
     log(">>> Entering MENU Mode", "INFO")
-    
     cfg = load_config()
     device_id = cfg.get('display', {}).get('device_id')
     token = cfg.get('api', {}).get('poster_token')
     rotation = int(cfg.get('display', {}).get('rotation_degree', 0))
-
-    # --- SETUP ROTATED COORDINATES ---
     PHY_W, PHY_H = screen.get_size()
 
-    # Define the "Logical" (Virtual) screen size based on rotation
-    # If 90 or 270, we swap dimensions for drawing, then rotate at end
-    if rotation in [90, 270]:
-        UI_W, UI_H = PHY_H, PHY_W
-    else:
-        UI_W, UI_H = PHY_W, PHY_H
+    if rotation in [90, 270]: UI_W, UI_H = PHY_H, PHY_W
+    else: UI_W, UI_H = PHY_W, PHY_H
 
-    # Create Virtual Surface for Drawing
     ui_surface = pygame.Surface((UI_W, UI_H))
-
-    # --- STYLE CONSTANTS ---
-    BG_COLOR = (18, 18, 18)
-    TOPBAR_COLOR = (28, 28, 28)
-    BUTTON_COLOR = (50, 90, 160)
-    BUTTON_HOVER = (70, 120, 200)
-    ITEM_BG = (35, 35, 35)
-    HOVER_COLOR = (60, 60, 60)
-    TEXT_COLOR = (230, 230, 230)
+    BG_COLOR, TOPBAR_COLOR = (18, 18, 18), (28, 28, 28)
+    BUTTON_COLOR, BUTTON_HOVER = (50, 90, 160), (70, 120, 200)
+    ITEM_BG, HOVER_COLOR, TEXT_COLOR = (35, 35, 35), (60, 60, 60), (230, 230, 230)
     
-    # Adaptive layout based on Virtual Width
-    IMAGE_MAX_WIDTH = int(UI_W * 0.8)
-    IMAGE_MAX_HEIGHT = int(UI_H * 0.5)
-    TOPBAR_HEIGHT = 70
-    BUTTON_WIDTH = 220
-    BUTTON_HEIGHT = 45
-    ITEM_PADDING = 25
-    TEXT_HEIGHT = 30
-    SCROLL_SPEED = 50
-
-    font = pygame.font.SysFont("arial", 22)
+    IMAGE_MAX_WIDTH, IMAGE_MAX_HEIGHT = int(UI_W * 0.8), int(UI_H * 0.5)
+    TOPBAR_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT = 70, 220, 45
+    ITEM_PADDING, TEXT_HEIGHT, SCROLL_SPEED = 25, 30, 50
     button_font = pygame.font.SysFont("arial", 24, bold=True)
-    
     button_rect = pygame.Rect(30, TOPBAR_HEIGHT//2 - BUTTON_HEIGHT//2, BUTTON_WIDTH, BUTTON_HEIGHT)
 
-    # Mouse coordinate mapper
     def map_mouse(px, py):
-        """Maps physical screen click (px, py) to virtual UI coordinates (vx, vy)."""
         if rotation == 0: return px, py
         if rotation == 90: return py, PHY_W - px
         if rotation == 180: return PHY_W - px, PHY_H - py
@@ -312,7 +283,6 @@ def run_menu_mode(screen, clock):
 
     def load_menu_images():
         loaded_items = []
-        if not CACHE_DIR.exists(): CACHE_DIR.mkdir()
         files = sorted([f for f in CACHE_DIR.glob('*') if f.suffix.lower() in ['.png', '.jpg', '.jpeg']])
         for path in files:
             try:
@@ -320,78 +290,47 @@ def run_menu_mode(screen, clock):
                 w, h = img.get_size()
                 scale = min(IMAGE_MAX_WIDTH / w, IMAGE_MAX_HEIGHT / h)
                 img = pygame.transform.smoothscale(img, (int(w * scale), int(h * scale)))
-                h_final = img.get_height() + TEXT_HEIGHT + ITEM_PADDING * 2
-                loaded_items.append({"image": img, "path": path, "height": h_final})
-            except Exception as e:
-                log(f"Error loading {path.name}: {e}", "WARN")
+                loaded_items.append({"image": img, "path": path, "height": img.get_height() + TEXT_HEIGHT + ITEM_PADDING * 2})
+            except: pass
         return loaded_items
-
+    
     display_handler.show_waiting_message(screen, PHY_W, PHY_H, "Loading Menu...", rotation)
     items = load_menu_images()
-    
-    scroll_y = 0
-    next_sync_time = time.time() + 30
-    last_config_check = time.time()
+    scroll_y, next_sync_time, last_config_check = 0, time.time() + 30, time.time()
 
     running = True
     while running:
         clock.tick(60)
         ui_surface.fill(BG_COLOR)
-        
-        # 1. Input Handling
         raw_mx, raw_my = pygame.mouse.get_pos()
-        mx, my = map_mouse(raw_mx, raw_my) # Virtual Coordinates
-        
+        mx, my = map_mouse(raw_mx, raw_my)
         current_time = time.time()
 
-        # Config Check
         if current_time - last_config_check > 2:
             check_cfg = load_config()
             if check_cfg.get('display', {}).get('Mode') != "Menu": return
-            
-            # Check Device ID Change
-            new_id = check_cfg.get('display', {}).get('device_id')
-            if str(new_id) != str(device_id):
-                display_handler.show_waiting_message(screen, PHY_W, PHY_H, "Device ID Changed...", rotation)
-                device_id = new_id
-                refresh_data_and_cache(token, device_id)
-                items = load_menu_images()
-                scroll_y = 0
-
-            # Check Rotation Change (Requires restart of mode to recalc UI dimensions)
-            new_rot = int(check_cfg.get('display', {}).get('rotation_degree', 0))
-            if new_rot != rotation:
-                return # Exiting will restart the mode in main loop
-                
+            if str(check_cfg.get('display', {}).get('device_id')) != str(device_id):
+                return # Restart mode
+            if int(check_cfg.get('display', {}).get('rotation_degree', 0)) != rotation:
+                return 
             last_config_check = current_time
-
-        # Auto Sync
-        if current_time > next_sync_time:
-            refresh_data_and_cache(token, device_id)
-            next_sync_time = current_time + 30
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
-                sys.exit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                update_config_mode("Time")
-                return
-
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_q: sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # Use mapped virtual coordinates for logic
                 if event.button == 1:
                     if button_rect.collidepoint(mx, my):
                         update_config_mode("Time")
                         return
-                    
                     y_offset = scroll_y + TOPBAR_HEIGHT + 20
                     for item in items:
                         if y_offset + item['height'] > 0 and y_offset < UI_H:
-                            r = pygame.Rect(40, y_offset, UI_W-80, item['height'])
-                            if r.collidepoint(mx, my):
-                                # Display single image (Standard handler handles rotation)
+                            if pygame.Rect(40, y_offset, UI_W-80, item['height']).collidepoint(mx, my):
                                 display_handler.display_image(screen, item['path'], PHY_W, PHY_H, rotation)
+                                # URL on top of preview
+                                display_handler.display_url(screen, PHY_W, PHY_H, rotation)
+                                pygame.display.flip()
                                 waiting = True
                                 t_start = time.time()
                                 while waiting:
@@ -404,44 +343,31 @@ def run_menu_mode(screen, clock):
                 elif event.button == 4: scroll_y += SCROLL_SPEED
                 elif event.button == 5: scroll_y -= SCROLL_SPEED
 
-        # 2. Layout & Drawing (To Virtual Surface)
         total_h = sum(i["height"] + 25 for i in items)
         if total_h > 0:
-            max_s = max(0, total_h - (UI_H - TOPBAR_HEIGHT))
-            scroll_y = max(-max_s, min(0, scroll_y))
+            scroll_y = max(-max(0, total_h - (UI_H - TOPBAR_HEIGHT)), min(0, scroll_y))
         
-        # Draw Topbar
         pygame.draw.rect(ui_surface, TOPBAR_COLOR, (0, 0, UI_W, TOPBAR_HEIGHT))
         c = BUTTON_HOVER if button_rect.collidepoint(mx, my) else BUTTON_COLOR
         pygame.draw.rect(ui_surface, c, button_rect, border_radius=8)
         txt = button_font.render("Start Schedule", True, TEXT_COLOR)
         ui_surface.blit(txt, (button_rect.centerx - txt.get_width()//2, button_rect.centery - txt.get_height()//2))
 
-        # Draw Items
         y = scroll_y + TOPBAR_HEIGHT + 20
         for item in items:
             if y + item["height"] > 0 and y < UI_H:
                 rect = pygame.Rect(40, y, UI_W-80, item["height"])
                 bg = HOVER_COLOR if rect.collidepoint(mx, my) else ITEM_BG
                 pygame.draw.rect(ui_surface, bg, rect, border_radius=12)
-                img = item["image"]
-                ui_surface.blit(img, (UI_W//2 - img.get_width()//2, y + ITEM_PADDING))
+                ui_surface.blit(item["image"], (UI_W//2 - item["image"].get_width()//2, y + ITEM_PADDING))
             y += item["height"] + 25
 
-        # 3. Final Rotation & Display
-        if rotation == 0:
-            screen.blit(ui_surface, (0, 0))
+        if rotation == 0: screen.blit(ui_surface, (0, 0))
         else:
-            # Rotate virtual surface to fit physical screen
-            # Note: Pygame rotates Counter-Clockwise.
-            # -rotation aligns it with the visual expectation.
-            rotated_surface = pygame.transform.rotate(ui_surface, -rotation)
-            
-            # Center it (handles slight aspect ratio weirdness if any, mostly for safety)
-            rx = (PHY_W - rotated_surface.get_width()) // 2
-            ry = (PHY_H - rotated_surface.get_height()) // 2
-            screen.blit(rotated_surface, (rx, ry))
+            rot_s = pygame.transform.rotate(ui_surface, -rotation)
+            screen.blit(rot_s, ((PHY_W - rot_s.get_width()) // 2, (PHY_H - rot_s.get_height()) // 2))
 
+        display_handler.display_url(screen, PHY_W, PHY_H, rotation)
         pygame.display.flip()
 
 # ---------------------------------------------------------
@@ -453,28 +379,23 @@ def main():
     pygame.mouse.set_visible(True)
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     clock = pygame.time.Clock()
-    
     system_startup_check(screen)
     
     while True:
         cfg = load_config()
-        mode = cfg.get('display', {}).get('Mode', 'Menu')
-        
+        mode = cfg.get('display', {}).get('Mode', 'Time')
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
-                sys.exit()
-        if mode == "Menu":
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_q: sys.exit()
+        if mode == "Time" or mode == "Scroll":
+            pygame.mouse.set_visible(False)
+            if mode == "Time": run_time_mode(screen, clock)
+            elif mode == "Scroll": run_scroll_mode(screen, clock)
+            else: update_config_mode("Time")
+            
+        else:
             pygame.mouse.set_visible(True)
             run_menu_mode(screen, clock)
-        else:
-            pygame.mouse.set_visible(False)
-            if mode == "Time":
-                run_time_mode(screen, clock)
-            elif mode == "Scroll":
-                run_scroll_mode(screen, clock)
-            else:
-                update_config_mode("Menu")
 
 if __name__ == "__main__":
     main()
