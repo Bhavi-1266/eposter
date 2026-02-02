@@ -313,3 +313,300 @@ Hello from the pygame community. https://www.pygame.org/contribute.html
 [cache] Cleaning up files not in: {'64'}
 [cache] ID 64: Found existing file (64.png). Skipping download.
 --- SYNC END: 1 images ready ---
+pygame 2.6.1 (SDL 2.28.4, Python 3.10.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[2026-02-02 19:40:15] [INFO] ========== Master Controller Started ==========
+[2026-02-02 19:40:16] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:40:19] [INFO] >>> Entering TIME Mode
+[2026-02-02 19:40:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:41:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:41:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:42:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:42:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:43:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:43:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:44:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:44:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:45:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:45:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:46:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Attempting to connect to primary WiFi: BHAVY
+[wifi] WiFi radio is already ON.
+[wifi] Attempting nmcli connect to SSID='BHAVY' (timeout 15s)...
+[wifi] nmcli output: Error: No network with SSID 'BHAVY' found.
+[wifi] Online!
+[wifi] Successfully connected to primary WiFi network.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:46:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:47:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:47:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:48:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:48:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:49:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:49:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:50:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:50:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:51:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:51:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:52:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:52:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:53:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:53:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:54:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:54:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:55:19] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:55:49] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---

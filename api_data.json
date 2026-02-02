@@ -1,13 +1,13 @@
 {
   "status": true,
-  "total_records": 9,
+  "total_records": 11,
   "total_screen": 10,
   "screen_duration": 90,
   "screens": [
     {
       "screen_number": 1,
-      "no_of_records_in_screen": 1,
-      "minutes_per_record": 90,
+      "no_of_records_in_screen": 2,
+      "minutes_per_record": 45,
       "records": [
         {
           "id": 57,
@@ -39,14 +39,7 @@
               "updated_at": "2026-01-19T07:43:58.000000Z"
             }
           ]
-        }
-      ]
-    },
-    {
-      "screen_number": 2,
-      "no_of_records_in_screen": 1,
-      "minutes_per_record": 90,
-      "records": [
+        },
         {
           "id": 64,
           "paper_id": "6236",
@@ -62,8 +55,8 @@
           "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/aGv29FoXtSfaVYoLYNAtP8zDIaOVCPJVbn0OPpiC.png",
           "url": null,
-          "start_date_time": "02-02-2026 14:11:20",
-          "end_date_time": "02-02-2026 14:11:20",
+          "start_date_time": "02-02-2026 18:21:20",
+          "end_date_time": "02-02-2026 18:21:20",
           "created_at": "2026-02-01T18:43:53.000000Z",
           "updated_at": "2026-02-01T18:43:53.000000Z",
           "co_author": [
@@ -108,7 +101,7 @@
       ]
     },
     {
-      "screen_number": 3,
+      "screen_number": 2,
       "no_of_records_in_screen": 1,
       "minutes_per_record": 90,
       "records": [
@@ -127,8 +120,8 @@
           "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/avzxqUuZl2YWamPDLU37jkBSiuLexus45emf9sez.png",
           "url": null,
-          "start_date_time": "02-02-2026 14:11:20",
-          "end_date_time": "02-02-2026 14:11:20",
+          "start_date_time": "02-02-2026 18:21:20",
+          "end_date_time": "02-02-2026 18:21:20",
           "created_at": "2026-02-01T23:48:13.000000Z",
           "updated_at": "2026-02-01T23:48:13.000000Z",
           "co_author": [
@@ -146,7 +139,7 @@
       ]
     },
     {
-      "screen_number": 4,
+      "screen_number": 3,
       "no_of_records_in_screen": 1,
       "minutes_per_record": 90,
       "records": [
@@ -165,8 +158,8 @@
           "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/J5BYnAaSyyUJlvW9tAaDcfry2hGPVZGDLvGwIdet.png",
           "url": null,
-          "start_date_time": "02-02-2026 14:11:20",
-          "end_date_time": "02-02-2026 14:11:20",
+          "start_date_time": "02-02-2026 18:21:20",
+          "end_date_time": "02-02-2026 18:21:20",
           "created_at": "2026-02-02T05:34:17.000000Z",
           "updated_at": "2026-02-02T05:34:17.000000Z",
           "co_author": [
@@ -184,7 +177,7 @@
       ]
     },
     {
-      "screen_number": 5,
+      "screen_number": 4,
       "no_of_records_in_screen": 1,
       "minutes_per_record": 90,
       "records": [
@@ -203,8 +196,8 @@
           "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/6B2xvHGhI4kqO4QzOxt2bZadDcb1HblBH3VX0b4U.png",
           "url": null,
-          "start_date_time": "02-02-2026 14:11:20",
-          "end_date_time": "02-02-2026 14:11:20",
+          "start_date_time": "02-02-2026 18:21:20",
+          "end_date_time": "02-02-2026 18:21:20",
           "created_at": "2026-02-02T05:48:42.000000Z",
           "updated_at": "2026-02-02T05:48:42.000000Z",
           "co_author": [
@@ -231,7 +224,7 @@
       ]
     },
     {
-      "screen_number": 6,
+      "screen_number": 5,
       "no_of_records_in_screen": 1,
       "minutes_per_record": 90,
       "records": [
@@ -250,8 +243,8 @@
           "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/3JcgMC6hZ1asWHbyBwm95wSsX7j3b6k30JJW2OLf.png",
           "url": null,
-          "start_date_time": "02-02-2026 14:11:20",
-          "end_date_time": "02-02-2026 14:11:20",
+          "start_date_time": "02-02-2026 18:21:20",
+          "end_date_time": "02-02-2026 18:21:20",
           "created_at": "2026-02-02T07:17:15.000000Z",
           "updated_at": "2026-02-02T07:17:15.000000Z",
           "co_author": [
@@ -269,7 +262,7 @@
       ]
     },
     {
-      "screen_number": 7,
+      "screen_number": 6,
       "no_of_records_in_screen": 1,
       "minutes_per_record": 90,
       "records": [
@@ -288,8 +281,8 @@
           "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/vH4B7e8SvFdog2Hatlm03y8AUfsgeh51jAZqVX1V.jpg",
           "url": null,
-          "start_date_time": "02-02-2026 14:11:20",
-          "end_date_time": "02-02-2026 14:11:20",
+          "start_date_time": "02-02-2026 18:21:20",
+          "end_date_time": "02-02-2026 18:21:20",
           "created_at": "2026-02-02T07:27:14.000000Z",
           "updated_at": "2026-02-02T07:27:14.000000Z",
           "co_author": []
@@ -297,7 +290,7 @@
       ]
     },
     {
-      "screen_number": 8,
+      "screen_number": 7,
       "no_of_records_in_screen": 1,
       "minutes_per_record": 90,
       "records": [
@@ -316,8 +309,8 @@
           "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/c0h79CaFfTOm4Bqr8cV51sRZxqWufc9G24tOAVsn.png",
           "url": "www.pegasusautomation.in",
-          "start_date_time": "02-02-2026 14:11:20",
-          "end_date_time": "02-02-2026 14:11:20",
+          "start_date_time": "02-02-2026 18:21:20",
+          "end_date_time": "02-02-2026 18:21:20",
           "created_at": "2026-02-02T07:47:24.000000Z",
           "updated_at": "2026-02-02T07:47:24.000000Z",
           "co_author": []
@@ -325,7 +318,7 @@
       ]
     },
     {
-      "screen_number": 9,
+      "screen_number": 8,
       "no_of_records_in_screen": 1,
       "minutes_per_record": 90,
       "records": [
@@ -344,8 +337,8 @@
           "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/PMxomLSriLRkM2vCVE3mXmmcME4Caxw0Es729xQH.jpg",
           "url": null,
-          "start_date_time": "02-02-2026 14:11:20",
-          "end_date_time": "02-02-2026 14:11:20",
+          "start_date_time": "02-02-2026 18:21:20",
+          "end_date_time": "02-02-2026 18:21:20",
           "created_at": "2026-02-02T09:08:19.000000Z",
           "updated_at": "2026-02-02T09:08:19.000000Z",
           "co_author": []
@@ -353,13 +346,82 @@
       ]
     },
     {
+      "screen_number": 9,
+      "no_of_records_in_screen": 1,
+      "minutes_per_record": 90,
+      "records": [
+        {
+          "id": 77,
+          "paper_id": "6009",
+          "corresponding_author_email": "rudra.swamy@sjce.ac.in",
+          "abstract": "Real-Time Crop Sensing and Localization for  Precision Agriculture",
+          "corresponding_author": "Rudraswamy S B",
+          "email": "rakeshmd@jssstuniv.in",
+          "google_id": "100566191742617336256",
+          "mobile": null,
+          "affiliation": "SJCE, JSS Science and Technology",
+          "paper_title": "Real-Time Crop Sensing and Localization for  Precision Agriculture",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/LA04WtkEy96tulbndFjvRR83fPNjPBSNGuMeSxK4.png",
+          "url": null,
+          "start_date_time": "02-02-2026 18:21:20",
+          "end_date_time": "02-02-2026 18:21:20",
+          "created_at": "2026-02-02T15:21:08.000000Z",
+          "updated_at": "2026-02-02T15:21:08.000000Z",
+          "co_author": [
+            {
+              "id": 30,
+              "eposter_id": 77,
+              "name": "Rakesh M D",
+              "email": "rakeshmd@jssstuniv.in",
+              "affiliation": "SJCE, JSS Science and Technology",
+              "created_at": "2026-02-02T15:21:08.000000Z",
+              "updated_at": "2026-02-02T15:21:08.000000Z"
+            },
+            {
+              "id": 31,
+              "eposter_id": 77,
+              "name": "Rohith Rajesh",
+              "email": "rohithrajeshindia@gmail.com",
+              "affiliation": "VIT, Chennai, India",
+              "created_at": "2026-02-02T15:21:08.000000Z",
+              "updated_at": "2026-02-02T15:21:08.000000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "screen_number": 10,
-      "no_of_records_in_screen": 0,
-      "minutes_per_record": 0,
-      "records": []
+      "no_of_records_in_screen": 1,
+      "minutes_per_record": 90,
+      "records": [
+        {
+          "id": 78,
+          "paper_id": "6166",
+          "corresponding_author_email": "kian.jafari@usherbrooke.ca",
+          "abstract": "This paper introduces a surface stress-based BioMEMS sensor featuring an optomechanical detection system designed to measure the target bioparticles concentration.",
+          "corresponding_author": "kian jafari",
+          "email": "kian.jafari@gmail.com",
+          "google_id": "115149488825280090720",
+          "mobile": null,
+          "affiliation": "Université de Sherbrooke",
+          "paper_title": "A Highly Sensitive Optical Biosensor with Tunable Point Defect Cavity for Point-of-Care Testing",
+          "track": "Medical & Digital Healthcare IX",
+          "other_track": null,
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/MmQIznPmG6MdtPhemhhhlc3mRTSRZYUjAM4FUMb0.png",
+          "url": null,
+          "start_date_time": "02-02-2026 18:21:20",
+          "end_date_time": "02-02-2026 18:21:20",
+          "created_at": "2026-02-02T15:51:17.000000Z",
+          "updated_at": "2026-02-02T15:51:17.000000Z",
+          "co_author": []
+        }
+      ]
     }
   ],
-  "fetched_at": "02-02-2026-19:41:21",
+  "fetched_at": "02-02-2026-23:51:20",
   "fetched_date": "02-02-2026",
-  "fetched_time": "19:41:21"
+  "fetched_time": "23:51:20"
 }

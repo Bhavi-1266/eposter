@@ -46,6 +46,14 @@ def setup():
     print(f"Installing ePoster from: {BASE_DIR}")
     os.chdir(BASE_DIR)
 
+    # Detect UID for XDG_RUNTIME_DIR
+    import pwd
+    try:
+        user_info = pwd.getpwnam(REAL_USER)
+        user_id = user_info.pw_uid
+    except KeyError:
+        user_id = 1000
+
     # 1. Ensure system dependencies
     run(["apt-get", "update", "-y"])
     run(["apt-get", "install", "-y", "python3-venv", "python3-pip", "x11-xserver-utils", "network-manager", "polkitd"])
@@ -60,29 +68,53 @@ def setup():
     else:
         run([str(pip_bin), "install", "flask", "dnslib", "pygame", "requests", "Pillow"])
 
-    # --- 3. WIFI & PERMISSIONS (NEW) ---
+    # --- 3. WIFI & PERMISSIONS (RAKSA OS FIX) ---
     print(f"Configuring Wi-Fi permissions for {REAL_USER}...")
     
-    # Add user to necessary groups
-    run(["usermod", "-aG", "netdev,audio,video", REAL_USER])
+    # Ensure the user is in the correct groups
+    run(["usermod", "-aG", "netdev,audio,video,sudo", REAL_USER])
 
-    # Create Polkit rule for NetworkManager
-    polkit_path = Path("/etc/polkit-1/localauthority/50-local.d/10-eposter-wifi.pkla")
-    polkit_path.parent.mkdir(parents=True, exist_ok=True)
+    # Path for modern Polkit rules
+    polkit_dir = Path("/etc/polkit-1/rules.d")
+    polkit_rule_path = polkit_dir / "10-eposter-wifi.rules"
     
-    pkla_content = f"""[Allow {REAL_USER} to modify network]
-Identity=unix-user:{REAL_USER}
-Action=org.freedesktop.NetworkManager.*
-ResultAny=yes
-ResultInactive=yes
-ResultActive=yes
+    # Modern Javascript-based Polkit Rule
+    rules_content = f"""
+polkit.addRule(function(action, subject) {{
+    if ((action.id.indexOf("org.freedesktop.NetworkManager.") == 0 ||
+         action.id == "org.freedesktop.nm-dispatcher.action") &&
+        subject.user == "{REAL_USER}") {{
+        return polkit.Result.YES;
+    }}
+}});
 """
-    with open(polkit_path, "w") as f:
-        f.write(pkla_content)
+    try:
+        # Ensure directory exists and has correct owner
+        run(["mkdir", "-p", str(polkit_dir)])
+        run(["chown", "polkitd:root", str(polkit_dir)], ignore_fail=True) # polkitd owns this in modern distros
+        
+        with open(polkit_rule_path, "w") as f:
+            f.write(rules_content)
+            
+        run(["chown", "root:root", str(polkit_rule_path)])
+        run(["chmod", "644", str(polkit_rule_path)])
+        
+        # Restart Polkit to load new rules
+        run(["systemctl", "restart", "polkit"], ignore_fail=True)
+    except Exception as e:
+        print(f"Failed to write Polkit rule: {e}")
 
-    # Disable Hotspot Autostart if it exists
-    print("Checking for existing Hotspot profiles to disable autostart...")
+    # Disable Hotspot Autostart
+    print("Disabling Hotspot autoconnect...")
     run("nmcli connection modify Hotspot connection.autoconnect no", ignore_fail=True)
+    
+    # --- 4. Systemd Services ---
+    # Update the environment with the detected UID
+    SERVICES["eposter-display"]["env"] = [
+        "DISPLAY=:0",
+        f"XAUTHORITY=/home/{REAL_USER}/.Xauthority",
+        f"XDG_RUNTIME_DIR=/run/user/{user_id}"
+    ]
 
     # --- 4. Systemd Services ---
     for name, info in SERVICES.items():
