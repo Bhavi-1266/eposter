@@ -12,6 +12,7 @@ import subprocess
 import requests
 from pathlib import Path
 import json
+import socket
 
 # Configuration
 with open(Path(__file__).parent / 'config.json', 'r') as f:
@@ -45,6 +46,7 @@ def is_online(check_url=API_BASE, timeout=3):
 def connect_wifi_nmcli(ssid=None, psk=None, iface=None, timeout=None, check_url=API_BASE):
     """
     Use nmcli to connect to WiFi SSID. Returns True on success.
+    Automatically enables WiFi radio if it's turned off.
     
     Args:
         ssid: WiFi SSID (defaults to WIFI_SSID env var)
@@ -71,6 +73,24 @@ def connect_wifi_nmcli(ssid=None, psk=None, iface=None, timeout=None, check_url=
     if not nmcli:
         print("[wifi] nmcli not found; cannot auto-connect.")
         return False
+
+    # Check if WiFi radio is enabled, turn it on if disabled
+    try:
+        radio_status = subprocess.check_output(
+            [nmcli, "radio", "wifi"], 
+            text=True
+        ).strip()
+        
+        if radio_status == "disabled":
+            print("[wifi] WiFi radio is OFF. Turning it ON...")
+            subprocess.run([nmcli, "radio", "wifi", "on"], check=True)
+            time.sleep(2)  # Give it a moment to initialize
+            print("[wifi] WiFi radio enabled.")
+        else:
+            print("[wifi] WiFi radio is already ON.")
+    except Exception as e:
+        print(f"[wifi] Could not check/enable WiFi radio: {e}")
+        # Continue anyway, maybe it's on
 
     # If already online, nothing to do
     if is_online(check_url=check_url):
@@ -111,8 +131,6 @@ def connect_wifi_nmcli(ssid=None, psk=None, iface=None, timeout=None, check_url=
 
     print("[wifi] Timed out waiting for network to become online.")
     return False
-
-import socket
 
 def internet_available(timeout=2):
     try:

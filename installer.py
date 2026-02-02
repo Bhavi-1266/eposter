@@ -16,7 +16,7 @@ REAL_USER = os.getenv("SUDO_USER") or os.getlogin() or "rock"
 # Service Definitions
 SERVICES = {
     "eposter-admin": {
-        "description": "ePoster Admin Web Interface",
+        "description": "ePoster Admin Web Interface & DNS",
         "exec": f"{PYTHON_BIN} {BASE_DIR}/config_portal.py",
         "user": "root", 
         "after": "network.target"
@@ -58,18 +58,9 @@ def setup():
         run([str(pip_bin), "install", "-r", str(REQ_FILE)])
     else:
         print("requirements.txt not found! Installing defaults...")
-        # Updated to include all necessary packages
-        run([str(pip_bin), "install", "flask", "pygame", "requests", "Pillow"])
+        run([str(pip_bin), "install", "flask", "dnslib", "pygame", "requests", "Pillow"])
 
-    # 4. Make Python scripts executable
-    print("Setting execute permissions on Python scripts...")
-    for script in ["config_portal.py", "RunThis.py"]:
-        script_path = BASE_DIR / script
-        if script_path.exists():
-            os.chmod(script_path, 0o755)
-            print(f"  ✓ {script}")
-
-    # 5. Create Systemd Service Files
+    # 4. Create Systemd Service Files
     for name, info in SERVICES.items():
         print(f"Creating systemd service: {name}")
         env_lines = "\n".join([f"Environment={e}" for e in info.get("env", [])])
@@ -95,7 +86,7 @@ WantedBy=graphical.target
         with open(service_path, "w") as f:
             f.write(service_content)
 
-    # 6. X11 Permissions
+    # 5. X11 Permissions
     print(f"Setting up X11 permissions for {REAL_USER}...")
     profile_path = f"/home/{REAL_USER}/.profile"
     xhost_line = f"xhost +SI:localuser:{REAL_USER} > /dev/null 2>&1"
@@ -106,57 +97,16 @@ WantedBy=graphical.target
             if xhost_line not in f.read():
                 f.write(f"\n{xhost_line}\n")
 
-    # 7. Create config.json if it doesn't exist
-    config_path = BASE_DIR / "config.json"
-    if not config_path.exists():
-        print("Creating default config.json...")
-        default_config = {
-            "ID": 0,
-            "password": "admin",
-            "wifi": {
-                "ssid1": "",
-                "password1": "",
-                "ssid2": "",
-                "password2": ""
-            },
-            "api": {
-                "poster_api_url": ""
-            },
-            "display": {
-                "device_id": 0,
-                "rotation_degree": 0,
-                "Mode": "Menu",
-                "Auto_Scroll": 5
-            }
-        }
-        import json
-        with open(config_path, "w") as f:
-            json.dump(default_config, f, indent=2)
-        print("  ✓ Default config.json created")
-
-    # 8. Refresh and Enable
+    # 6. Refresh and Enable
     print("Activating services...")
     run(["systemctl", "daemon-reload"])
     run(["systemctl", "enable", "eposter-admin.service"])
+    run(["systemctl", "daemon-reload"])
     run(["systemctl", "enable", "eposter-display.service"])
+    run(["systemctl", "start", "eposter-display.service"])
     
-    print(f"\n{'='*60}")
-    print(f"[SUCCESS] Setup finished for user '{REAL_USER}'.")
-    print(f"{'='*60}")
-    print(f"\nInstallation Location: {BASE_DIR}")
-    print(f"Virtual Environment: {VENV_PATH}")
-    print(f"\nServices installed:")
-    print(f"  • eposter-admin.service   (Web Admin Portal on port 80)")
-    print(f"  • eposter-display.service (Display Controller)")
-    print(f"\nNext steps:")
-    print(f"  1. Reboot your device: sudo reboot")
-    print(f"  2. Access web admin at: http://<device-ip>")
-    print(f"  3. Default password: admin")
-    print(f"\nService management:")
-    print(f"  • Check status: sudo systemctl status eposter-admin")
-    print(f"  • View logs: sudo journalctl -u eposter-admin -f")
-    print(f"  • Restart: sudo systemctl restart eposter-admin")
-    print(f"{'='*60}\n")
+    print(f"\n[SUCCESS] Setup finished for user '{REAL_USER}'.")
+    print("Please reboot your device to   start the display and admin portal.")
 
 if __name__ == "__main__":
     if os.geteuid() != 0:
