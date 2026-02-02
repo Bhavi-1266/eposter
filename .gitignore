@@ -1,1 +1,3 @@
 config.json
+venv/
+epsoter_cache/ 
