@@ -1,0 +1,315 @@
+pygame 2.6.1 (SDL 2.28.4, Python 3.10.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[2026-02-02 19:24:23] [INFO] ========== Master Controller Started ==========
+[2026-02-02 19:24:23] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:24:26] [INFO] >>> Entering TIME Mode
+[2026-02-02 19:24:56] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Attempting to connect to primary WiFi: BHAVY
+[wifi] WiFi radio is OFF. Turning it ON...
+[wifi] Could not check/enable WiFi radio: Command '['/usr/bin/nmcli', 'radio', 'wifi', 'on']' returned non-zero exit status 1.
+[wifi] Attempting nmcli connect to SSID='BHAVY' (timeout 15s)...
+[wifi] nmcli output: Error: No network with SSID 'BHAVY' found.
+[wifi] Timed out waiting for network to become online.
+[wifi] Failed to connect to primary WiFi: BHAVY
+[wifi] Attempting to connect to fallback WiFi: BHAVY2
+[wifi] WiFi radio is OFF. Turning it ON...
+[wifi] Could not check/enable WiFi radio: Command '['/usr/bin/nmcli', 'radio', 'wifi', 'on']' returned non-zero exit status 1.
+[wifi] Attempting nmcli connect to SSID='BHAVY2' (timeout 15s)...
+[wifi] nmcli output: Error: No network with SSID 'BHAVY2' found.
+[wifi] Timed out waiting for network to become online.
+[wifi] Failed to connect to fallback WiFi: BHAVY2
+[wifi] Could not connect to any configured WiFi network.
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:25:27] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Attempting to connect to primary WiFi: BHAVY
+[wifi] WiFi radio is already ON.
+[wifi] Attempting nmcli connect to SSID='BHAVY' (timeout 15s)...
+[wifi] nmcli output: Error: No network with SSID 'BHAVY' found.
+[wifi] Timed out waiting for network to become online.
+[wifi] Failed to connect to primary WiFi: BHAVY
+[wifi] Attempting to connect to fallback WiFi: BHAVY2
+[wifi] WiFi radio is already ON.
+[wifi] Attempting nmcli connect to SSID='BHAVY2' (timeout 15s)...
+[wifi] nmcli output: Error: Insufficient privileges.
+[wifi] Timed out waiting for network to become online.
+[wifi] Failed to connect to fallback WiFi: BHAVY2
+[wifi] Could not connect to any configured WiFi network.
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:25:57] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Attempting to connect to primary WiFi: BHAVY
+[wifi] WiFi radio is already ON.
+[wifi] Attempting nmcli connect to SSID='BHAVY' (timeout 15s)...
+[wifi] nmcli output: Error: No network with SSID 'BHAVY' found.
+[wifi] Online!
+[wifi] Successfully connected to primary WiFi network.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:26:27] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:26:57] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:27:27] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:27:58] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:28:28] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+pygame 2.6.1 (SDL 2.28.4, Python 3.10.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[2026-02-02 19:29:36] [INFO] ========== Master Controller Started ==========
+[2026-02-02 19:29:37] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Attempting to connect to primary WiFi: BHAVY
+[wifi] WiFi radio is OFF. Turning it ON...
+[wifi] WiFi radio enabled.
+[wifi] Attempting nmcli connect to SSID='BHAVY' (timeout 15s)...
+[wifi] nmcli output: Error: No network with SSID 'BHAVY' found.
+[wifi] Timed out waiting for network to become online.
+[wifi] Failed to connect to primary WiFi: BHAVY
+[wifi] Attempting to connect to fallback WiFi: BHAVY2
+[wifi] WiFi radio is already ON.
+[wifi] Attempting nmcli connect to SSID='BHAVY2' (timeout 15s)...
+[wifi] nmcli output: Error: No network with SSID 'BHAVY2' found.
+[wifi] Timed out waiting for network to become online.
+[wifi] Failed to connect to fallback WiFi: BHAVY2
+[wifi] Could not connect to any configured WiFi network.
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:30:10] [INFO] >>> Entering TIME Mode
+[2026-02-02 19:30:40] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Attempting to connect to primary WiFi: BHAVY
+[wifi] WiFi radio is already ON.
+[wifi] Attempting nmcli connect to SSID='BHAVY' (timeout 15s)...
+[wifi] nmcli output: Error: No network with SSID 'BHAVY' found.
+[wifi] Timed out waiting for network to become online.
+[wifi] Failed to connect to primary WiFi: BHAVY
+[wifi] Attempting to connect to fallback WiFi: BHAVY2
+[wifi] WiFi radio is already ON.
+[wifi] Attempting nmcli connect to SSID='BHAVY2' (timeout 15s)...
+[wifi] nmcli output: [2K
+Device 'wlp8s0' successfully activated with '2dff00a3-8987-4ddf-8c56-a01a0eb6dea5'.
+[wifi] Online!
+[wifi] Successfully connected to fallback WiFi network.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:31:10] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:31:40] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:32:11] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:32:41] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:33:11] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:33:41] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Attempting to connect to primary WiFi: BHAVY
+[wifi] WiFi radio is already ON.
+[wifi] Attempting nmcli connect to SSID='BHAVY' (timeout 15s)...
+[wifi] nmcli output: Error: No network with SSID 'BHAVY' found.
+[wifi] Timed out waiting for network to become online.
+[wifi] Failed to connect to primary WiFi: BHAVY
+[wifi] Attempting to connect to fallback WiFi: BHAVY2
+[wifi] WiFi radio is already ON.
+[wifi] Attempting nmcli connect to SSID='BHAVY2' (timeout 15s)...
+[wifi] nmcli output: [2K
+Device 'wlp8s0' successfully activated with 'd55ac0bb-40b0-4d5b-a712-4eb1c2fabc7c'.
+[wifi] Online!
+[wifi] Successfully connected to fallback WiFi network.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:34:29] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+pygame 2.6.1 (SDL 2.28.4, Python 3.10.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[2026-02-02 19:35:31] [INFO] ========== Master Controller Started ==========
+[2026-02-02 19:35:31] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Attempting to connect to primary WiFi: BHAVY
+[wifi] WiFi radio is OFF. Turning it ON...
+[wifi] WiFi radio enabled.
+[wifi] Attempting nmcli connect to SSID='BHAVY' (timeout 15s)...
+[wifi] nmcli output: Error: No network with SSID 'BHAVY' found.
+[wifi] Timed out waiting for network to become online.
+[wifi] Failed to connect to primary WiFi: BHAVY
+[wifi] Attempting to connect to fallback WiFi: BHAVY2
+[wifi] WiFi radio is already ON.
+[wifi] Attempting nmcli connect to SSID='BHAVY2' (timeout 15s)...
+[wifi] nmcli output: [2K
+Device 'wlp8s0' successfully activated with 'b6ea3efa-f744-41d5-b115-dba1521645e8'.
+[wifi] Online!
+[wifi] Successfully connected to fallback WiFi network.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:35:56] [INFO] >>> Entering TIME Mode
+[2026-02-02 19:36:26] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+pygame 2.6.1 (SDL 2.28.4, Python 3.10.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[2026-02-02 19:37:33] [INFO] ========== Master Controller Started ==========
+[2026-02-02 19:37:33] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:37:38] [INFO] >>> Entering TIME Mode
+pygame 2.6.1 (SDL 2.28.4, Python 3.10.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[2026-02-02 19:39:03] [INFO] ========== Master Controller Started ==========
+[2026-02-02 19:39:03] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Attempting to connect to primary WiFi: BHAVY
+[wifi] WiFi radio is OFF. Turning it ON...
+[wifi] WiFi radio enabled.
+[wifi] Attempting nmcli connect to SSID='BHAVY' (timeout 15s)...
+[wifi] nmcli output: Error: No network with SSID 'BHAVY' found.
+[wifi] Timed out waiting for network to become online.
+[wifi] Failed to connect to primary WiFi: BHAVY
+[wifi] Attempting to connect to fallback WiFi: BHAVY2
+[wifi] WiFi radio is already ON.
+[wifi] Attempting nmcli connect to SSID='BHAVY2' (timeout 15s)...
+[wifi] nmcli output: [2K
+Device 'wlp8s0' successfully activated with '1bba0588-9b9c-421c-b0d6-524f18502887'.
+[wifi] Online!
+[wifi] Successfully connected to fallback WiFi network.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---
+[2026-02-02 19:39:28] [INFO] >>> Entering TIME Mode
+pygame 2.6.1 (SDL 2.28.4, Python 3.10.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[2026-02-02 19:39:52] [INFO] ========== Master Controller Started ==========
+[2026-02-02 19:39:53] [INFO] --- Refreshing Data for Device: 2 ---
+[wifi] Already online.
+[fetch_posters] Successfully fetched posters from API
+[ensure_api_json] API data file already exists: /home/bhavy/Projects/eposter/api_data.json
+[fetch_posters] Saved API response to /home/bhavy/Projects/eposter/api_data.json
+--- SYNC START: Received 1 records ---
+[cache] Cleaning up files not in: {'64'}
+[cache] ID 64: Found existing file (64.png). Skipping download.
+--- SYNC END: 1 images ready ---

@@ -1,0 +1,11 @@
+error: XDG_RUNTIME_DIR not set in the environment.
+ALSA lib pcm_dmix.c:1032:(snd_pcm_dmix_open) unable to open slave
+Error: failed to set Wi-Fi radio: Not authorized to perform this operation
+Error: failed to set Wi-Fi radio: Not authorized to perform this operation
+ALSA lib pcm_dmix.c:1032:(snd_pcm_dmix_open) unable to open slave
+error: XDG_RUNTIME_DIR not set in the environment.
+ALSA lib pcm_dmix.c:1032:(snd_pcm_dmix_open) unable to open slave
+ALSA lib pcm_dmix.c:1032:(snd_pcm_dmix_open) unable to open slave
+ALSA lib pcm_dmix.c:1032:(snd_pcm_dmix_open) unable to open slave
+ALSA lib pcm_dmix.c:1032:(snd_pcm_dmix_open) unable to open slave
+ALSA lib pcm_dmix.c:1032:(snd_pcm_dmix_open) unable to open slave

@@ -23,7 +23,7 @@ WIFI_SSID = config.get('wifi', {}).get('ssid1')
 WIFI_PSK = config.get('wifi', {}).get('password1')
 WIFI_SSID_2 = config.get('wifi', {}).get('ssid2')
 WIFI_PSK_2 = config.get('wifi', {}).get('password2')
-WIFI_TIMEOUT = int(config.get('wifi', {}).get('connect_timeout', 60))
+WIFI_TIMEOUT = int(config.get('wifi', {}).get('connect_timeout', 20))
 
 def is_online(check_url=API_BASE, timeout=3):
     """

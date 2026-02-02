@@ -5,7 +5,7 @@
     "password1": "Bms@1266",
     "ssid2": "BHAVY2",
     "password2": "Bms@1266",
-    "connect_timeout": 2
+    "connect_timeout": 15
   },
   "password": "hello",
   "api": {
