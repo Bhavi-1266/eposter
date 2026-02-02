@@ -68,7 +68,8 @@ def setup():
         service_content = f"""[Unit]
 Description={info['description']}
 After={info['after']}
-Wants=network-online.target
+After=display-manager.service
+#Wants=network-online.target
 
 [Service]
 User={info['user']}
