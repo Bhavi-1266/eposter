@@ -1,13 +1,13 @@
 {
   "status": true,
-  "total_records": 57,
+  "total_records": 65,
   "total_screen": 10,
   "screen_duration": 90,
   "screens": [
     {
       "screen_number": 1,
-      "no_of_records_in_screen": 6,
-      "minutes_per_record": 15,
+      "no_of_records_in_screen": 7,
+      "minutes_per_record": 12.86,
       "records": [
         {
           "id": 2,
@@ -21,6 +21,7 @@
           "affiliation": "xyz",
           "paper_title": "xyz",
           "track": "xyz",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/9RGiapog4b68V4fzUvRnro6gRJKxhYx7wU403l3q.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:00:00",
@@ -41,6 +42,7 @@
           "affiliation": "XYZ Hospital",
           "paper_title": "Title 1",
           "track": "Testing Poster",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/EWJdYvtvXJGG3fqtBiw0H2gOrFh7VmlV59qeaTOO.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:01:00",
@@ -61,6 +63,7 @@
           "affiliation": "XYZ Hospital",
           "paper_title": "Title 2",
           "track": "Testing Poster",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/FAxM843TdvDaNNExJScsQhIzczxMUqeyE4TUSjes.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:02:00",
@@ -81,6 +84,7 @@
           "affiliation": "testing",
           "paper_title": "testing",
           "track": "Testing",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/9QvlNrWh5Z51drIVWrSnk5JyjCPQuxQYtbFlVqyt.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:03:00",
@@ -101,6 +105,7 @@
           "affiliation": "test",
           "paper_title": "test",
           "track": "test",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/trI9VLnKB4N5aWRswi2yaBn759yEahn2CxHh4Y9d.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:04:00",
@@ -121,6 +126,7 @@
           "affiliation": "ABC University",
           "paper_title": "Poster Title 1",
           "track": "Health Research",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/SLoEUm17eyde6zXUEJMf25RUUOvpylemrnHIqc7h.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:05:00",
@@ -128,14 +134,7 @@
           "created_at": "2025-12-08T10:27:56.000000Z",
           "updated_at": "2025-12-08T10:27:56.000000Z",
           "co_author": []
-        }
-      ]
-    },
-    {
-      "screen_number": 2,
-      "no_of_records_in_screen": 6,
-      "minutes_per_record": 15,
-      "records": [
+        },
         {
           "id": 8,
           "paper_id": null,
@@ -148,6 +147,7 @@
           "affiliation": "XYZ Institute",
           "paper_title": "Poster Title 2",
           "track": "Medical Science",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/IBtkuvIvzijHkD01zQ1TAG1S7eUL6NJcaqw0XMhq.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:06:00",
@@ -155,7 +155,14 @@
           "created_at": "2025-12-08T10:28:53.000000Z",
           "updated_at": "2025-12-08T10:28:53.000000Z",
           "co_author": []
-        },
+        }
+      ]
+    },
+    {
+      "screen_number": 2,
+      "no_of_records_in_screen": 7,
+      "minutes_per_record": 12.86,
+      "records": [
         {
           "id": 9,
           "paper_id": null,
@@ -168,6 +175,7 @@
           "affiliation": "PQR Hospital",
           "paper_title": "Poster Title 3",
           "track": "Neuroscience",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/O5lRGcvZpU3zMkZigjBg13ZX5lCDxWMXSMCi0DTq.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:07:00",
@@ -188,6 +196,7 @@
           "affiliation": "XYZ Hospital",
           "paper_title": "Title 2",
           "track": "Testing Poster",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/s8QcDl6cb8WRNt9I3bMf8w3JRZFXMto6akpS12Ng.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:08:00",
@@ -208,6 +217,7 @@
           "affiliation": "LMN Medical College",
           "paper_title": "Poster Title 5",
           "track": "Cardiology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/8o8CfEaVmxDgWP1zaaHJ5uWVVxjq4ySnplhifvBf.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:09:00",
@@ -228,6 +238,7 @@
           "affiliation": "Global Health Center",
           "paper_title": "Poster Title 6",
           "track": "Public Health",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/PM1ovX7kBDOK4Q5Y8Xpx0mQxFj5zeRBPfPByci3g.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:10:00",
@@ -248,6 +259,7 @@
           "affiliation": "Bright Medical Lab",
           "paper_title": "Poster Title 7",
           "track": "Biotechnology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/yKmCa4ktiksCgVy5CPPtJzkmxJUmfrobb5IyPdmb.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:11:00",
@@ -255,14 +267,7 @@
           "created_at": "2025-12-08T10:34:51.000000Z",
           "updated_at": "2025-12-08T10:34:51.000000Z",
           "co_author": []
-        }
-      ]
-    },
-    {
-      "screen_number": 3,
-      "no_of_records_in_screen": 6,
-      "minutes_per_record": 15,
-      "records": [
+        },
         {
           "id": 14,
           "paper_id": null,
@@ -275,6 +280,7 @@
           "affiliation": "City Hospital",
           "paper_title": "Poster Title 8",
           "track": "Clinical Testing",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/pNLHTVG84pYgvy77kTATqfTFe4435h6raROjhpua.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:12:00",
@@ -295,6 +301,7 @@
           "affiliation": "Sunrise Health Institute",
           "paper_title": "Poster Title 9",
           "track": "Diagnostics",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/kH7eB05uDOtsd1wxPDQnOYMr5PzGghiR6hri2bsi.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:13:00",
@@ -302,7 +309,14 @@
           "created_at": "2025-12-08T10:36:40.000000Z",
           "updated_at": "2025-12-08T10:36:40.000000Z",
           "co_author": []
-        },
+        }
+      ]
+    },
+    {
+      "screen_number": 3,
+      "no_of_records_in_screen": 7,
+      "minutes_per_record": 12.86,
+      "records": [
         {
           "id": 16,
           "paper_id": null,
@@ -315,6 +329,7 @@
           "affiliation": "Metro Health College",
           "paper_title": "Poster Title 56",
           "track": "Genetic Research",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/5rgRHa3UdjP6B3BsMrFas853vaT9vn2guofUH3i2.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:14:00",
@@ -335,6 +350,7 @@
           "affiliation": "Green Valley Institute",
           "paper_title": "Poster Title 57",
           "track": "Cancer Biology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/TyA5Er8EkIu7tj7Wo3ER641zfpcsaxHDALbxhGlf.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:15:00",
@@ -355,6 +371,7 @@
           "affiliation": "Sunrise Research Lab",
           "paper_title": "Poster Title 58",
           "track": "Pharmacology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/BpIVLPNdWlus3dJeM99Ip9T02Ab6da0SGQNUVfdh.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:16:00",
@@ -375,6 +392,7 @@
           "affiliation": "National Medical University",
           "paper_title": "Poster Title 59",
           "track": "Bioinformatics",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/M0OVavEpnulb7SX0joMgpabp6hcLAbyVieICPG5Y.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:17:00",
@@ -382,14 +400,7 @@
           "created_at": "2025-12-08T10:45:38.000000Z",
           "updated_at": "2025-12-08T10:45:38.000000Z",
           "co_author": []
-        }
-      ]
-    },
-    {
-      "screen_number": 4,
-      "no_of_records_in_screen": 6,
-      "minutes_per_record": 15,
-      "records": [
+        },
         {
           "id": 20,
           "paper_id": null,
@@ -402,6 +413,7 @@
           "affiliation": "Ocean View Hospital",
           "paper_title": "Poster Title 60",
           "track": "Neurobiology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/Zf7mtzpdOCp75gRZeDZJTHDPOkoYWu5bbMUTofo9.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:18:00",
@@ -422,6 +434,7 @@
           "affiliation": "Prime Care Medical Center",
           "paper_title": "Poster Title 61",
           "track": "Microbiology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/v7GwkPUUvudmVLv359Ie06z2ktdMyaUzNoDf1NLS.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:19:00",
@@ -442,6 +455,7 @@
           "affiliation": "Horizon Medical Center",
           "paper_title": "Poster Title 62",
           "track": "Pathology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/Onwp7tAW3gByL8sn1reDQ2t4kmmK4lW95uXqsDiX.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:20:00",
@@ -449,7 +463,14 @@
           "created_at": "2025-12-08T10:54:07.000000Z",
           "updated_at": "2025-12-08T10:54:07.000000Z",
           "co_author": []
-        },
+        }
+      ]
+    },
+    {
+      "screen_number": 4,
+      "no_of_records_in_screen": 7,
+      "minutes_per_record": 12.86,
+      "records": [
         {
           "id": 23,
           "paper_id": null,
@@ -462,6 +483,7 @@
           "affiliation": "Riverdale Research Institute",
           "paper_title": "Poster Title 63",
           "track": "Dermatology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/Wo2QhlTLu6ENdWfDLvCQo1A3UILCmdL9AkywLhNs.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:21:00",
@@ -482,6 +504,7 @@
           "affiliation": "Silver Oak Medical School",
           "paper_title": "Poster Title 64",
           "track": "Virology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/VTHqrg8Og20GeUvAZjFu31RxTP36TooOgbX3eGdj.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:22:00",
@@ -502,6 +525,7 @@
           "affiliation": "Hilltop Healthcare",
           "paper_title": "Poster Title 65",
           "track": "Immunology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/CnKSoMpGFfys7pG9P61dnUNf87ZbsqEHtmcQpaEt.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:23:00",
@@ -509,14 +533,7 @@
           "created_at": "2025-12-08T10:57:03.000000Z",
           "updated_at": "2025-12-08T10:57:03.000000Z",
           "co_author": []
-        }
-      ]
-    },
-    {
-      "screen_number": 5,
-      "no_of_records_in_screen": 6,
-      "minutes_per_record": 15,
-      "records": [
+        },
         {
           "id": 26,
           "paper_id": null,
@@ -529,6 +546,7 @@
           "affiliation": "Central Medical Institute",
           "paper_title": "Poster Title 66",
           "track": "Psychiatry",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/n89Ff0LAKnvcyTh2nF33CbN9ylrXTCW7VYRBVRwm.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:24:00",
@@ -549,6 +567,7 @@
           "affiliation": "Galaxy Hospital",
           "paper_title": "Poster Title 67",
           "track": "Radiology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/Dd9njWF6dpEnTdWIUeadmKRXo3Y40Ci7UNVWs2R5.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:25:00",
@@ -569,6 +588,7 @@
           "affiliation": "Evergreen Medical College",
           "paper_title": "Poster Title 68",
           "track": "Anatomy",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/05bGB4o1e0yBjbLhjiMAEx2xkSDrIsLmjRpOopGh.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:26:00",
@@ -589,6 +609,7 @@
           "affiliation": "Hope Research Center",
           "paper_title": "Poster Title 69",
           "track": "Pediatrics",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/EAJ3NFDQ9O3xEDP1J2BxpimjYxRiO5WMya64xOJ0.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:27:00",
@@ -596,7 +617,14 @@
           "created_at": "2025-12-08T11:02:07.000000Z",
           "updated_at": "2025-12-08T11:02:07.000000Z",
           "co_author": []
-        },
+        }
+      ]
+    },
+    {
+      "screen_number": 5,
+      "no_of_records_in_screen": 7,
+      "minutes_per_record": 12.86,
+      "records": [
         {
           "id": 30,
           "paper_id": null,
@@ -609,6 +637,7 @@
           "affiliation": "Future Health Institute",
           "paper_title": "Poster Title 70",
           "track": "Ophthalmology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/G4QquiM4KkRr7we0oW5rKKKx8e62u26eWQU3WDj6.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:28:00",
@@ -629,6 +658,7 @@
           "affiliation": "Bright Vision Hospital",
           "paper_title": "Poster Title 71",
           "track": "Orthopedics",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/IeNcIa2Gp8OeNdD6xYx5WcXSEXjd8RRoCrX7Xz6w.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:29:00",
@@ -636,14 +666,7 @@
           "created_at": "2025-12-08T11:03:54.000000Z",
           "updated_at": "2025-12-08T11:03:54.000000Z",
           "co_author": []
-        }
-      ]
-    },
-    {
-      "screen_number": 6,
-      "no_of_records_in_screen": 6,
-      "minutes_per_record": 15,
-      "records": [
+        },
         {
           "id": 32,
           "paper_id": null,
@@ -656,6 +679,7 @@
           "affiliation": "Royal Medical University",
           "paper_title": "Poster Title 72",
           "track": "Pulmonology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/QWvkt4Jgr9ME0tyPqxdOAGtQ27VKsXjuY0GHTNA4.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:30:00",
@@ -676,6 +700,7 @@
           "affiliation": "Urban Health Center",
           "paper_title": "Poster Title 73",
           "track": "ENT Research",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/nXEjs7pyDUSuJ9mORMUGfsnqFYUSZZczEUqJK9N6.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:31:00",
@@ -696,6 +721,7 @@
           "affiliation": "Northside Medical College",
           "paper_title": "Poster Title 74",
           "track": "Gastroenterology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/sHBQshUyD4vIjMoQJBKvbbvd3KWWjPOk6CZZeYqK.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:32:00",
@@ -716,6 +742,7 @@
           "affiliation": "Zenith Hospital",
           "paper_title": "Poster Title 75",
           "track": "Urology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/DQD5maWmuhKiw1z1fnh7sRAdAZab36KQgWZisObA.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:33:00",
@@ -736,6 +763,7 @@
           "affiliation": "Central Health Research",
           "paper_title": "Poster Title 76",
           "track": "Hematology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/soS5Nh4TYRkD0VhJrOSvqw3Fldd9GzWsei0cnERV.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:34:00",
@@ -743,7 +771,14 @@
           "created_at": "2025-12-08T11:18:19.000000Z",
           "updated_at": "2025-12-08T11:18:19.000000Z",
           "co_author": []
-        },
+        }
+      ]
+    },
+    {
+      "screen_number": 6,
+      "no_of_records_in_screen": 6,
+      "minutes_per_record": 15,
+      "records": [
         {
           "id": 37,
           "paper_id": null,
@@ -756,6 +791,7 @@
           "affiliation": "Prime Medical College",
           "paper_title": "Poster Title 77",
           "track": "Cardiac Surgery",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/tCsv1MvATUmAZSE3zJBc6U4kOpFFR671rokpL0pz.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:35:00",
@@ -763,14 +799,7 @@
           "created_at": "2025-12-08T11:19:14.000000Z",
           "updated_at": "2025-12-08T11:19:14.000000Z",
           "co_author": []
-        }
-      ]
-    },
-    {
-      "screen_number": 7,
-      "no_of_records_in_screen": 6,
-      "minutes_per_record": 15,
-      "records": [
+        },
         {
           "id": 38,
           "paper_id": null,
@@ -783,6 +812,7 @@
           "affiliation": "LifeCare Hospital",
           "paper_title": "Poster Title 78",
           "track": "Bone Research",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/ffTpatHVYGklmGQeEkWExc36WAVrYAQnn35KXw7z.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:36:00",
@@ -803,6 +833,7 @@
           "affiliation": "North Hill University",
           "paper_title": "Poster Title 79",
           "track": "Neural Networks",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/SRcMPjUAVnBs5BKBCq7hCdT2pmwcQcnw8o22sV0T.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:37:00",
@@ -823,6 +854,7 @@
           "affiliation": "Genesis Health Center",
           "paper_title": "Poster Title 80",
           "track": "Molecular Biology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/wTnYgQEG4DUBnJzkTa9nlHwXGUtNGSMzQ1DtwDS8.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:38:00",
@@ -843,6 +875,7 @@
           "affiliation": "Research Institute of Medicine",
           "paper_title": "Poster Title 81",
           "track": "Clinical Studies",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/6udxouA81UKZwMJT5rqHgHkHYwkPUsvYNPXbRA27.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:39:00",
@@ -863,6 +896,7 @@
           "affiliation": "Blue Valley Research Hospital",
           "paper_title": "Poster Title 82",
           "track": "Dentistry",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/BTThfJtlWtNH9ucbqy8YWcgXdORw9XAmDynq5VMH.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:40:00",
@@ -870,7 +904,14 @@
           "created_at": "2025-12-08T11:29:29.000000Z",
           "updated_at": "2025-12-08T11:29:29.000000Z",
           "co_author": []
-        },
+        }
+      ]
+    },
+    {
+      "screen_number": 7,
+      "no_of_records_in_screen": 6,
+      "minutes_per_record": 15,
+      "records": [
         {
           "id": 43,
           "paper_id": null,
@@ -883,6 +924,7 @@
           "affiliation": "Elite Medical Academy",
           "paper_title": "Poster Title 83",
           "track": "Toxicology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/sBIY65pQ4SUqKPdpwCvy0hQgCzhj1WsqudulawiI.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:41:00",
@@ -890,14 +932,7 @@
           "created_at": "2025-12-08T11:30:23.000000Z",
           "updated_at": "2025-12-08T11:30:23.000000Z",
           "co_author": []
-        }
-      ]
-    },
-    {
-      "screen_number": 8,
-      "no_of_records_in_screen": 5,
-      "minutes_per_record": 18,
-      "records": [
+        },
         {
           "id": 44,
           "paper_id": null,
@@ -910,6 +945,7 @@
           "affiliation": "Silverline Health Institute",
           "paper_title": "Poster Title 84",
           "track": "Blood Disorders",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/d9ywpnFatwGrfFXGbherz7bzY5Z1JFqRh2v3u0Ru.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:42:00",
@@ -930,6 +966,7 @@
           "affiliation": "Grand City Medical University",
           "paper_title": "Poster Title 85",
           "track": "Organ Transplant",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/okgb2b20s18TLFl3wB5lh6pWeuF8NzIQEEsBgkAl.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:43:00",
@@ -950,6 +987,7 @@
           "affiliation": "City Health Center",
           "paper_title": "Poster Title 86",
           "track": "Chronic Diseases",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/3iSR8ms70DSGswJ9FrtnyRuLxtjIwROPef8nxyuv.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:44:00",
@@ -970,6 +1008,7 @@
           "affiliation": "United Science Institute",
           "paper_title": "Poster Title 87",
           "track": "Liver Studies",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/odwpERXQv5oWGipGnT4AV98lFU2mHEBuaMe1A7K9.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:45:00",
@@ -990,6 +1029,7 @@
           "affiliation": "Prestige Medical School",
           "paper_title": "Poster Title 88",
           "track": "Vaccine Development",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/MpgxFP62yIV8Jxk8sGFdxx2JHPNJ4AXAumJW4UTn.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:46:00",
@@ -1001,9 +1041,9 @@
       ]
     },
     {
-      "screen_number": 9,
-      "no_of_records_in_screen": 5,
-      "minutes_per_record": 18,
+      "screen_number": 8,
+      "no_of_records_in_screen": 6,
+      "minutes_per_record": 15,
       "records": [
         {
           "id": 49,
@@ -1017,6 +1057,7 @@
           "affiliation": "Royal Health Academy",
           "paper_title": "Poster Title 89",
           "track": "Brain Mapping",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/C1R4M4VhgHOBOU6YSTQPsTnZWbRJAbfIId5G4ZOH.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:47:00",
@@ -1037,6 +1078,7 @@
           "affiliation": "Bright Future Research Center",
           "paper_title": "Poster Title 90",
           "track": "Endocrinology",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/aqdH9JeC0E1juDYR94Q0hTaH5vI1zTXBFIKpv1hu.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:48:00",
@@ -1057,6 +1099,7 @@
           "affiliation": "Sun Medical Institute",
           "paper_title": "Poster Title 91",
           "track": "Geriatrics",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/JimegIjVSdXCINnXkHpNAmWFiUZwHm709QBCzTLC.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:49:00",
@@ -1077,6 +1120,7 @@
           "affiliation": "National Health Bureau",
           "paper_title": "Poster Title 92",
           "track": "Muscle Disorders",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/S6umCoPENZHwmNF0F38LJzcP87u0FAmQ3iKDKMKl.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:50:00",
@@ -1097,6 +1141,7 @@
           "affiliation": "abc",
           "paper_title": "Poster Title 144",
           "track": "Clinical Studies",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/WVUGP7F345HEu3efw7fiUe67hX6X4vg13cuMT7sy.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:51:00",
@@ -1123,14 +1168,7 @@
               "updated_at": "2026-01-16T08:53:42.000000Z"
             }
           ]
-        }
-      ]
-    },
-    {
-      "screen_number": 10,
-      "no_of_records_in_screen": 5,
-      "minutes_per_record": 18,
-      "records": [
+        },
         {
           "id": 54,
           "paper_id": null,
@@ -1143,6 +1181,7 @@
           "affiliation": "Testing",
           "paper_title": "Testing Poster",
           "track": "test 1,test 2,test 3",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/3thyZWQRZ6YMbCDk8SNsFMEsC5ldeFc1MdoFX0zu.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:52:00",
@@ -1160,7 +1199,14 @@
               "updated_at": "2026-01-17T09:44:55.000000Z"
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "screen_number": 9,
+      "no_of_records_in_screen": 6,
+      "minutes_per_record": 15,
+      "records": [
         {
           "id": 55,
           "paper_id": null,
@@ -1173,6 +1219,7 @@
           "affiliation": "Test 1",
           "paper_title": "Poster 2",
           "track": "test 1,test 2,test 3,test 4",
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/EANojZc9B6lZqkJwmR90Ljaqdg8efiEQs1kf0OL5.webp",
           "url": null,
           "start_date_time": "29-01-2026 15:53:00",
@@ -1221,6 +1268,7 @@
           "affiliation": "Charusat",
           "paper_title": "Implementation of AI in current World",
           "track": null,
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/9A68xAROczYpJqDMkST3QMdrjmmFb39esSYJs9ti.webp",
           "url": null,
           "start_date_time": "29-01-2026 15:54:00",
@@ -1251,6 +1299,7 @@
           "affiliation": "test",
           "paper_title": "Paper Demo 1",
           "track": null,
+          "other_track": null,
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/UX7bxclcgySHn3h6tPstCEf0u2dU007b4i5buhfj.jpg",
           "url": null,
           "start_date_time": "29-01-2026 15:55:00",
@@ -1270,48 +1319,291 @@
           ]
         },
         {
-          "id": 62,
-          "paper_id": "986523",
-          "corresponding_author_email": "malani3851@gmail.com",
-          "abstract": "testing",
-          "corresponding_author": "testing",
-          "email": "mpushpa.apliket@gmail.com",
-          "google_id": "109574807492111435681",
+          "id": 64,
+          "paper_id": "6236",
+          "corresponding_author_email": "vijay.srinvas06@gmail.com",
+          "abstract": "ASD classification using resting-state fMRI from ABIDE combines Pearson and tangent space connectivity with strict cross-validation to reduce site bias.",
+          "corresponding_author": "Vijay Srinivas P",
+          "email": "harshavardhangunda14@gmail.com",
+          "google_id": "107128617098815031047",
           "mobile": null,
-          "affiliation": "testing",
-          "paper_title": "Cross-Domain Adaptation",
-          "track": "testing1,testing2",
-          "eposter_file": "https://myeposter.com/storage/eposter-pdf/ZM8fgORNVCEiTG8UDZUx5CDKpgiOoyizzkoNK3nm.jpg",
-          "url": "https://youtu.be/YWG44a_y-bw?si=TJH9BcSY0f8YKwFN",
-          "start_date_time": "01-02-2026 13:20:30",
-          "end_date_time": "01-02-2026 13:20:30",
-          "created_at": "2026-01-29T08:57:46.000000Z",
-          "updated_at": "2026-01-29T08:57:46.000000Z",
+          "affiliation": "Amrita Vishwa Vidyapeetham",
+          "paper_title": "A Robust Ensemble Framework for Autism Spectrum Disorder Classification Integrating Multiple Connectivity Features for fMRI data",
+          "track": "Medical and Digital Healthcare",
+          "other_track": null,
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/aGv29FoXtSfaVYoLYNAtP8zDIaOVCPJVbn0OPpiC.png",
+          "url": null,
+          "start_date_time": "02-02-2026 11:08:13",
+          "end_date_time": "02-02-2026 11:08:13",
+          "created_at": "2026-02-01T18:43:53.000000Z",
+          "updated_at": "2026-02-01T18:43:53.000000Z",
           "co_author": [
             {
-              "id": 14,
-              "eposter_id": 62,
-              "name": "user1",
-              "email": "user1@gmail.com",
-              "affiliation": "user1",
-              "created_at": "2026-01-29T08:57:46.000000Z",
-              "updated_at": "2026-01-29T08:57:46.000000Z"
+              "id": 17,
+              "eposter_id": 64,
+              "name": "Harish SS",
+              "email": "harishdeepikassdeepikass@gmail.com",
+              "affiliation": "Amrita Vishwa Vidyapeetham",
+              "created_at": "2026-02-01T18:43:53.000000Z",
+              "updated_at": "2026-02-01T18:43:53.000000Z"
             },
             {
-              "id": 15,
-              "eposter_id": 62,
-              "name": "user2",
-              "email": "user2@gmail.com",
-              "affiliation": "user2",
-              "created_at": "2026-01-29T08:57:46.000000Z",
-              "updated_at": "2026-01-29T08:57:46.000000Z"
+              "id": 18,
+              "eposter_id": 64,
+              "name": "Gunda Harshavardhan",
+              "email": "harshavardhangunda14@gmail.com",
+              "affiliation": "Amrita Vishwa Vidyapeetham",
+              "created_at": "2026-02-01T18:43:53.000000Z",
+              "updated_at": "2026-02-01T18:43:53.000000Z"
+            },
+            {
+              "id": 19,
+              "eposter_id": 64,
+              "name": "Jerome Richard D",
+              "email": "cb.sc.u4aie23265@cb.students.amrita.edu",
+              "affiliation": "Amrita Vishwa Vidyapeetham",
+              "created_at": "2026-02-01T18:43:53.000000Z",
+              "updated_at": "2026-02-01T18:43:53.000000Z"
+            },
+            {
+              "id": 20,
+              "eposter_id": 64,
+              "name": "Amrutha Veluppal",
+              "email": "V_amrutha1@cb.amrita.edu",
+              "affiliation": "Amrita Vishwa Vidyapeetham",
+              "created_at": "2026-02-01T18:43:53.000000Z",
+              "updated_at": "2026-02-01T18:43:53.000000Z"
+            }
+          ]
+        },
+        {
+          "id": 65,
+          "paper_id": "6104",
+          "corresponding_author_email": "anukha.vusiri@gmail.com",
+          "abstract": "We present a low-cost blink-based BCI using a Muse EEG headset that classifies blink sequences to enable real-time prosthetic arm control with 90.6% accuracy.",
+          "corresponding_author": "Anukha Vusirikala",
+          "email": "26avusirikala@castilleja.org",
+          "google_id": "109706009390787426284",
+          "mobile": null,
+          "affiliation": "Castilleja School",
+          "paper_title": "Multi-Command Control of Prosthetic Arm Using a Low-Cost EEG Blink Sequencer",
+          "track": "Wearables and Immersive Technologies",
+          "other_track": null,
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/avzxqUuZl2YWamPDLU37jkBSiuLexus45emf9sez.png",
+          "url": null,
+          "start_date_time": "02-02-2026 11:08:13",
+          "end_date_time": "02-02-2026 11:08:13",
+          "created_at": "2026-02-01T23:48:13.000000Z",
+          "updated_at": "2026-02-01T23:48:13.000000Z",
+          "co_author": [
+            {
+              "id": 21,
+              "eposter_id": 65,
+              "name": "Simarjeet Singh Saini",
+              "email": "simarjeet.saini@uwaterloo.ca",
+              "affiliation": "University of Waterloo",
+              "created_at": "2026-02-01T23:48:13.000000Z",
+              "updated_at": "2026-02-01T23:48:13.000000Z"
+            }
+          ]
+        },
+        {
+          "id": 66,
+          "paper_id": "6038",
+          "corresponding_author_email": "mehmet.yuce@monash.edu",
+          "abstract": "xx",
+          "corresponding_author": "Mehmet R. Yuce",
+          "email": "stephanie.pella@monash.edu",
+          "google_id": "110294653351975614880",
+          "mobile": null,
+          "affiliation": "Monash University",
+          "paper_title": "Accurately Quantified Heart Rate Variability through Non-Contact Wearable Radar Sensing",
+          "track": "Wearables and Immersive Tecnologies",
+          "other_track": null,
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/J5BYnAaSyyUJlvW9tAaDcfry2hGPVZGDLvGwIdet.png",
+          "url": null,
+          "start_date_time": "02-02-2026 11:08:13",
+          "end_date_time": "02-02-2026 11:08:13",
+          "created_at": "2026-02-02T05:34:17.000000Z",
+          "updated_at": "2026-02-02T05:34:17.000000Z",
+          "co_author": [
+            {
+              "id": 22,
+              "eposter_id": 66,
+              "name": "Zainab Riaz",
+              "email": "zainab.riaz@monash.edu",
+              "affiliation": "Monash University",
+              "created_at": "2026-02-02T05:34:17.000000Z",
+              "updated_at": "2026-02-02T05:34:17.000000Z"
             }
           ]
         }
       ]
+    },
+    {
+      "screen_number": 10,
+      "no_of_records_in_screen": 6,
+      "minutes_per_record": 15,
+      "records": [
+        {
+          "id": 67,
+          "paper_id": "6039",
+          "corresponding_author_email": "vishal.roha@monash.edu",
+          "abstract": "VITAL Net: A Hybrid Framework for SpO2 and HR Estimation Using Smartphone rPPG Video",
+          "corresponding_author": "Vishal Singh Roha",
+          "email": "vishal.roha@monash.edu",
+          "google_id": "107550482234828240525",
+          "mobile": null,
+          "affiliation": "Monash University",
+          "paper_title": "VITAL Net: A Hybrid Framework for SpO2 and HR Estimation Using Smartphone rPPG Video",
+          "track": "Medical and Digital Healthcare",
+          "other_track": null,
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/6B2xvHGhI4kqO4QzOxt2bZadDcb1HblBH3VX0b4U.png",
+          "url": null,
+          "start_date_time": "02-02-2026 11:08:13",
+          "end_date_time": "02-02-2026 11:08:13",
+          "created_at": "2026-02-02T05:48:42.000000Z",
+          "updated_at": "2026-02-02T05:48:42.000000Z",
+          "co_author": [
+            {
+              "id": 23,
+              "eposter_id": 67,
+              "name": "Rahul Ranjan",
+              "email": "rahul.ranjan@monash.edu",
+              "affiliation": "Monash University",
+              "created_at": "2026-02-02T05:48:42.000000Z",
+              "updated_at": "2026-02-02T05:48:42.000000Z"
+            },
+            {
+              "id": 24,
+              "eposter_id": 67,
+              "name": "Mehmet Rasit Yuce",
+              "email": "mehmet.yuce@monash.edu",
+              "affiliation": "Monash University",
+              "created_at": "2026-02-02T05:48:42.000000Z",
+              "updated_at": "2026-02-02T05:48:42.000000Z"
+            }
+          ]
+        },
+        {
+          "id": 69,
+          "paper_id": "213",
+          "corresponding_author_email": "abhi@gmail.com",
+          "abstract": "mlknhbjn",
+          "corresponding_author": "abhi",
+          "email": "luckyabhi49@gmail.com",
+          "google_id": "108039941523039794012",
+          "mobile": null,
+          "affiliation": "hgfcvbn",
+          "paper_title": "Test paper",
+          "track": "Other",
+          "other_track": "tfvg",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/Vyl8fa0TZdwKL3rtKnGnY3XEebO8BP7fO4X62oNZ.png",
+          "url": null,
+          "start_date_time": "02-02-2026 11:08:13",
+          "end_date_time": "02-02-2026 11:08:13",
+          "created_at": "2026-02-02T07:13:43.000000Z",
+          "updated_at": "2026-02-02T07:13:43.000000Z",
+          "co_author": []
+        },
+        {
+          "id": 70,
+          "paper_id": "6247",
+          "corresponding_author_email": "prithvichawla@gmail.com",
+          "abstract": "In this work, a comparative study of chemiluminescence-based H2O2 detection is given using two platforms: paper-based micropads and glass vials. Paper micro pads showed better Linear Regression of 0.9788 as compared to vials with 0.9573.",
+          "corresponding_author": "Prithvi Chawla",
+          "email": "prithvichawla@gmail.com",
+          "google_id": "100554950855813811020",
+          "mobile": null,
+          "affiliation": "Ramdeobaba University, Nagpur",
+          "paper_title": "Comparative Analysis of Hydrogen Peroxide Detection Using Paper-Based Micropads and Glass Vials",
+          "track": "Medical & Digital Healthcare IX",
+          "other_track": null,
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/3JcgMC6hZ1asWHbyBwm95wSsX7j3b6k30JJW2OLf.png",
+          "url": null,
+          "start_date_time": "02-02-2026 11:08:13",
+          "end_date_time": "02-02-2026 11:08:13",
+          "created_at": "2026-02-02T07:17:15.000000Z",
+          "updated_at": "2026-02-02T07:17:15.000000Z",
+          "co_author": [
+            {
+              "id": 25,
+              "eposter_id": 70,
+              "name": "Meghana Hasamnis",
+              "email": "hasamnisma@rknec.edu",
+              "affiliation": "Ramdeobaba University, Nagpur",
+              "created_at": "2026-02-02T07:17:15.000000Z",
+              "updated_at": "2026-02-02T07:17:15.000000Z"
+            }
+          ]
+        },
+        {
+          "id": 71,
+          "paper_id": "1234567890",
+          "corresponding_author_email": "prashantbharda1@gmail.com",
+          "abstract": "handful of sensors for sensing environmental parameters",
+          "corresponding_author": "Prashant Bharda",
+          "email": "prashantbharda1@gmail.com",
+          "google_id": "102422623168844536644",
+          "mobile": null,
+          "affiliation": "CTO",
+          "paper_title": "An introduction to MYOSA",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/vH4B7e8SvFdog2Hatlm03y8AUfsgeh51jAZqVX1V.jpg",
+          "url": null,
+          "start_date_time": "02-02-2026 11:08:13",
+          "end_date_time": "02-02-2026 11:08:13",
+          "created_at": "2026-02-02T07:27:14.000000Z",
+          "updated_at": "2026-02-02T07:27:14.000000Z",
+          "co_author": []
+        },
+        {
+          "id": 73,
+          "paper_id": "123",
+          "corresponding_author_email": "solankikalpan05@gmail.com",
+          "abstract": "These is the next big thing in the technology",
+          "corresponding_author": "Kalpan Solanki",
+          "email": "kalpany5104@gmail.com",
+          "google_id": "103299957796957491203",
+          "mobile": null,
+          "affiliation": "Pegasus Automation",
+          "paper_title": "New Gen AI: Agentic AI",
+          "track": "Robotics & Digital Twin II",
+          "other_track": null,
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/c0h79CaFfTOm4Bqr8cV51sRZxqWufc9G24tOAVsn.png",
+          "url": "www.pegasusautomation.in",
+          "start_date_time": "02-02-2026 11:08:13",
+          "end_date_time": "02-02-2026 11:08:13",
+          "created_at": "2026-02-02T07:47:24.000000Z",
+          "updated_at": "2026-02-02T07:47:24.000000Z",
+          "co_author": []
+        },
+        {
+          "id": 75,
+          "paper_id": "1234",
+          "corresponding_author_email": "joymehtani1512@gmail.com",
+          "abstract": "1234",
+          "corresponding_author": "Joy",
+          "email": "joymehtani1512@gmail.com",
+          "google_id": "112098188252455477266",
+          "mobile": null,
+          "affiliation": "Pegasus Automation Pvt. Ltd.",
+          "paper_title": "Myosense",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/PMxomLSriLRkM2vCVE3mXmmcME4Caxw0Es729xQH.jpg",
+          "url": null,
+          "start_date_time": "02-02-2026 11:08:13",
+          "end_date_time": "02-02-2026 11:08:13",
+          "created_at": "2026-02-02T09:08:19.000000Z",
+          "updated_at": "2026-02-02T09:08:19.000000Z",
+          "co_author": []
+        }
+      ]
     }
   ],
-  "fetched_at": "01-02-2026-18:50:30",
-  "fetched_date": "01-02-2026",
-  "fetched_time": "18:50:30"
+  "fetched_at": "02-02-2026-16:38:13",
+  "fetched_date": "02-02-2026",
+  "fetched_time": "16:38:13"
 }

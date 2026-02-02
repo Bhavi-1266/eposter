@@ -50,8 +50,7 @@ def display_url(screen, scr_w, scr_h, rotation=0):
 
         bar_height = 25
         bar_surface = pygame.Surface((logical_w, bar_height), pygame.SRCALPHA)
-        bar_surface.fill((20, 20, 20, 230)) 
-        
+        bar_surface.set_alpha(230)
         text_surf = font.render(url_text, True, (90, 90, 90))
         text_rect = text_surf.get_rect(center=(logical_w // 2, bar_height // 2))
         bar_surface.blit(text_surf, text_rect)

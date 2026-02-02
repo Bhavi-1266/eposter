@@ -18,7 +18,7 @@
   "display": {
     "cache_refresh": 60,
     "rotation_degree": 90,
-    "device_id": 1,
+    "device_id": 2,
     "Auto_Scroll": 5,
     "Mode": "Time"
   }

@@ -2,11 +2,9 @@
 import json
 import os
 import socket
-import threading
+import time
 from pathlib import Path
-from flask import Flask, request, redirect, render_template_string
-from dnslib import DNSRecord, QTYPE, A, RR
-from dnslib.server import DNSServer, DNSHandler, BaseResolver
+from flask import Flask, request, redirect, render_template_string, jsonify
 
 # --- Config ---
 PROJECT_DIR = Path(__file__).parent
@@ -42,9 +40,51 @@ HTML_TEMPLATE = """
         .btn:hover { opacity: 0.9; }
         .error { background: #fee; color: #c33; padding: 10px; border-radius: 5px; margin-bottom: 15px; border-left: 4px solid #c33; }
         .note { font-size: 12px; color: #666; margin-top: 5px; }
+        
+        /* Toast Notification Styles */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            display: none;
+        }
+        .toast.success { background: #4caf50; }
+        .toast.error { background: #f44336; }
+        .toast.show { display: block; }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
+    <div id="toast" class="toast"></div>
+    
     <div class="container">
         <div class="header">
             <h1>ePoster Manager</h1>
@@ -55,10 +95,16 @@ HTML_TEMPLATE = """
             </div>
         </div>
         <div class="content">
-            {% if error %}
-            <div class="error">{{ error }}</div>
-            {% endif %}
-            <form method="POST" action="/save">
+            <form method="POST" action="/save" id="configForm">
+                <div class="section">
+                    <h2>Authorization</h2>
+                    <div class="form-group">
+                        <label>Admin Password (Required to Save)</label>
+                        <input type="password" name="admin_password" id="admin_password" required>
+                        <div class="note">Enter your admin password to save changes</div>
+                    </div>
+                </div>
+                
                 <div class="section">
                     <h2>Identity</h2>
                     <div class="form-group">
@@ -128,19 +174,53 @@ HTML_TEMPLATE = """
                     </div>
                 </div>
 
-                <div class="section">
-                    <h2>Authorization</h2>
-                    <div class="form-group">
-                        <label>Admin Password (Required to Save)</label>
-                        <input type="password" name="admin_password" required>
-                        <div class="note">Enter your admin password to save changes</div>
-                    </div>
-                </div>
-
                 <button type="submit" class="btn">Save Changes</button>
             </form>
         </div>
     </div>
+    
+    <script>
+        const form = document.getElementById('configForm');
+        const toast = document.getElementById('toast');
+        
+        function showToast(message, type) {
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' show';
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    toast.style.animation = '';
+                }, 300);
+            }, 3000);
+        }
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch('/save', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    // Clear password field after successful save
+                    document.getElementById('admin_password').value = '';
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Error saving settings', 'error');
+            }
+        });
+    </script>
 </body>
 </html>
 """
@@ -149,7 +229,8 @@ HTML_TEMPLATE = """
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        s.connect(('10.255.255.255', 1))
+        # Doesn't actually connect, just used to find local IP
+        s.connect(('8.8.8.8', 1))
         IP = s.getsockname()[0]
     except Exception:
         IP = '127.0.0.1'
@@ -157,67 +238,27 @@ def get_ip():
         s.close()
     return IP
 
-# --- Custom DNS Resolver ---
-class CustomResolver(BaseResolver):
-    def __init__(self, ip_address, config_file):
-        self.ip_address = ip_address
-        self.config_file = config_file
-    
-    def get_device_id(self):
-        """Load device ID from config"""
-        try:
-            if self.config_file.exists():
-                with open(self.config_file, 'r') as f:
-                    config = json.load(f)
-                    return config.get('ID', 0)
-        except Exception:
-            pass
-        return 0
-    
-    def resolve(self, request, handler):
-        reply = request.reply()
-        qname = str(request.q.qname).lower()
-        
-        # Get current device ID
-        device_id = self.get_device_id()
-        target_hostname = f"setupeposter{device_id}."
-        
-        # Check if the query is for our custom hostname or any domain (captive portal)
-        if qname.startswith("setupeposter") or True:  # Respond to all DNS queries for captive portal
-            if request.q.qtype == QTYPE.A:
-                reply.add_answer(
-                    RR(
-                        request.q.qname,
-                        QTYPE.A,
-                        rdata=A(self.ip_address),
-                        ttl=60
-                    )
-                )
-        
-        return reply
+# --- Passive Wi-Fi Check ---
+def wait_for_wifi(timeout_interval=5):
+    """
+    Waits until the device has a valid network IP 
+    and can reach the outside world.
+    """
+    print("[*] Entering Passive Mode: Waiting for Wi-Fi connection...")
+    while True:
+        ip = get_ip()
+        if ip != '127.0.0.1':
+            print(f"[*] Wi-Fi Connected! Local IP: {ip}")
+            return ip
+        else:
+            print(f"[-] No connection found. Retrying in {timeout_interval}s...")
+            time.sleep(timeout_interval)
 
-# --- DNS Server ---
-def start_dns_server(ip_address, config_file):
-    """Start DNS server with custom resolver"""
-    try:
-        resolver = CustomResolver(ip_address, config_file)
-        dns_server = DNSServer(
-            resolver,
-            port=53,
-            address=ip_address,
-            tcp=False
-        )
-        print(f"[*] DNS Server Active on {ip_address}:53")
-        print(f"[*] Resolving setupEposter[ID] to {ip_address}")
-        dns_server.start()
-    except Exception as e:
-        print(f"[!] DNS Server Error: {e}")
-
-# --- Web Routes ---
+# --- Config Management ---
 def load_config():
     default_config = {
         "ID": 0,
-        "password": "admin",  # Default password if none exists
+        "password": "admin",
         "wifi": {"ssid1": "", "password1": "", "ssid2": "", "password2": ""},
         "api": {"poster_api_url": ""},
         "display": {
@@ -234,7 +275,6 @@ def load_config():
     try:
         with open(CONFIG_FILE, 'r') as f:
             data = json.load(f)
-        # Ensure basic structure exists
         for key in default_config:
             if key not in data:
                 data[key] = default_config[key]
@@ -242,85 +282,48 @@ def load_config():
     except Exception:
         return default_config
 
+# --- Web Routes ---
 @app.route('/')
 def home():
-    error = request.args.get('error')
     conf = load_config()
-    current_hostname = f"setupEposter{conf['ID']}"
-    return render_template_string(HTML_TEMPLATE, config=conf, hostname=current_hostname, error=error)
+    return render_template_string(HTML_TEMPLATE, config=conf, hostname=f"ePoster-{conf['ID']}")
 
 @app.route('/save', methods=['POST'])
 def save():
     conf = load_config()
     input_password = request.form.get('admin_password')
     
-    # Password Verification
     if input_password != conf.get('password'):
-        return redirect('/?error=Incorrect+Admin+Password')
+        return jsonify({'success': False, 'message': 'Incorrect Admin Password'})
     
     try:
-        # Update fields
+        # Update configuration
         conf['display']['device_id'] = int(request.form.get('device_id'))
         conf['display']['rotation_degree'] = int(request.form.get('rotation'))
         conf['display']['Mode'] = request.form.get('mode')
         conf['display']['Auto_Scroll'] = int(request.form.get('auto_scroll'))
-        
         conf['wifi']['ssid1'] = request.form.get('ssid1')
         conf['wifi']['password1'] = request.form.get('pass1')
         conf['wifi']['ssid2'] = request.form.get('ssid2')
         conf['wifi']['password2'] = request.form.get('pass2')
-        
         conf['api']['poster_api_url'] = request.form.get('poster_api_url')
         
-        # Save to File
         with open(CONFIG_FILE, 'w') as f:
             json.dump(conf, f, indent=2)
         
-        return """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Settings Saved</title>
-            <style>
-                body { font-family: Arial; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-                .box { background: white; padding: 40px; border-radius: 10px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-                h1 { color: #667eea; margin-bottom: 20px; }
-                .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; }
-            </style>
-        </head>
-        <body>
-            <div class="box">
-                <h1>Settings Saved!</h1>
-                <p>The configuration has been updated successfully.</p>
-                <a href="/" class="btn">Go Back</a>
-            </div>
-        </body>
-        </html>
-        """
+        return jsonify({'success': True, 'message': 'Settings saved successfully!'})
     except Exception as e:
-        return f"<h1>Error Saving</h1><p>{e}</p>"
+        return jsonify({'success': False, 'message': f'Error saving settings: {str(e)}'})
 
-@app.route('/generate_204')
-@app.route('/ncsi.txt')
-def captive_check():
-    return redirect('/', code=302)
-
+# --- Main Entry ---
 if __name__ == '__main__':
-    current_ip = get_ip()
+    # 1. Wait for Wi-Fi (Passive Mode)
+    current_ip = wait_for_wifi()
+    
+    # 2. Load Config
     conf = load_config()
     
-    print(f"[*] Device ID: {conf['ID']}")
-    print(f"[*] DNS Hostname: setupEposter{conf['ID']}")
-    print(f"[*] Web Admin running on: http://{current_ip}")
-    print(f"[*] Access via: http://setupEposter{conf['ID']}")
+    print(f"[*] Starting Web Admin on http://{current_ip}:{PORT}")
     
-    # Start DNS Server in background thread
-    dns_thread = threading.Thread(
-        target=start_dns_server, 
-        args=(current_ip, CONFIG_FILE), 
-        daemon=True
-    )
-    dns_thread.start()
-    
-    # Start Flask Web Server
+    # 3. Start Flask (DNS logic removed)
     app.run(host='0.0.0.0', port=PORT, debug=False)
