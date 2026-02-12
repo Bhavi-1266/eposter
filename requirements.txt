@@ -1,5 +1,5 @@
-Flask
-dnslib
-pygame
-requests
-Pillow
+Flask>=3.0.0
+dnslib>=0.9.23
+pygame>=2.6.0
+requests>=2.31.0
+Pillow>=10.2.0

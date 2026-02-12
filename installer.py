@@ -10,6 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent
 VENV_PATH = BASE_DIR / "venv"
 PYTHON_BIN = VENV_PATH / "bin" / "python3"
 REQ_FILE = BASE_DIR / "requirements.txt"
+POWERSAVE_SCRIPT = BASE_DIR / "wifi_powersave.sh"
 
 # Detect the actual user
 REAL_USER = os.getenv("SUDO_USER") or os.getlogin() or "rock"
@@ -54,15 +55,20 @@ def setup():
     except KeyError:
         user_id = 1000
 
-    # 1. Ensure system dependencies
+    # 1. Ensure system dependencies (Added JQ and SDL2 for Pygame)
     run(["apt-get", "update", "-y"])
-    run(["apt-get", "install", "-y", "python3-venv", "python3-pip", "x11-xserver-utils", "network-manager", "polkitd"])
+    run(["apt-get", "install", "-y", 
+         "python3-venv", "python3-pip", "x11-xserver-utils", "network-manager", "polkitd", 
+         "jq", "libsdl2-dev", "libsdl2-image-dev", "libsdl2-mixer-dev", "libsdl2-ttf-dev", "libfreetype6-dev"])
 
     # 2. Virtual Env & Requirements
     if not os.path.exists(VENV_PATH):
         run(["python3", "-m", "venv", str(VENV_PATH)])
     
     pip_bin = VENV_PATH / "bin" / "pip"
+    # Upgrade pip to handle modern wheels for Python 3.14
+    run([str(pip_bin), "install", "--upgrade", "pip"])
+    
     if REQ_FILE.exists():
         run([str(pip_bin), "install", "-r", str(REQ_FILE)])
     else:
@@ -73,6 +79,19 @@ def setup():
     
     # Ensure the user is in the correct groups
     run(["usermod", "-aG", "netdev,audio,video,sudo", REAL_USER])
+
+    # NEW: Configure NOPASSWD for the powersave script so the Web UI works
+    if POWERSAVE_SCRIPT.exists():
+        run(["chmod", "+x", str(POWERSAVE_SCRIPT)])
+        sudoers_line = f"{REAL_USER} ALL=(ALL) NOPASSWD: {POWERSAVE_SCRIPT}\n"
+        sudoers_path = "/etc/sudoers.d/eposter-wifi"
+        try:
+            with open(sudoers_path, "w") as f:
+                f.write(sudoers_line)
+            run(["chmod", "0440", sudoers_path])
+            print("--> Added NOPASSWD rule for WiFi powersave script.")
+        except Exception as e:
+            print(f"Failed to write sudoers rule: {e}")
 
     # Path for modern Polkit rules
     polkit_dir = Path("/etc/polkit-1/rules.d")
@@ -116,7 +135,6 @@ polkit.addRule(function(action, subject) {{
         f"XDG_RUNTIME_DIR=/run/user/{user_id}"
     ]
 
-    # --- 4. Systemd Services ---
     for name, info in SERVICES.items():
         print(f"Creating systemd service: {name}")
         env_lines = "\n".join([f"Environment={e}" for e in info.get("env", [])])

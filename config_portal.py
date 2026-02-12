@@ -3,15 +3,71 @@ import json
 import os
 import socket
 import time
+import subprocess
 from pathlib import Path
-from flask import Flask, request, redirect, render_template_string, jsonify
+from flask import Flask, request, redirect, render_template_string, jsonify, session, url_for
 
 # --- Config ---
 PROJECT_DIR = Path(__file__).parent
 CONFIG_FILE = PROJECT_DIR / 'config.json'
+POWERSAVE_SCRIPT = PROJECT_DIR / 'wifi_powersave.sh'
 PORT = 80
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)  # Secret key for session management
+app.secret_key = os.urandom(24)  # Secret key for session management
+
+# --- Login Template ---
+LOGIN_TEMPLATE = """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ePoster Manager - Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-container { max-width: 400px; width: 100%; background: white; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 28px; margin-bottom: 5px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .content { padding: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; color: #333; font-weight: bold; font-size: 14px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        input:focus { outline: none; border-color: #667eea; }
+        .btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
+        .btn:hover { opacity: 0.9; }
+        .error { background: #fee; color: #c33; padding: 10px; border-radius: 5px; margin-bottom: 15px; border-left: 4px solid #c33; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="header">
+            <h1>ePoster Manager</h1>
+            <p>Admin Login</p>
+        </div>
+        <div class="content">
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+            <form method="POST" action="/login">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+"""
 
 # --- HTML Template ---
 HTML_TEMPLATE = """
@@ -106,6 +162,18 @@ HTML_TEMPLATE = """
                 </div>
                 
                 <div class="section">
+                    <h2>Power Management</h2>
+                    <div class="form-group">
+                        <label>WiFi Power Saving</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button type="button" id="powerSaveBtn" class="btn" style="width: auto; padding: 10px 20px; margin: 0;">Turn On</button>
+                            <span id="powerSaveStatus" style="color: #666; font-size: 14px;">Currently: OFF</span>
+                        </div>
+                        <div class="note">Enable WiFi power saving to reduce power consumption</div>
+                    </div>
+                </div>
+                
+                <div class="section">
                     <h2>Identity</h2>
                     <div class="form-group">
                         <label>Unit ID (Read Only)</label>
@@ -182,6 +250,9 @@ HTML_TEMPLATE = """
     <script>
         const form = document.getElementById('configForm');
         const toast = document.getElementById('toast');
+        const powerSaveBtn = document.getElementById('powerSaveBtn');
+        const powerSaveStatus = document.getElementById('powerSaveStatus');
+        let isPowerSaveOn = false;
         
         function showToast(message, type) {
             toast.textContent = message;
@@ -195,6 +266,30 @@ HTML_TEMPLATE = """
                 }, 300);
             }, 3000);
         }
+        
+        // Fetch current power save status on page load
+        async function fetchPowerSaveStatus() {
+            try {
+                const response = await fetch('/powersave_status');
+                const result = await response.json();
+                
+                if (result.success) {
+                    isPowerSaveOn = result.status === 'ON';
+                    updatePowerSaveUI();
+                }
+            } catch (error) {
+                console.error('Error fetching power save status:', error);
+            }
+        }
+        
+        function updatePowerSaveUI() {
+            powerSaveBtn.textContent = isPowerSaveOn ? 'Turn Off' : 'Turn On';
+            powerSaveStatus.textContent = 'Currently: ' + (isPowerSaveOn ? 'ON' : 'OFF');
+            powerSaveStatus.style.color = isPowerSaveOn ? '#4caf50' : '#666';
+        }
+        
+        // Fetch status on page load
+        fetchPowerSaveStatus();
         
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -218,6 +313,37 @@ HTML_TEMPLATE = """
                 }
             } catch (error) {
                 showToast('Error saving settings', 'error');
+            }
+        });
+        
+        powerSaveBtn.addEventListener('click', async () => {
+            try {
+                powerSaveBtn.disabled = true;
+                powerSaveBtn.textContent = 'Processing...';
+                
+                const response = await fetch('/toggle_powersave', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ enable: !isPowerSaveOn })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    isPowerSaveOn = !isPowerSaveOn;
+                    powerSaveBtn.textContent = isPowerSaveOn ? 'Turn Off' : 'Turn On';
+                    powerSaveStatus.textContent = 'Currently: ' + (isPowerSaveOn ? 'ON' : 'OFF');
+                    powerSaveStatus.style.color = isPowerSaveOn ? '#4caf50' : '#666';
+                    showToast(result.message, 'success');
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Error toggling power save', 'error');
+            } finally {
+                powerSaveBtn.disabled = false;
             }
         });
     </script>
@@ -258,6 +384,7 @@ def wait_for_wifi(timeout_interval=5):
 def load_config():
     default_config = {
         "ID": 0,
+        "username": "admin",
         "password": "admin",
         "wifi": {"ssid1": "", "password1": "", "ssid2": "", "password2": ""},
         "api": {"poster_api_url": ""},
@@ -283,13 +410,41 @@ def load_config():
         return default_config
 
 # --- Web Routes ---
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template_string(LOGIN_TEMPLATE, error=None)
+    
+    # POST: Handle login
+    username = request.form.get('username')
+    password = request.form.get('password')
+    conf = load_config()
+    
+    # Check credentials (both from config)
+    if username == conf.get('username') and password == conf.get('password'):
+        session['logged_in'] = True
+        return redirect(url_for('home'))
+    else:
+        return render_template_string(LOGIN_TEMPLATE, error='Invalid username or password')
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
+
 @app.route('/')
 def home():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    
     conf = load_config()
     return render_template_string(HTML_TEMPLATE, config=conf, hostname=f"ePoster-{conf['ID']}")
 
 @app.route('/save', methods=['POST'])
 def save():
+    if not session.get('logged_in'):
+        return jsonify({'success': False, 'message': 'Not authenticated'})
+    
     conf = load_config()
     input_password = request.form.get('admin_password')
     
@@ -314,6 +469,63 @@ def save():
         return jsonify({'success': True, 'message': 'Settings saved successfully!'})
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error saving settings: {str(e)}'})
+
+@app.route('/powersave_status', methods=['GET'])
+def powersave_status():
+    if not session.get('logged_in'):
+        return jsonify({'success': False, 'message': 'Not authenticated'})
+    
+    try:
+        if not POWERSAVE_SCRIPT.exists():
+            return jsonify({'success': False, 'message': 'Power save script not found'})
+        
+        result = subprocess.run(
+            ['bash', str(POWERSAVE_SCRIPT), 'status'],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        
+        if result.returncode == 0:
+            status = result.stdout.strip()
+            return jsonify({'success': True, 'status': status})
+        else:
+            return jsonify({'success': False, 'message': 'Could not get status'})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'})
+
+@app.route('/toggle_powersave', methods=['POST'])
+def toggle_powersave():
+    if not session.get('logged_in'):
+        return jsonify({'success': False, 'message': 'Not authenticated'})
+    
+    try:
+        data = request.get_json()
+        enable = data.get('enable', False)
+        
+        if not POWERSAVE_SCRIPT.exists():
+            return jsonify({'success': False, 'message': 'Power save script not found'})
+        
+        command = 'on' if enable else 'off'
+        
+        result = subprocess.run(
+            ['bash', str(POWERSAVE_SCRIPT), command],
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        
+        if result.returncode == 0:
+            message = 'WiFi power saving enabled' if enable else 'WiFi power saving disabled'
+            return jsonify({'success': True, 'message': message})
+        else:
+            return jsonify({'success': False, 'message': f'Script error: {result.stderr}'})
+    
+    except subprocess.TimeoutExpired:
+        return jsonify({'success': False, 'message': 'Script execution timeout'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'})
 
 # --- Main Entry ---
 if __name__ == '__main__':

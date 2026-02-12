@@ -8,6 +8,7 @@
     "connect_timeout": 15
   },
   "password": "hello",
+  "username": "admin" ,
   "api": {
     "poster_token": "A9993E364706816ABA3E25717850C26C9CD0D89D",
     "poster_api_url": "https://myeposter.com/api/v1/eposter-list",
@@ -18,7 +19,7 @@
   "display": {
     "cache_refresh": 60,
     "rotation_degree": 90,
-    "device_id": 2,
+    "device_id": 1,
     "Auto_Scroll": 5,
     "Mode": "Time"
   }
