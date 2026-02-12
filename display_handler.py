@@ -23,9 +23,9 @@ def get_local_ip():
     except:
         return "127.0.0.1"
 
-def display_url(screen, scr_w, scr_h, rotation=0):
+def display_url(screen, scr_w, scr_h, rotation=0, poster_id=None):
     """
-    Overlays a centered dark bar with grey text.
+    Overlays a bottom bar with poster ID on left and IP on right.
     Removed .flip() to prevent flickering.
     """
     try:
@@ -40,7 +40,8 @@ def display_url(screen, scr_w, scr_h, rotation=0):
             except: return "127.0.0.1"
 
         ip_addr = get_local_ip()
-        url_text = f"Admin Portal: http://{ip_addr}"
+        url_text = f"http://{ip_addr}"
+        poster_text = f"Poster ID: {poster_id}" if poster_id else ""
         font = pygame.font.SysFont("Arial", 16, bold=True)
         
         if rotation in [90, 270]:
@@ -51,9 +52,13 @@ def display_url(screen, scr_w, scr_h, rotation=0):
         bar_height = 25
         bar_surface = pygame.Surface((logical_w, bar_height), pygame.SRCALPHA)
         bar_surface.set_alpha(230)
-        text_surf = font.render(url_text, True, (90, 90, 90))
-        text_rect = text_surf.get_rect(center=(logical_w // 2, bar_height // 2))
-        bar_surface.blit(text_surf, text_rect)
+        
+        if poster_text:
+            left_surf = font.render(poster_text, True, (90, 90, 90))
+            bar_surface.blit(left_surf, (10, (bar_height - left_surf.get_height()) // 2))
+        
+        right_surf = font.render(url_text, True, (90, 90, 90))
+        bar_surface.blit(right_surf, (logical_w - right_surf.get_width() - 10, (bar_height - right_surf.get_height()) // 2))
         
         if rotation == 0:
             screen.blit(bar_surface, (0, scr_h - bar_height))
@@ -229,6 +234,7 @@ def show_screensaver_message(screen, scr_w, scr_h, message="Waiting...", rotatio
             screen.blit(surf, (0, 0))
 
         _draw_status_bar(screen, scr_w, scr_h, message, rotation)
+        display_url(screen, scr_w, scr_h, rotation)
         pygame.display.flip()
     except Exception as e:
         print(f"[display] Error showing screensaver: {e}")

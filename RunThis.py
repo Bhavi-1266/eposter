@@ -180,7 +180,7 @@ def run_time_mode(screen, clock):
                 path = cache_handler.get_image_path(pid)
                 if path and path.exists():
                     display_handler.display_image(screen, path, scr_w, scr_h, rotation)
-                    display_handler.display_url(screen, scr_w, scr_h, rotation)
+                    display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=pid)
                     pygame.display.flip()
                     poster_end_time = current_time + max(5, min(duration, (active["end_dt"] - now).total_seconds()))
                 else:
@@ -258,7 +258,8 @@ def run_scroll_mode(screen, clock):
             if index >= len(images): index = 0
             if images[index].exists():
                 display_handler.display_image(screen, images[index], scr_w, scr_h, rotation)
-                display_handler.display_url(screen, scr_w, scr_h, rotation)
+                img_id = images[index].stem
+                display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=img_id)
                 pygame.display.flip()
             index = (index + 1) % len(images)
             next_switch = current_time + scroll_delay
@@ -344,7 +345,8 @@ def run_menu_mode(screen, clock):
                             if pygame.Rect(40, y_offset, UI_W-80, item['height']).collidepoint(mx, my):
                                 display_handler.display_image(screen, item['path'], PHY_W, PHY_H, rotation)
                                 # URL on top of preview
-                                display_handler.display_url(screen, PHY_W, PHY_H, rotation)
+                                menu_img_id = item['path'].stem
+                                display_handler.display_url(screen, PHY_W, PHY_H, rotation, poster_id=menu_img_id)
                                 pygame.display.flip()
                                 waiting = True
                                 t_start = time.time()
