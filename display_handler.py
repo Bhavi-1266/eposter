@@ -172,6 +172,68 @@ def show_waiting_message(screen, scr_w, scr_h, message="Waiting...", rotation=0)
         print(f"[display] Error showing waiting message: {e}")
         pygame.display.flip()
 
+def _draw_status_bar(screen, scr_w, scr_h, message, rotation=0):
+    if rotation in [90, 270]:
+        logical_w = scr_h
+        logical_h = scr_w
+    else:
+        logical_w = scr_w
+        logical_h = scr_h
+
+    bar_height = max(30, int(logical_h * 0.1))
+    bar_surface = pygame.Surface((logical_w, bar_height), pygame.SRCALPHA)
+    bar_surface.fill((0, 0, 0, 0))
+
+    lines = message.split('\n') if message else []
+    font_size = max(14, int(bar_height * 0.18))
+    font = pygame.font.SysFont("Arial", font_size, bold=True)
+    text_color = (210, 210, 210)
+    rendered = [font.render(line, True, text_color) for line in lines]
+    total_h = sum(s.get_height() for s in rendered) + (4 * (len(rendered) - 1))
+
+    while rendered and total_h > bar_height - 10 and font_size > 12:
+        font_size -= 2
+        font = pygame.font.SysFont("Arial", font_size, bold=True)
+        rendered = [font.render(line, True, text_color) for line in lines]
+        total_h = sum(s.get_height() for s in rendered) + (4 * (len(rendered) - 1))
+
+    y = (bar_height - total_h) // 2
+    for surf in rendered:
+        x = (logical_w - surf.get_width()) // 2
+        bar_surface.blit(surf, (x, y))
+        y += surf.get_height() + 4
+
+    if rotation == 0:
+        screen.blit(bar_surface, (0, scr_h - bar_height))
+    else:
+        rotated_bar = pygame.transform.rotate(bar_surface, -rotation)
+        if rotation == 90:
+            screen.blit(rotated_bar, (0, 0))
+        elif rotation == 180:
+            screen.blit(rotated_bar, (0, 0))
+        elif rotation == 270:
+            screen.blit(rotated_bar, (scr_w - rotated_bar.get_width(), 0))
+        else:
+            screen.blit(rotated_bar, (0, scr_h - bar_height))
+
+def show_screensaver_message(screen, scr_w, scr_h, message="Waiting...", rotation=0, image_path=None):
+    screen.fill((0, 0, 0))
+    try:
+        if image_path is None:
+            image_path = Path(__file__).parent / "ScreenSaver.png"
+
+        if Path(image_path).exists():
+            img = Image.open(image_path).convert("RGBA")
+            canvas = make_landscape_and_fit(img, scr_w, scr_h, rotation=-rotation)
+            surf = pil_to_surface(canvas)
+            screen.blit(surf, (0, 0))
+
+        _draw_status_bar(screen, scr_w, scr_h, message, rotation)
+        pygame.display.flip()
+    except Exception as e:
+        print(f"[display] Error showing screensaver: {e}")
+        pygame.display.flip()
+
 def display_image(screen, image_path, scr_w, scr_h, rotation=0):
     """Displays an image on the screen with a black background."""
     try:

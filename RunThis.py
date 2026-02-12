@@ -116,9 +116,9 @@ def system_startup_check(screen):
     token = cfg.get('api', {}).get('poster_token')
     dev_id = cfg.get('display', {}).get('device_id')
 
-    display_handler.show_waiting_message(screen, scr_w, scr_h, "System Startup...\nChecking WiFi & Syncing Data", rotation)
+    display_handler.show_screensaver_message(screen, scr_w, scr_h, "System Startup...\nChecking WiFi & Syncing Data", rotation)
     refresh_data_and_cache(token, dev_id)
-    display_handler.show_waiting_message(screen, scr_w, scr_h, "Startup Complete!\nStarting Mode...", rotation)
+    display_handler.show_screensaver_message(screen, scr_w, scr_h, "Startup Complete!\nStarting Mode...", rotation)
     time.sleep(1)
 
 # ---------------------------------------------------------
@@ -147,7 +147,7 @@ def run_time_mode(screen, clock):
             rotation = int(check_cfg.get('display', {}).get('rotation_degree', 0))
             new_id = check_cfg.get('display', {}).get('device_id')
             if str(new_id) != str(device_id):
-                display_handler.show_waiting_message(screen, scr_w, scr_h, "Device ID Changed\nRefetching Data...", rotation)
+                display_handler.show_screensaver_message(screen, scr_w, scr_h, "Device ID Changed\nRefetching Data...", rotation)
                 device_id = new_id
                 records, duration = refresh_data_and_cache(token, device_id)
                 poster_end_time = 0 
@@ -163,20 +163,18 @@ def run_time_mode(screen, clock):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_q: sys.exit()
 
         if not records:
-            display_handler.show_waiting_message(screen, scr_w, scr_h, f"No Schedule for Device {device_id}", rotation)
-            display_handler.display_url(screen, scr_w, scr_h, rotation)
+            display_handler.show_screensaver_message(screen, scr_w, scr_h, "", rotation)
             pygame.display.flip()
             time.sleep(1)
             continue
             
         if current_time >= poster_end_time:
             now = datetime.now()
-            def get_dist(r):
-                if r["start_dt"] <= now <= r["end_dt"]: return 0
-                elif now < r["start_dt"]: return (r["start_dt"] - now).total_seconds()
-                else: return (now - r["end_dt"]).total_seconds()
-            
-            active = min(records, key=get_dist)
+            active = None
+            for r in sorted(records, key=lambda item: item.get("start_dt") or now):
+                if r["start_dt"] <= now <= r["end_dt"]:
+                    active = r
+                    break
             if active:
                 pid = active.get("id") or active.get("PosterId")
                 path = cache_handler.get_image_path(pid)
@@ -184,16 +182,14 @@ def run_time_mode(screen, clock):
                     display_handler.display_image(screen, path, scr_w, scr_h, rotation)
                     display_handler.display_url(screen, scr_w, scr_h, rotation)
                     pygame.display.flip()
-                    poster_end_time = current_time + (max(5, min(duration, (active["end_dt"]-now).total_seconds())) if get_dist(active)==0 else 5)
+                    poster_end_time = current_time + max(5, min(duration, (active["end_dt"] - now).total_seconds()))
                 else:
-                    display_handler.show_waiting_message(screen, scr_w, scr_h, f"Downloading ID: {pid}...", rotation)
-                    display_handler.display_url(screen, scr_w, scr_h, rotation)
+                    display_handler.show_screensaver_message(screen, scr_w, scr_h, f"Downloading ID: {pid}...", rotation)
                     pygame.display.flip()
                     cache_handler.sync_cache([active]) 
                     poster_end_time = current_time + 2
             else:
-                display_handler.show_waiting_message(screen, scr_w, scr_h, "No Posters Scheduled", rotation)
-                display_handler.display_url(screen, scr_w, scr_h, rotation)
+                display_handler.show_screensaver_message(screen, scr_w, scr_h, "", rotation)
                 pygame.display.flip()
                 poster_end_time = current_time + 5
         clock.tick(30)
@@ -235,7 +231,7 @@ def run_scroll_mode(screen, clock):
             scroll_delay = int(check_cfg.get('display', {}).get('Auto_Scroll', 5))
             new_id = check_cfg.get('display', {}).get('device_id')
             if str(new_id) != str(device_id):
-                display_handler.show_waiting_message(screen, scr_w, scr_h, "Device ID Changed...", rotation)
+                display_handler.show_screensaver_message(screen, scr_w, scr_h, "Device ID Changed...", rotation)
                 device_id = new_id
                 records, _ = refresh_data_and_cache(token, device_id)
                 images = get_valid_images(records)
@@ -252,8 +248,7 @@ def run_scroll_mode(screen, clock):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_q: sys.exit()
 
         if not images:
-            display_handler.show_waiting_message(screen, scr_w, scr_h, f"No Images (ID: {device_id})", rotation)
-            display_handler.display_url(screen, scr_w, scr_h, rotation)
+            display_handler.show_screensaver_message(screen, scr_w, scr_h, "", rotation)
             pygame.display.flip()
             time.sleep(2)
             images = get_valid_images(records)
@@ -314,7 +309,7 @@ def run_menu_mode(screen, clock):
             except: pass
         return loaded_items
     
-    display_handler.show_waiting_message(screen, PHY_W, PHY_H, "Loading Menu...", rotation)
+    display_handler.show_screensaver_message(screen, PHY_W, PHY_H, "Loading Menu...", rotation)
     items = load_menu_images()
     scroll_y, next_sync_time, last_config_check = 0, time.time() + 30, time.time()
 
