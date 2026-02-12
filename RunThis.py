@@ -177,10 +177,11 @@ def run_time_mode(screen, clock):
                     break
             if active:
                 pid = active.get("id") or active.get("PosterId")
+                paper_id = active.get("paper_id")
                 path = cache_handler.get_image_path(pid)
                 if path and path.exists():
                     display_handler.display_image(screen, path, scr_w, scr_h, rotation)
-                    display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=pid)
+                    display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=paper_id)
                     pygame.display.flip()
                     poster_end_time = current_time + max(5, min(duration, (active["end_dt"] - now).total_seconds()))
                 else:
@@ -259,7 +260,8 @@ def run_scroll_mode(screen, clock):
             if images[index].exists():
                 display_handler.display_image(screen, images[index], scr_w, scr_h, rotation)
                 img_id = images[index].stem
-                display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=img_id)
+                paper_id = next((r.get("paper_id") for r in records if str(r.get("id")) == str(img_id)), img_id)
+                display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=paper_id)
                 pygame.display.flip()
             index = (index + 1) % len(images)
             next_switch = current_time + scroll_delay
@@ -346,7 +348,9 @@ def run_menu_mode(screen, clock):
                                 display_handler.display_image(screen, item['path'], PHY_W, PHY_H, rotation)
                                 # URL on top of preview
                                 menu_img_id = item['path'].stem
-                                display_handler.display_url(screen, PHY_W, PHY_H, rotation, poster_id=menu_img_id)
+                                menu_records, _ = get_device_records(device_id)
+                                menu_paper_id = next((r.get("paper_id") for r in menu_records if str(r.get("id")) == str(menu_img_id)), menu_img_id)
+                                display_handler.display_url(screen, PHY_W, PHY_H, rotation, poster_id=menu_paper_id)
                                 pygame.display.flip()
                                 waiting = True
                                 t_start = time.time()

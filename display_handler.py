@@ -40,8 +40,8 @@ def display_url(screen, scr_w, scr_h, rotation=0, poster_id=None):
             except: return "127.0.0.1"
 
         ip_addr = get_local_ip()
-        url_text = f"http://{ip_addr}"
-        poster_text = f"Poster ID: {poster_id}" if poster_id else ""
+        url_text = f"{ip_addr}"
+        poster_text = f"Paper ID: {poster_id}" if poster_id else ""
         font = pygame.font.SysFont("Arial", 16, bold=True)
         
         if rotation in [90, 270]:
