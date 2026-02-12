@@ -1,13 +1,574 @@
 {
   "status": true,
-  "date": "11-02-2026",
-  "total_screen": 2,
+  "date": "12-02-2026",
+  "total_screen": 7,
   "screens": [
     {
       "screen_number": 1,
-      "screen_start_time": "11-02-2026 02:00:00",
-      "screen_end_time": "11-02-2026 02:15:00",
-      "no_of_records_in_screen": 3,
+      "screen_start_time": "12-02-2026 14:20:00",
+      "screen_end_time": "12-02-2026 15:40:00",
+      "no_of_records_in_screen": 8,
+      "records": [
+        {
+          "id": 77,
+          "paper_id": "6009",
+          "paper_title": "Real-Time Crop Sensing and Localization for  Precision Agriculture",
+          "abstract": "Real-Time Crop Sensing and Localization for  Precision Agriculture",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "corresponding_author": "Rudraswamy S B",
+          "corresponding_author_email": "rudra.swamy@sjce.ac.in",
+          "email": "rakeshmd@jssstuniv.in",
+          "mobile": null,
+          "affiliation": "SJCE, JSS Science and Technology",
+          "google_id": "100566191742617336256",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/LA04WtkEy96tulbndFjvRR83fPNjPBSNGuMeSxK4.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:20:00",
+          "end_date_time": "12-02-2026 14:30:00",
+          "co_author": [
+            {
+              "name": "Rakesh M D",
+              "email": "rakeshmd@jssstuniv.in",
+              "affiliation": "SJCE, JSS Science and Technology"
+            },
+            {
+              "name": "Rohith Rajesh",
+              "email": "rohithrajeshindia@gmail.com",
+              "affiliation": "VIT, Chennai, India"
+            }
+          ]
+        },
+        {
+          "id": 146,
+          "paper_id": "6115",
+          "paper_title": "Smart Scale",
+          "abstract": "Precise nutritional monitoring remains challenging despite advances in mobile health applications. Existing image-only approaches struggle with visually similar foods and hidden ingredients, limiting their reliability for users requiring accurate dietary data. Smart Scale introduces a novel multi-modal approach, integrating precision weighing technology with artificial intelligence-powered visual recognition. The system combines embedded sensors, uniform illumination, and cloud-based deep learning to provide comprehensive nutritional analysis. Validation studies confirmed substantial improvements in user experience, logging efficiency, and estimation accuracy compared to conventional methods, establishing Smart Scale as a practical solution for automated dietary monitoring.",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "corresponding_author": "Pranav kaul",
+          "corresponding_author_email": "pranav22367@iiitd.ac.in",
+          "email": "nitin23359@iiitd.ac.in",
+          "mobile": null,
+          "affiliation": "IIIT delhi",
+          "google_id": "100870403711341561485",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/hq2DaX6yUDnoVJQzULmuvTq4ojI46RnVOpqxisyL.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:30:00",
+          "end_date_time": "12-02-2026 14:40:00",
+          "co_author": [
+            {
+              "name": "Nitin yadav",
+              "email": "nitin23359@iiitd.ac.in",
+              "affiliation": "IIIT delhi"
+            }
+          ]
+        },
+        {
+          "id": 122,
+          "paper_id": "6184",
+          "paper_title": "A Lightweight CNN Framework with SAM-Based Preprocessing for Luffa Disease Detection",
+          "abstract": "The accurate and automatic detection of diseases in Luffa is crucial for safeguarding crop yield. While deep learning offers promising solutions, many models suffer from\r\nhigh computational complexity. This paper introduces a robust and efficient pipeline for automated identification of Luffa leaf diseases. It consists of the Segment Anything Model (SAM)-based image preprocessing and a lightweight Convolutional Neural Network (CNN). The use of a zero-shot segmentation tool, such as SAM, helps the proposed pipeline isolate the leaf from the background and enhance the performance of the CNN. The proposed CNN combines modified MBConv blocks with a dual-branch Efficient Channel Attention (ECA) mechanism, achieving a remarkably small footprint of just 166K parameters, 204.5 MMac FLOPs, and 0.58 MB of memory footprint. Evaluated\r\non the benchmark LuffaFolio dataset, our method demonstrates that SAM-based preprocessing improves accuracy by 19.73% and F1-score by 20.98% compared to using the original images. The result demonstrates the critical role of advanced segmentation in achieving robust classification. Also, the proposed CNN is optimal for deployment on low-powered edge and TinyML devices. In summary, the proposed framework provides a practical solution for in-field plant disease diagnosis, enabling timely intervention to minimize crop yield losses.",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "corresponding_author": "Sumeet Saurav",
+          "corresponding_author_email": "sumeet.ceeri@csir.res.in",
+          "email": "smanijee@gmail.com",
+          "mobile": null,
+          "affiliation": "CSIR-Central Electronics Engineering Research Institute, Pilani",
+          "google_id": "102751378279614146893",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/Mf1MQK3qwMgJYurJTRLX5zVHUIE6RpLb641fkBFL.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:40:00",
+          "end_date_time": "12-02-2026 14:50:00",
+          "co_author": [
+            {
+              "name": "Manish Kumar Sharma",
+              "email": "smanijee@gmail.com",
+              "affiliation": "CSIR-Central Electronics Engineering Research Institute, Pilani"
+            },
+            {
+              "name": "Sanjay Singh",
+              "email": "sanjay.ceeri@csir.res.in",
+              "affiliation": "CSIR-Central Electronics Engineering Research Institute, Pilani, Rajasthan, India,  Academy of Scientific and Innovative Research (AcSIR), Ghaziabad, Uttar Pradesh, India"
+            }
+          ]
+        },
+        {
+          "id": 113,
+          "paper_id": "6238",
+          "paper_title": "A Disposable Sensor Combined with LDA-SVM for Rapid Detection of Milk Fat Percentage and Water Adulteration",
+          "abstract": "This paper presents milk adulteration, particularly\r\nthrough dilution with water, poses a serious concern for consumer\r\nsafety and product integrity. This study presents a impedance based\r\ndisposable paper sensor which requires only 0.4ml milk (i.e\r\na drop of milk) to asses the identification of milk fat content\r\nand detection of water adulteration using machine learning\r\nframework. Impedance magnitude(|Z|)data, recorded over 20Hz-\r\n1MHz,were analysed using Linear Discriminant Analysis(LDA)\r\nto reduce dimensionality. The extracted discriminant features\r\nwere further classified using Support Vector Machine(SVM) with\r\na medium Gaussian kernel. The proposed LDA-SVM model\r\nachieved accuracies of 95.3% for water adultered milk and\r\n81.7% for distinguishing between fat percentage of milk. This\r\nresult demonstrate that combining impedance spectroscopy with\r\ndata driven classification offers a reliable approach for milk\r\nquality monitoring, enabling on-site adulteration detection and\r\ncomposition analysis.",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "corresponding_author": "Avishek Adhikary",
+          "corresponding_author_email": "avisheka@iitbhilai.ac.in",
+          "email": "poojaprasa@iitbhilai.ac.in",
+          "mobile": null,
+          "affiliation": "IIT BHILAI",
+          "google_id": "108340673211352909392",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/AEaQjUtbBleIp5qXT4ug7pPJEUCHxPw1Jusj33rx.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:50:00",
+          "end_date_time": "12-02-2026 15:00:00",
+          "co_author": [
+            {
+              "name": "Pooja Prasad",
+              "email": "poojaprasa@iitbhilai.ac.in",
+              "affiliation": "IIT BHILAI"
+            },
+            {
+              "name": "Asmita Bose",
+              "email": "asmitabose@iitbhilai.ac.in",
+              "affiliation": "IIT BHILAI"
+            }
+          ]
+        },
+        {
+          "id": 151,
+          "paper_id": "6300",
+          "paper_title": "In-Vitro and In-Vivo EIS-Based Analysis and Validation of Salt Stress Response in Pusa Basmati 1 Rice",
+          "abstract": "Rice is one of the most important food crops, serving as a major carbohydrate source worldwide. With ongoing climatic changes, abiotic stress has emerged as a critical challenge to rice production. Among these, salinity stress caused by excess salt in soil significantly impacts rice growth, particularly during germination and reproductive stages. To address the need for a cost-effective analytical approach, we evaluated salt stress in Pusa Basmati 1 rice plants using in vivo and in vitro electrochemical impedance spectroscopy (EIS). In addition, morphological changes, such as reduced plant height, leaf dimensions, shoot thickness, and root development, were recorded under increasing salt concentrations. EIS data, interpreted using an equivalent circuit model, revealed systematic variations in impedance and admittance parameters correlating with salt-induced morphological alterations.",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "corresponding_author": "Gautam Bacher",
+          "corresponding_author_email": "ggb@goa.bits-pilani.ac.in",
+          "email": "p20230044@goa.bits-pilani.ac.in",
+          "mobile": null,
+          "affiliation": "Department of Biological Sciences, BITS Pilani K K Birla Goa Campus, Zuarinagar 403726, India",
+          "google_id": "104803638162589022349",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/elYPC8dz6zupu6QPX1xoT3c2EAEQzoc5XobcYQ2M.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:00:00",
+          "end_date_time": "12-02-2026 15:10:00",
+          "co_author": [
+            {
+              "name": "Sohom Adhikari",
+              "email": "p20230044@goa.bits-pilani.ac.in",
+              "affiliation": "Department of Biological Sciences, BITS Pilani K K Birla Goa Campus, Zuarinagar 403726, India"
+            },
+            {
+              "name": "Rishikesh Datar",
+              "email": "p20200082@goa.bits-pilani.ac.in",
+              "affiliation": "Department of Electrical and Electronics Engineering, BITS Pilani K K Birla Goa Campus, Zuarinagar 403726, India"
+            },
+            {
+              "name": "Rajesh Mehrotra",
+              "email": "rajeshm@goa.bits-pilani.ac.in",
+              "affiliation": "Department of Biological Sciences, BITS Pilani K K Birla Goa Campus, Zuarinagar 403726, India"
+            },
+            {
+              "name": "Sandhya Mehrotra",
+              "email": "sandhyam@goa.bits-pilani.ac.in",
+              "affiliation": "Department of Biological Sciences, BITS Pilani K K Birla Goa Campus, Zuarinagar 403726, India"
+            }
+          ]
+        },
+        {
+          "id": 127,
+          "paper_id": "6386",
+          "paper_title": "Graphene/PEDOT:PSS Hybrid Ink Based Flexible and Eco-Friendly Humidity Sensor for Early Plant Leaf Stress Monitoring",
+          "abstract": "In this work, we present a flexible and eco-friendly humidity sensor suitable for early plant leaf stress monitoring. The humidity sensor was fabricated using graphene/PEDOT:PSS hybrid ink deposited via drop-casting method on interdigitated electrodes (IDEs) screen printed on a eco-friendly paper substrate. Contact angle measurement, scanning electron microscopy (SEM) and energy dispersive X-ray spectroscopy (EDX) studies were performed to demonstrate hydrophilic nature, surface morphology and elemental analysis, respectively, of the sensing layer. The sensor exhibited excellent sensing performance in the measured relative humidity (%RH) range from 25% RH to 94% RH having a maximum % response of 226.5%. The sensor demonstrated a nearly linear response (adj. R² = 0.99) in the considered range with a slope observed as 3.21 %/%RH. Multi-cyclic repeatability and reproducibility analysis further confirmed high reliability and consistent performance of the developed sensor. Furthermore, the capability of the sensor was successfully evaluated through capturing variations in plant physiological health status (under different environmental conditions, such as un-watered, water availability and solar irradiation) via monitoring microclimatic relative humidity (%RH) variations on plant (Epiremnun aureum) leaves. Through establishing the %RH values for healthy crops or plants under normal (well-watered) and stress conditions (un-watered or excessive solar irradiations), sensor seems to demonstrate strong potential for smart agriculture i.e., detecting early plant leaf stress.",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "corresponding_author": "Ajay Beniwal",
+          "corresponding_author_email": "d.beniwal@ucl.ac.uk",
+          "email": "t.odedeyi@ucl.ac.uk",
+          "mobile": null,
+          "affiliation": "Department of Electronic and Electrical Engineering, University College London (UCL), London, WC1E 7JE, United Kingdom.",
+          "google_id": "114185096129305524099",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/6xDg2fohzmPTfPDSM9tDWp3Oyb8MRBZs8ocoELqY.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:10:00",
+          "end_date_time": "12-02-2026 15:20:00",
+          "co_author": [
+            {
+              "name": "Temitope Odedeyi",
+              "email": "t.odedeyi@ucl.ac.uk",
+              "affiliation": "Department of Electronic and Electrical Engineering, University College London (UCL), London, WC1E 7JE, United Kingdom."
+            },
+            {
+              "name": "Izzat Darwazeh",
+              "email": "i.darwazeh@ucl.ac.uk",
+              "affiliation": "Department of Electronic and Electrical Engineering, University College London (UCL), London, WC1E 7JE, United Kingdom."
+            }
+          ]
+        },
+        {
+          "id": 163,
+          "paper_id": "6387",
+          "paper_title": "Quality Assessment and Valuation of Made-Tea Using ROI Segmentation and Spectral–TDS Fusion",
+          "abstract": "Consistent and objective valuation of made-tea is critical for quality control and pricing in the tea industry; however, conventional manual tasting is subjective, fatigue-prone, and difficult to scale. In addition, the visually complex nature of made-tea—characterized by curled and broken particles, overlapping structures, shadows, and non-uniform backgrounds—poses significant challenges for reliable image-based analysis.\n \nThis work presents a fully automated, operator-independent system for made-tea quality assessment by fusing region-of-interest (ROI) segmentation from spectral imaging with Total Dissolved Solids (TDS) measurements. A robust ROI isolation pipeline is developed using adaptive two-stage K-means segmentation, boundary-confidence filtering, and automated non-overlapping bounding-box extraction to mitigate segmentation-driven noise. Spectral reflectance features extracted from isolated ROIs are fused with TDS values to capture both physical and chemical characteristics of tea samples.\n \nThe proposed approach predicts the two-digit Valuation Grade (VG; Body–Zing: 0–5 each) and achieves an accuracy of 95.2% on an independent test set, with significant improvement in signal-to-noise ratio (+12.4 dB) and reduction in contamination (from 14.6% to 0.9%). The system demonstrates high repeatability (r = 0.97) and rapid processing (402 ms per sample), making it suitable for industrial deployment.\n \nOverall, the proposed spectral–TDS fusion framework enables fast, reliable, and scalable made-tea valuation, offering a practical alternative to subjective manual grading in quality-control workflows.",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "corresponding_author": "Sanket Junagade",
+          "corresponding_author_email": "sanket.junagade@tcs.com",
+          "email": "swagatambose.c@tcs.com",
+          "mobile": null,
+          "affiliation": "",
+          "google_id": "",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/cQuoRXTpso4MHV7MazL6eZACGoaIHkHwoojz2Kfg.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:20:00",
+          "end_date_time": "12-02-2026 15:30:00",
+          "co_author": [
+            {
+              "name": "Swagatam Bose Choudhury",
+              "email": "swagatambose.c@tcs.com",
+              "affiliation": ""
+            },
+            {
+              "name": "Sanat Sarangi",
+              "email": "sanat.sarangi@tcs.com",
+              "affiliation": ""
+            },
+            {
+              "name": "Dineshkumar Singh",
+              "email": "dineshkumar.singh@tcs.com",
+              "affiliation": ""
+            }
+          ]
+        },
+        {
+          "id": 98,
+          "paper_id": "6400",
+          "paper_title": "Magnetic Characterization and an Arctan-based Multi-Component Nonlinear Modelling of Mangifera Indica L. Tissues for PBC Applications",
+          "abstract": "The growing global population and rising food demand, coupled with environmental challenges, call for advanced agricultural technologies. Plant Body Communication (PBC) is an emerging approach that utilizes intrinsic plant tissues for signal transmission, enabling seamless integration of plant sensors via a unified gateway for real-time monitoring and controlled magnetic and/or electric stimuli across growth stages. Realizing PBC requires precise characterization of the electrical and magnetic properties of plant tissues. In this work, the M - H characteristics of different types of Mangifera indica L. tissues were measured across different seasons using a vibrating sample magnetometer under magnetic fields up to 1.8 ×104 Oe at room temperature. The measured data were analyzed using an arctan-based multi-component nonlinear model, with parameters extracted via nonlinear least-squares optimization, capturing seasonal and tissue-specific variations. The reliability of the extracted magnetic parameters was validated using the coefficient of determination (R2). These findings provide new insights into plant-based biomagnetism and support the development of robust PBC systems (for continuous monitoring and nutrient diagnostics) in precision agriculture.",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "corresponding_author": "Nagendra Prasad Pathak",
+          "corresponding_author_email": "nagendra.pathak@ece.iitr.ac.in",
+          "email": "gunjan_k@ec.iitr.ac.in",
+          "mobile": null,
+          "affiliation": "RFIC Lab, Department of Electronics and Communication Engineering, Indian Institute of Technology Roorkee, 247667 Roorkee, India",
+          "google_id": "112487378406910274621",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/cQuoRXTpso4MHV7MazL6eZACGoaIHkHwooJZ1Kfg.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:30:00",
+          "end_date_time": "12-02-2026 15:40:00",
+          "co_author": [
+            {
+              "name": "Gunjan Kumari",
+              "email": "gunjan_k@ec.iitr.ac.in",
+              "affiliation": "RFIC Lab, Department of Electronics and Communication Engineering, Indian Institute of Technology Roorkee, 247667 Roorkee, India"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_number": 2,
+      "screen_start_time": "12-02-2026 14:20:00",
+      "screen_end_time": "12-02-2026 15:50:00",
+      "no_of_records_in_screen": 9,
+      "records": [
+        {
+          "id": 121,
+          "paper_id": "6077",
+          "paper_title": "FFT and Chirp-Z Transform Based Signal Processing for Precision FMCW RADAR Level Measurement",
+          "abstract": "This paper investigates signal processing strategies for a 24 GHz FMCW RADAR-based level measurement system in harsh environments. Range estimation depends on accurate determination of the intermediate frequency (IF) generated by the beat signal. Conventional Fast Fourier Transform (FFT) method is limited by frequency bin width, reducing sensitivity to small displacements. A Chirp-Z Transform (CZT) based approach was implemented to improve spectral resolution. Experiments with in-house developed horn antennas and an ADF5901/5904 transceiver module demonstrated that while FFT outputs remained constant for 1 cm\r\ndisplacements, the CZT method successfully resolved them. Nonlinear estimation trends were attributed to the nonlinearity of the oscillator control voltage. The study highlights CZT as a promising tool for high-resolution RADAR sensing, with future work aimed at calibration and linearization.",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Shyam Sundar Jena",
+          "corresponding_author_email": "shyamsundar.nitr@gmail.com",
+          "email": "manjiri@barc.gov.in",
+          "mobile": null,
+          "affiliation": "Bhabha Atomic Research Centre,Mumbai",
+          "google_id": "109606509339071791758",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/PGTDtzcN0N3kplnxenrP53MCgeEIn5cfAR50brdH.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:20:00",
+          "end_date_time": "12-02-2026 14:30:00",
+          "co_author": [
+            {
+              "name": "Manjiri Pande",
+              "email": "manjiri@barc.gov.in",
+              "affiliation": "Bhabha Atomic Research Centre,Mumbai"
+            },
+            {
+              "name": "Sandip Shrotriya",
+              "email": "sds@barc.gov.in",
+              "affiliation": "Bhabha Atomic Research Centre"
+            },
+            {
+              "name": "Amitava Roy",
+              "email": "aroy@barc.gov.in",
+              "affiliation": "Bhabha Atomic Research Centre"
+            }
+          ]
+        },
+        {
+          "id": 88,
+          "paper_id": "6079",
+          "paper_title": "Physics Inspired Approach for Enhancing Underwater Images using Virtual Polarizer",
+          "abstract": "Underwater image enhancement is a challenge due to the absorption and scattering of light, which results in severe color distortion and hazy images that reduce contrast. In recent years, researchers have explored a variety of image-processing approaches such as illumination compensation and pyramid-based blending, CLAHE-based intensification filters, color balance combined with edge sharpening, and improved white balance algorithms to restore visibility in underwater environments. Building on these works, in this study we develop a novel variant of the polarization technique, clubbed with existing models like CLAHE, white balancing, and sharpening, to achieve better image quality. The proposed method, termed the virtual polarizer dehazing algorithm, employs a physics-backed model using pure image processing to deliver robust and visually consistent results. Experimental evaluations on benchmark datasets such as UIEB and EUPV demonstrate that our approach provides considerable improvements over conventional methods in both qualitative and quantitative metrics.",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Biswarup Ganguly",
+          "corresponding_author_email": "bganguly@ee.nits.ac.in",
+          "email": "alok1241712@gmail.com",
+          "mobile": null,
+          "affiliation": "National Institute of Technology Silchar",
+          "google_id": "117965627901873207634",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/bHV7Et9Wa0lPvvXMkQecYo3fe2z0vYZx6mmy1533.png",
+          "url": "https://drive.google.com/file/d/14JJk6Mxa0TUSXJ_Pw08CsTZbBNUGdzii/view?usp=sharing",
+          "start_date_time": "12-02-2026 14:30:00",
+          "end_date_time": "12-02-2026 14:40:00",
+          "co_author": [
+            {
+              "name": "Alok Rajput",
+              "email": "alok1241712@gmail.com",
+              "affiliation": "National Institute of Technology Silchar"
+            },
+            {
+              "name": "Vidhi Khakholia",
+              "email": "vidhikhakholia@gmail.com",
+              "affiliation": "National Institute of Technology Silchar"
+            },
+            {
+              "name": "Rakib Rizuwan Riyad",
+              "email": "rakibriyad111@gmail.com",
+              "affiliation": "National Institute of Technology Silchar"
+            },
+            {
+              "name": "Shayan Roy",
+              "email": "royp8213@gmail.com",
+              "affiliation": "National Institute of Technology Silchar"
+            }
+          ]
+        },
+        {
+          "id": 108,
+          "paper_id": "6136",
+          "paper_title": "Design and Simulation of a MEMS based Non-thermal Hair type Airflow Sensor",
+          "abstract": "MEMS based non-thermal airflow sensors have recently emerged as a promising research area, offering high precision and accuracy for airflow measurements. This study introduces an airflow sensor inspired by the motion of human hair, presenting an innovative approach to enhance flow sensing capabilities. This sensor allows for precise measurement of airflow speeds within the laminar flow range. Additionally, the sensor’s deflection causes a change in resistance in piezo-resistive elements, leading to a voltage difference. The proposed sensor is designed for airflow velocities up to 40 m/s. A simulation based approach was employed to validate the sensor design, ensuring functionality under diverse flow conditions and contributing to significant advancements in airflow sensing technologies.",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "S. A. Kariyawasam",
+          "corresponding_author_email": "sudheera.akalanka1998@gmail.com",
+          "email": null,
+          "mobile": null,
+          "affiliation": "University of Southern Denmark, Denmark",
+          "google_id": "115174557465037234175",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/DvK4phX1nfnDAHN8Sazi4TeFdYyuDQRoPcST8kO5.jpg",
+          "url": null,
+          "start_date_time": "12-02-2026 14:40:00",
+          "end_date_time": "12-02-2026 14:50:00",
+          "co_author": [
+            {
+              "name": "K. K. D. V. N. Kannangara",
+              "email": null,
+              "affiliation": "University of Southern Denmark, Denmark"
+            }
+          ]
+        },
+        {
+          "id": 93,
+          "paper_id": "6168",
+          "paper_title": "Nanotechnology-Assisted Sensing and Remediation of Methylene Blue in Water",
+          "abstract": "The presence of synthetic dyes in water is critical due to their persistence and toxicity, encouraging the development of effective methods for their detection, quantification and removal. In this work, silver nanoparticles were applied in a multi-purpose approach: detection, quantification and remediation of methylene blue in water. Surface-Enhanced Raman Scattering of colloidal silver nanoparticles, enables reliable detection and quantification of methylene blue, with a limit of detection of 5x10−9 M. A cellulose-silver nanoparticle composite prepared from peanut husks provides methylene blue remediation. The removal efficiency of 99.9 % was achieved using 0.1 g of the adsorbent composite and 25 mL of a 10 −5 M methylene blue solution, whereas pure cellulose reached 97.6 % under the same conditions. This study highlights the potential of silver nanoparticles platforms as powerful analytical tools for environmental monitoring, while also supporting the development of sustainable remediation strategies.",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "José Luís Fabris",
+          "corresponding_author_email": "fabris@utfpr.edu.br",
+          "email": "isabelareis@alunos.utfpr.edu.br",
+          "mobile": null,
+          "affiliation": "UTFPR",
+          "google_id": "108413323379130976819",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/FmMexeAujgDzxPQe2ir5ja9lYlhHm4G97fmfEyIV.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:50:00",
+          "end_date_time": "12-02-2026 15:00:00",
+          "co_author": [
+            {
+              "name": "Isabela Fernandes Silva Reis",
+              "email": "isabelareis@alunos.utfpr.edu.br",
+              "affiliation": "UTFPR"
+            },
+            {
+              "name": "Neoli Lucyszyn Suckow",
+              "email": "nelucys@gmail.com",
+              "affiliation": "PUC-PR"
+            },
+            {
+              "name": "Marcia Muller",
+              "email": "mmuller@utfpr.edu.br",
+              "affiliation": "UTFPR"
+            }
+          ]
+        },
+        {
+          "id": 159,
+          "paper_id": "6172",
+          "paper_title": "3D printed automated optical delay stage with gear reduction enabled sub-micron microstepping",
+          "abstract": "We demonstrate a novel 3D printed optical delay stage providing sub-micron level displacements. The delay stage actuation is based on lead-screw mechanism, and can be controlled using a conventional stepper motor. A key aspect of the design is the use of a fully 3D printed cascaded compound train gearbox, which provides different step sizes down to the submicron level without the need for microstepping control of the stepper motor. We demonstrate the delay stage performance using knife-edge based laser beamwidth measurements, which serve to underscore the precision and repeatability of the 3D printed stage and gearbox. The low complexity of realization, together with automation readiness and on-the-fly step-size adjustment makes our demonstrated design highly desirable for applications that require flexible optical delay control.",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Shailendra Prajapati",
+          "corresponding_author_email": "s24096@students.iitmandi.ac.in",
+          "email": "d23259@students.iitmandi.ac.in",
+          "mobile": null,
+          "affiliation": "Pratibimb Photonics Labs, School of Computing and Electrical Engineering, IIT Mandi",
+          "google_id": "116567651566525585410",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/SaghI8b4qkh0UACSefUXBValhfKMo1pycW9hYEp1.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:00:00",
+          "end_date_time": "12-02-2026 15:10:00",
+          "co_author": [
+            {
+              "name": "Muthuserpi Sasikumar",
+              "email": "d23259@students.iitmandi.ac.in",
+              "affiliation": "Pratibimb Photonics Labs, School of Computing and Electrical Engineering, IIT Mandi"
+            },
+            {
+              "name": "Srikanth Sugavanam",
+              "email": "ssrikanth@iitmandi.ac.in",
+              "affiliation": "Pratibimb Photonics Labs, School of Computing and Electrical Engineering, IIT Mandi"
+            }
+          ]
+        },
+        {
+          "id": 141,
+          "paper_id": "6204",
+          "paper_title": "High Precision Direct Detection-Based Automated Measurements of the Verdet Constant Using 3D Printing Technologies",
+          "abstract": "Magneto-optic materials are used for several applications, ranging from optical telecommunications to current sensing devices. High precision measurements of the associated Verdet constant is thus imperative to ensure the targeted performance for such applications. Typically this requires the use of advanced measurement configurations like balanced detection or multipass arrangements, which increases complexity of realization and associated costs. Here, we report high precision measurements of the Verdet constant obtained using a highly\r\nsimplified configuration employing off-the-shelf electronics and 3D printing. Specifically, we show that by a combination of direct detection and linear regression analysis, it is possible to achieve measurement precisions that are typically provided by lock-in approaches. The use of longer averaging windows enables enhanced precision, positioning the method as an effective and reliable solution for high-precision measurements in quasi-static regimes. This opens up opportunities not only for industry but also makes such precision measurements accessible for academic research and teaching.",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Anand Mohan",
+          "corresponding_author_email": "s21027@students.iitmandi.ac.in",
+          "email": "s24096@students.iitmandi.ac.in",
+          "mobile": null,
+          "affiliation": "IIT Mandi",
+          "google_id": "111127126754356058886",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/0Jnfw7Closrr39xqv47caBG9jR6L35fNrsRqfLRr.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:10:00",
+          "end_date_time": "12-02-2026 15:20:00",
+          "co_author": [
+            {
+              "name": "Shailendra Prajapati",
+              "email": "s24096@students.iitmandi.ac.in",
+              "affiliation": "IIT Mandi"
+            }
+          ]
+        },
+        {
+          "id": 103,
+          "paper_id": "6296",
+          "paper_title": "Multi-View Panoramic Thermal Infrared Monitoring with Edge Analytics for Resource-Constrained Sensing",
+          "abstract": "Continuous monitoring of wide areas is pivotal for surveillance, environmental assessment, autonomous navigation, and industrial inspection. However, traditional wide-field-of-view (WFoV) lenses introduce geometric distortion, reduced angular resolution, and limited detection range. Multi-camera arrays and panoramic optics further increase system size, calibration complexity, and power demand, and often lack support for on-device computer-vision analytics in resource-constrained platforms. This paper introduces a compact, low-SWaP, and edge-deployable panoramic imaging system that uses a single narrow-field-of-view (NFoV) thermal camera mounted on a servo mechanism. By stepping the camera in discrete θFoV increments, the system synthesises a rectilinear panorama without overlap, blending, or geometric warping. A deterministic frame-gating strategy mitigates motion-induced blur by discarding k unstable frames until servo settling completes, ensuring spatial consistency. The resultant panoramic strip preserves native sensor resolution while expanding coverage beyond conventional WFoV lenses, enabling reliable on-board analytics. We demonstrate the system using an NFoV long-wave infrared sensor with an 18° horizontal field of view, achieving a 198° sweep composed of 11 segments processed directly on a Jetson Nano edge device. Experimental results demonstrate the feasibility and repeatability of the approach for real-time, resource-constrained wide-area thermal monitoring.",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Dr Aparna Akula",
+          "corresponding_author_email": "aparna.akula.csio@csir.res.in",
+          "email": "manjeet.csio21j@acsir.res.in",
+          "mobile": null,
+          "affiliation": "CSIR-Central Scientific Instruments Organisation Chandigarh-160030, India. Academy of Scientific and Innovative Research (AcSIR), Ghaziabad- 201002, India",
+          "google_id": "111647064374090956509",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/Th0NE6MAe0OpTUxUakzVnYGCQ5YGSMGfrfrVo7SV.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:20:00",
+          "end_date_time": "12-02-2026 15:30:00",
+          "co_author": [
+            {
+              "name": "Manjeet Singh",
+              "email": "manjeet.csio21j@acsir.res.in",
+              "affiliation": "CSIR-Central Scientific Instruments Organisation Chandigarh-160030, India. Academy of Scientific and Innovative Research (AcSIR), Ghaziabad- 201002, India"
+            },
+            {
+              "name": "Gurkirat Singh",
+              "email": "gurkiratsinghvirdi10@gmail.com",
+              "affiliation": "Chitkara University Institute of Engineering and Technology, Chitkara University, Punjab-140401, India"
+            },
+            {
+              "name": "Neeraj Guleria",
+              "email": "neerajguleria.csio@csir.res.in",
+              "affiliation": "CSIR-Central Scientific Instruments Organisation Chandigarh-160030, India"
+            },
+            {
+              "name": "Guramandeep Singh",
+              "email": "researchwork.adsr@gmail.com",
+              "affiliation": "CSIR-Central Scientific Instruments Organisation Chandigarh-160030, India"
+            }
+          ]
+        },
+        {
+          "id": 143,
+          "paper_id": "6283",
+          "paper_title": "Novel Al2O3/GO nanocomposite-based highly sensitive optical fiber humidity sensor",
+          "abstract": "This research aims to develop simple and novel optical fiber relative humidity (RH) sensor that employs intensity modulation via evanescent wave (EW) absorption. Proposed sensor exploits Al₂O₃/GO nanocomposite doped thin film of nanostructured silica as the sensing cladding on a centrally decladded plastic-clad silica (PCS) fiber. This configuration is used for the first time to the best of author’s knowledge for the development of optical fiber RH sensor. Comprehensive experimental investigations are carried out to establish response characteristics of the sensor. Proposed sensor demonstrates a significantly enhanced sensitivity of 0.0107 RH⁻¹ while responding linearly over a dynamic range of 14%-86% RH. In addition, fast response/recovery time, excellent reversibility, repeatability, and reliability characteristics of the sensor make it suitable for real-field applications.",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Sunil K Khijwania",
+          "corresponding_author_email": "skhijwania@iitj.ac.in",
+          "email": "p24ph0204@iitj.ac.in",
+          "mobile": null,
+          "affiliation": "Indian Institute of Technology Jodhpur",
+          "google_id": "108601139929307149984",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/Wo1pOeDQ26dcnZDAA2fpp964Rjrpvg1IK9ZHF19x.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:30:00",
+          "end_date_time": "12-02-2026 15:40:00",
+          "co_author": [
+            {
+              "name": "Subham Koley",
+              "email": "p24ph0204@iitj.ac.in",
+              "affiliation": "Indian Institute of Technology Jodhpur"
+            }
+          ]
+        },
+        {
+          "id": 173,
+          "paper_id": "6297",
+          "paper_title": "Design and Optimization of Ni-Cr Microheaters Structures with Thickness Variation for Low- Power Operation",
+          "abstract": "This study presents the design, fabrication, and characterization of four Ni-Cr microheater structures, incorporating variations in heater strip width (inner side wider than the outer side) and film thickness of 100, 200, and 300nm, each integrated with a temperature sensor for precise thermal monitoring. All fabricated microheaters exhibited nearly identical TCR values, with an average of 0.000260/°C. Among them, the 100 nm-thick microheater (Design 1) showed the lowest TCR of 0.000245/°C. Its integrated temperature sensor demonstrated a sensitivity of 1.33 Ω/°C, indicating good thermal response. Experimental analyses confirmed that thinner microheaters significantly reduce power consumption without compromising performance. Integration of the microheater platform with an Arduino Uno based PID controller achieved highly accurate temperature regulation, maintaining errors within ±8% and ensuring excellent temperature tracking. The developed system thus offers a robust solution for stable and controlled microscale heating, with promising implications for applications such as gas sensing and other scenarios demanding precise thermal management.",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Ujjwal Singh",
+          "corresponding_author_email": "p22ee011@iitj.ac.in",
+          "email": "soni.17@iitj.ac.in",
+          "mobile": null,
+          "affiliation": "IIT Jodhpur",
+          "google_id": "115482727338106647680",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/0kmfNZWa1gYvWqxrXOaJHVLbrskCeNRUCfXzZ99K.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:40:00",
+          "end_date_time": "12-02-2026 15:50:00",
+          "co_author": [
+            {
+              "name": "Prachi Soni",
+              "email": "soni.17@iitj.ac.in",
+              "affiliation": "IIT Jodhpur"
+            },
+            {
+              "name": "Aditya Joshi",
+              "email": "aditya6.230102006@iiitbh.ac.in",
+              "affiliation": "IIIT Bhagalpur"
+            },
+            {
+              "name": "Bhawna Pareek",
+              "email": "pareekbhawna83@gmail.com",
+              "affiliation": "Mody University of Science and Technology  Laxmangarh,"
+            },
+            {
+              "name": "Shailesh K Moussalpuriya",
+              "email": "mousalpuriya.1@iitj.ac.in",
+              "affiliation": "IIT Jodhpur"
+            },
+            {
+              "name": "Ajay Agarwal",
+              "email": "ajayagarwal@iitj.ac.in",
+              "affiliation": "IIT Jodhpur"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_number": 3,
+      "screen_start_time": "12-02-2026 14:20:00",
+      "screen_end_time": "12-02-2026 15:00:00",
+      "no_of_records_in_screen": 4,
       "records": [
         {
           "id": 81,
@@ -24,8 +585,8 @@
           "google_id": "111515008947351318081",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/y2hEuuBEZR7mpVA4ORiN5BH0Jz2QKREuhe0JtuYS.png",
           "url": null,
-          "start_date_time": "11-02-2026 02:00:00",
-          "end_date_time": "11-02-2026 02:05:00",
+          "start_date_time": "12-02-2026 14:20:00",
+          "end_date_time": "12-02-2026 14:30:00",
           "co_author": [
             {
               "name": "Jinmoo Heo",
@@ -50,6 +611,94 @@
           ]
         },
         {
+          "id": 90,
+          "paper_id": "6347",
+          "paper_title": "Optimization of Low-Noise Amplifier Circuits for Enhanced Sensor Signal Integrity",
+          "abstract": "A Low Noise Amplifier (LNA) acts as an important component in sensor system design for wireless sensing applications. In this direction, this paper demonstrates a novel approach to optimizing LNA design using Grey Relation Analysis (GRA), a multi-objective optimization method. This technique was used to increase gain (S21), and stability factor (K), and decrease input reflection coefficient (S11), reverse voltage gain (S12), output reflection coefficient (S22), and Noise Figure (NF) for the LNA circuit. The LNA circuit was simulated in the Advanced Design System (ADS) tool. The obtained optimized input values are R3 = 665 Ω, R4= 12 Ω, L3 = 2 nH, C4 = 1.2 pF, C5 = 1.2 pF. In this situation, outputs had magnitudes as S11= -14.007 dB, S22= -17.023 dB, S12= -17.752 dB, S21= 11.390 dB, K = 1.210, NF= 0.882 dB at 4 GHz. Furthermore, an analysis of variance (ANOVA) was performed to determine the impact of inputs on LNA outputs. This study suggests that the contribution of L3 is significantly high, with 98.62%.",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Mitradip Bhattacharjee",
+          "corresponding_author_email": "mitradip@iiserb.ac.in",
+          "email": "dayarnab20@iiserb.ac.in",
+          "mobile": null,
+          "affiliation": null,
+          "google_id": "113962613992000633889",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/D0wOc2XFnJCVS4HKoMmK1ZWd2ax723YydSf3ajQq.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:30:00",
+          "end_date_time": "12-02-2026 14:40:00",
+          "co_author": [
+            {
+              "name": "Dayarnab Baidya",
+              "email": "dayarnab20@iiserb.ac.in",
+              "affiliation": null
+            }
+          ]
+        },
+        {
+          "id": 89,
+          "paper_id": "6389",
+          "paper_title": "Spectral Line Enhancement for Noise-Resilient Passive Sonar Detection using Dual-Attention Guided Wavelet domain FISTA-Net",
+          "abstract": "Robust detection of underwater targets by passive sonar is hindered by weak tonal emissions masked by strong ambient noise in the marine environment. These narrowband components, represented as spectral lines in the LOFAR spectrum of received acoustic signals, are critical for target recognition but remain difficult to enhance under low signal-to-noise ratio (SNR) conditions. We propose a spectral enhancement framework that combines a frequency domain adaptive line enhancer (ALE) with a dual-attention guided wavelet domain fast iterative shrinkage thresholding algorithm network (FISTA-Net). The ALE stage suppresses broadband noise while preserving spectral structures, whereas wavelet domain FISTA employs multiresolution analysis and attention-guided weighting to enhance weak spectral features under sparsity constraints. Experimental results show an average SNR improvement of 4.87 dB over block-processed sparsity-\r\nbased on ALE and 6.37 dB over conventional ALE. To further study the recognition accuracy of the proposed method, a common ResNet based classifier is used. The proposed method outperforms existing approaches, achieving higher classification accuracy and demonstrating its effectiveness for underwater target detection and recognition.",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Sumit Datta",
+          "corresponding_author_email": "sumit.datta@duk.ac.in",
+          "email": "riya.esres23@duk.ac.in",
+          "mobile": null,
+          "affiliation": "Digital University Kerala",
+          "google_id": "112329868356698953231",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/uiSCEzEQpsuZaA8vGjTxe1frNuGRevuMGLUJSlie.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:40:00",
+          "end_date_time": "12-02-2026 14:50:00",
+          "co_author": [
+            {
+              "name": "Riya Rani SS",
+              "email": "riya.esres23@duk.ac.in",
+              "affiliation": "Digital University Kerala"
+            }
+          ]
+        },
+        {
+          "id": 117,
+          "paper_id": "6408",
+          "paper_title": "Wet Bulk Micromachining of Si{110} with IPA-added NH4OH Etchant for MEMS-based Sensor Application",
+          "abstract": "This study investigates the wet anisotropic etching behavior of Si{110} wafers in ammonium hydroxide (NH₄OH), with and without the addition of isopropyl alcohol (IPA), as etchants for MEMS applications involving the formation of various microstructures. A SiO2 thin film is employed as the masking layer, and photolithography is used to transfer microstructure patterns onto the SiO2. The concentration of IPA is varied incrementally from 2% to 20%, while the NH₄OH concentration remains fixed at 70 °C. The study reveals that pure NH₄OH yields high etch rates, pronounced undercutting at convex corners, and increased surface roughness. In contrast, the incorporation of IPA significantly suppresses these effects, leading to smoother etched surfaces and enhanced dimensional control. These findings demonstrate the potential of IPA-added NH₄OH solutions as effective etchants for accurately fabricating microstructures with smooth surfaces, making them well-suited to a range of MEMS-based sensor applications.",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Priyanka Dewangan",
+          "corresponding_author_email": "ph22resch01007@iith.ac.in",
+          "email": "ph22resch01003@iith.ac.in",
+          "mobile": null,
+          "affiliation": "MEMS & Micro/Nano Systems Laboratory, Department of Physics, Indian Institute of Technology Hyderabad, Telangana, 502284, India",
+          "google_id": "113374633736902058939",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/aNqGM6c7QiekOdzJGSbKYgndvuvyURGVRvx7i60q.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:50:00",
+          "end_date_time": "12-02-2026 15:00:00",
+          "co_author": [
+            {
+              "name": "Vishal Sahu",
+              "email": "ph22resch01003@iith.ac.in",
+              "affiliation": "MEMS & Micro/Nano Systems Laboratory, Department of Physics, Indian Institute of Technology Hyderabad, Telangana, 502284, India"
+            },
+            {
+              "name": "Prem Pal",
+              "email": "prem@phy.iith.ac.in",
+              "affiliation": "MEMS & Micro/Nano Systems Laboratory, Department of Physics, Indian Institute of Technology Hyderabad, Telangana, 502284, India"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_number": 4,
+      "screen_start_time": "12-02-2026 14:20:00",
+      "screen_end_time": "12-02-2026 15:10:00",
+      "no_of_records_in_screen": 5,
+      "records": [
+        {
           "id": 80,
           "paper_id": "6072",
           "paper_title": "An IoT-Integrated IMU Sensor Node for Affordable Crash Detection and Emergency Notification",
@@ -64,8 +713,8 @@
           "google_id": "114795112347503127646",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/1HxBsBurnfxKGXusxozlOVhkNCPayhductsfSBhQ.png",
           "url": "NA",
-          "start_date_time": "11-02-2026 02:05:00",
-          "end_date_time": "11-02-2026 02:10:00",
+          "start_date_time": "12-02-2026 14:20:00",
+          "end_date_time": "12-02-2026 14:30:00",
           "co_author": [
             {
               "name": "S. G. Ganpule",
@@ -75,27 +724,353 @@
           ]
         },
         {
-          "id": 84,
-          "paper_id": "6240",
-          "paper_title": "Computational Analysis of Working and Counter Electrode Gap Influence on Current Density in Laser-Induced Graphene Electrochemical Sensors",
-          "abstract": "Laser-induced graphene (LIG) has emerged as a promising electrode material for electrochemical sensors due to its high conductivity, tunable surface morphology, and facile fabrication via laser scribing. The geometric configuration of the electrodes—particularly the gap between the working electrode (WE) and counter electrode (CE)—plays a crucial role in determining the current distribution and overall sensor performance. In this study, a computational approach using COMSOL\r\nMultiphysics was employed to investigate the influence of WE–CE spacing on the current density and electric field distribution in a planar LIG-based electrochemical system. The model of the electrode system was constructed using a set of parameters to maintain constant areas of the WE and CE. The electric currents interface, located under the AC/DC module, was used to simulate the working of the planar electrode system, assuming an isotropic and homogeneous electrolyte medium. A parametric sweep was applied to the WE–CE gap, ranging from 0.1 mm to 1.0 mm, while maintaining constant electrode areas. The results revealed that a smaller WE–CE gap produced a higher average current density, whereas a larger gap led to a decrease in current density, providing a critical foundation for the future work that will focus on practical fabrication of the designs to confirm the correlation between simulation outcomes and the practical performance of the electrodes.",
-          "track": "Medical & Digital Healthcare VIII",
+          "id": 110,
+          "paper_id": "6141",
+          "paper_title": "Enhancing Electric Vehicle Route Transparency Using Explainable AI Integrated Quantum Deep Reinforcement Learning framework for Green Transportation",
+          "abstract": "The rapid adoption of electric vehicles (EVs) has intensified the demand for intelligent routing systems capable of minimizing travel time, reducing energy consumption, and ensuring reliable access to charging infrastructure. Conventional routing algorithms often fail to incorporate dynamic, real-world constraints such as traffic fluctuations, charger availability, environmental conditions, and the nonlinear nature of EV energy usage. To address these limitations, this paper proposes a Quantum-Enhanced Deep Reinforcement Learning Transformer framework integrated with explainable AI for efficient EV routing across the Delhi–NCR megaregion. The model combines quantum-inspired optimization, deep neural policy networks, and real geospatial charging-station data, enriched with live weather intelligence to accurately estimate energy demand. Experimental evaluation shows that the proposed Q-DRL policy achieves an average energy savings of 1.5171 kWh per trip, equivalent to a 12.04% improvement compared to a baseline approach, highlighting the model’s ability to generate energy-optimal, trustworthy routes. This study provides a scalable, data-driven foundation for next-generation EV mobility, supporting smarter and cleaner urban transportation.",
+          "track": "Transportation Systems & AI for Sensing",
           "other_track": null,
-          "corresponding_author": "Kalpana Settu",
-          "corresponding_author_email": "skalpana@iiitdm.ac.in",
-          "email": "ec25d0003@iiitdm.ac.in",
+          "corresponding_author": "Shweta Jain",
+          "corresponding_author_email": "jainshweta290204@gmail.com",
+          "email": "prashantkumar@nitdelhi.ac.in",
           "mobile": null,
-          "affiliation": "Dept. of Electronics and Communication Engg. Indian Institute of Information Technology, Design and Manufacturing Kancheepuram Chennai, India",
-          "google_id": "111394736693072167301",
-          "eposter_file": "https://myeposter.com/storage/eposter-pdf/xq8YkZ2WyVHG5M0Z8nmPI2NHHgaEuCzqbisF0Vk4.png",
+          "affiliation": "National Institute of Technology Delhi",
+          "google_id": "112388441605657512571",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/fWEVqv4iWObwTQDU4IeZ0Yf1o1ZNRxWLjdpWq3lY.png",
           "url": null,
-          "start_date_time": "11-02-2026 02:10:00",
-          "end_date_time": "11-02-2026 02:15:00",
+          "start_date_time": "12-02-2026 14:30:00",
+          "end_date_time": "12-02-2026 14:40:00",
           "co_author": [
             {
-              "name": "David Stephen J B",
-              "email": "ec25d0003@iiitdm.ac.in",
-              "affiliation": "Dept. of Electronics and Communication Engg. Indian Institute of Information Technology, Design and Manufacturing Kancheepuram Chennai, India"
+              "name": "Prashant Kumar",
+              "email": "prashantkumar@nitdelhi.ac.in",
+              "affiliation": "National Institute of Technology Delhi"
+            },
+            {
+              "name": "Rajni",
+              "email": "rajni@jgu.edu.in",
+              "affiliation": "O. P. Jindal Global University"
+            },
+            {
+              "name": "Bahareh Kamranzad",
+              "email": "bahareh.kamranzad@strath.ac.uk",
+              "affiliation": "University of Strathclyde"
+            }
+          ]
+        },
+        {
+          "id": 126,
+          "paper_id": "6399",
+          "paper_title": "Differential Self-Attention in 1D CNNs for Driver Inattention Detection Using Multimodal Biosignals",
+          "abstract": "Driver inattention detection is crucial for road safety, as stress can impair cognitive functions and increase accident risk. Recent advances in wearable technology have led to an increase in the use of multimodal physiological signals for driver inattention detection. Integrating attention mechanisms into these systems has shown promise in enhancing inattention detection. However, attention features can be affected by noise in the data, presenting a significant challenge. To address this, we propose a multimodal Differential Self-Attention based 1D Convolutional Neural Network (MDSA-1DCNN) to reduce noise in attention features. In this study, we evaluate the effectiveness of MDSA-1DCNN on multimodal 1D biosignals obtained from textile electrodes, collecting single-lead Electrocardiogram (ECG) (256 Hz) and Respiration (RSP) (128 Hz) data from 15 healthy participants in two driving states: Normal and inattention.  The raw data were divided into non-overlapping segments of 10, 15, and 20 seconds and preprocessed using the Neurokit Toolbox. These processed segments from each modality were then passed through convolutional blocks to extract temporal features. Self-attention was applied to these features, followed by a differential attention layer to reduce noise. The resulting features were fed into dense layers to classify driver inattention state. The proposed MDSA-1DCNN approach achieved a weighted F-Score of 73.23 % and an average accuracy of 78.51 % on the validation set using Leave-One-Subject-Out Cross-Validation. Future work will explore the utilization of data from multiple sensors and investigate sensor fusion techniques.",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Pavan Kaveti",
+          "corresponding_author_email": "bm23resch01001@iith.ac.in",
+          "email": "es25resch11002@iith.ac.in",
+          "mobile": null,
+          "affiliation": "Indian Institute of Technology Hyderabad",
+          "google_id": "110388058050248981556",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/Eqf6en0MKP5xRfvK8YEmx7JbnFySuzIWZwG0iTwg.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:40:00",
+          "end_date_time": "12-02-2026 14:50:00",
+          "co_author": [
+            {
+              "name": "P Satyajith Chary",
+              "email": "es25resch11002@iith.ac.in",
+              "affiliation": "Indian Institute of Technology Hyderabad"
+            },
+            {
+              "name": "Ankit Singh",
+              "email": "ce22resch01008@iith.ac.in",
+              "affiliation": "Indian Institute of Technology Hyderabad"
+            },
+            {
+              "name": "Digvijay S. Pawar",
+              "email": "dspawar@ce.iith.ac.in",
+              "affiliation": "Indian Institute of Technology Hyderabad"
+            },
+            {
+              "name": "Nagarajan Ganapathy",
+              "email": "gnagarajan@bme.iith.ac.in",
+              "affiliation": "Indian Institute of Technology Hyderabad"
+            }
+          ]
+        },
+        {
+          "id": 153,
+          "paper_id": "6398",
+          "paper_title": "A Novel Multilayer Functional Brain Connectivity-Based Motor Imagery Classification Model Using EEG Sensor Data",
+          "abstract": "This letter presents a novel electroencephalography (EEG) rhythm-based motor imagery (MI) classification\r\nframework employing multilayer weighted visibility graph (WVG) and deep learning. In this study, multi-channel EEG\r\nsignals corresponding to different MI classes were acquired from various subjects by placing sensors on the scalp. The\r\nacquired EEG signals were initially decomposed into five frequency sub-bands (EEG rhythms), by segmenting into 2-\r\nsecond overlapping windows. For each rhythm, a multi-layer functional brain network (FBN) has been constructed\r\nutilizing WVG, and the resulting functional brain connectivity matrices (FBC) were mapped into RGB images, which were\r\nfurther classified through a lightweight custom ConvNeXt model. In this work, subject independent evaluation was\r\nperformed using a leave-one-subject-out (LOSO) protocol with stratified 10-fold cross-validation. Experimental validation\r\non two datasets- BCI Competition IV-2a and High Gamma Dataset (HGD), yielded accuracies of 90.20% and 96.1%,\r\nrespectively. The analysis reveals physiological meaningful connectivity patterns such as contralateral β-band\r\nconnectivity in BCI IV-2a and enhanced inter-hemispheric γ-band integration in HGD. Ablation studies and benchmark\r\ncomparison confirmed that the proposed framework achieved high classification accuracy, demonstrating the efficiency\r\nand potential for robust, real-time subject-independent MI–BCI applications.",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Soumya Chatterjee",
+          "corresponding_author_email": "chapeshwar@gmail.com",
+          "email": "sudipmodak9@gmail.com",
+          "mobile": null,
+          "affiliation": "National Institute of Technology Durgapur",
+          "google_id": "114786220423134695917",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/dDFk6AQK5of01rqqeOk4sWd0gMzb45QEci9sxAxq.png",
+          "url": "https://drive.google.com/drive/folders/1dcpxW3wR41KI2aIvvECR2dRbtJxAyNGs?usp=sharing",
+          "start_date_time": "12-02-2026 14:50:00",
+          "end_date_time": "12-02-2026 15:00:00",
+          "co_author": [
+            {
+              "name": "Sudip Modak",
+              "email": "sudipmodak9@gmail.com",
+              "affiliation": "National Institute of Technology Durgapur"
+            },
+            {
+              "name": "Suman Halder",
+              "email": "shalder.ee@nitdgp.ac.in",
+              "affiliation": "National Institute of Technology Durgapur"
+            }
+          ]
+        },
+        {
+          "id": 97,
+          "paper_id": "6404",
+          "paper_title": "Precision-Driven AI Smartphone-Based Sensor System for Fingernail-Based Non-Invasive Disease Detection",
+          "abstract": "Liver disease and nail psoriasis can manifest through secondary nail changes, yet conventional diagnostic methods such as blood tests and biopsies remain invasive, costly, and painful for patients, highlighting the need for more accessible, non-invasive alternatives. This research introduces a novel deep learning (DL) based approach for the non-invasive detection of these diseases using fingernail image analysis.  Various DL models, including Convolutional Neural Networks (CNN), VGG16, MobileNet, MobileNetV2, and InceptionV3, were evaluated, and accuracy of 82.66%, 91.33%, 90.00%, 90.67%, and 95.71% respectively for each model was achieved.  The models were trained on a dataset of fingernail images, and their performance was assessed based on classification accuracy. The accuracy of InceptionV3 achieved was the highest. Building upon this model's success, a mobile application integrated with sensor-based functionality was developed allowing users to upload fingernail images and receive instant diagnostic feedback conveniently enabling early detection. This research demonstrates the transformative potential of DL and sensor technology in healthcare by providing a fast, reliable, and non-invasive diagnostic tool for early diagnosing liver and nail psoriasis disease in clinical and remote applications.",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Neha S. Ingole",
+          "corresponding_author_email": "ingolens1@rknec.edu",
+          "email": null,
+          "mobile": null,
+          "affiliation": null,
+          "google_id": "110004149074288931443",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/Sz7Afv9ZbcfBRrYF1p7GkGm4f9Jf2mzQXRiEE7xa.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:00:00",
+          "end_date_time": "12-02-2026 15:10:00",
+          "co_author": []
+        }
+      ]
+    },
+    {
+      "screen_number": 5,
+      "screen_start_time": "12-02-2026 14:20:00",
+      "screen_end_time": "12-02-2026 15:40:00",
+      "no_of_records_in_screen": 8,
+      "records": [
+        {
+          "id": 91,
+          "paper_id": "6061",
+          "paper_title": "Dual-Mode Optical Detection of Cobalt Ions using Silica Nanoparticles",
+          "abstract": "A facile one-pot synthesis of amine-functionalized silica nanoparticles (SiNPs) using 3-Aminopropyltriethoxysilane (APTES) and basic fuchsin dye was developed to detect cobalt ions in an aqueous medium. The dual-mode sensing offers colorimetric and fluorescence response, enabling visual and quantitative detection. The quenching of fluorescence of SiNPs by cobalt is caused by the formation of the metal-ligand Co–NH₂ complex. A straightforward centrifugation step was used to achieve the purification of nanoparticles. These synthesized SiNPs were of average diameter ~270 nm and were able to detect cobalt through fluorescence quenching and colour change. This approach has a measurable detection limit of 0.30 μM Co2⁺ and a calculated detection limit of 0.27 μM Co2⁺ for fluorescence response, which is less than the US Environmental Protection Agency's maximum permitted cobalt concentration in water (1.7 μM). Also, static quenching is indicated since UV-Vis absorption spectrum of quencher (cobalt) and fluorescence spectrum of fluorophore (SiNPs) do not overlap. The straightforward, cost-effective synthesis and reliable optical response demonstrate the potential of this system for practical environmental cobalt monitoring applications.",
+          "track": "Environment & Climate Change Monitoring IV",
+          "other_track": null,
+          "corresponding_author": "Priyanka Shedbale",
+          "corresponding_author_email": "priyankashedbale93@gmail.com",
+          "email": "mukherji@iitb.ac.in",
+          "mobile": null,
+          "affiliation": "Department of Bioscience and Bioengineering IIT Bombay Mumbai, India.",
+          "google_id": "105693762504877050458",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/AnPPkXU2IwTDAxl8QpmsbOSx829rdSu3fYvFo3BT.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:20:00",
+          "end_date_time": "12-02-2026 14:30:00",
+          "co_author": [
+            {
+              "name": "Soumyo Mukherji",
+              "email": "mukherji@iitb.ac.in",
+              "affiliation": "Department of Bioscience and Bioengineering IIT Bombay Mumbai, India."
+            },
+            {
+              "name": "Suparna Mukherji",
+              "email": "mitras@iitb.ac.in",
+              "affiliation": "Environmental Science and Engineering Department IIT Bombay Mumbai, India"
+            },
+            {
+              "name": "Nirmal Punjabi",
+              "email": "npunjabi@iitb.ac.in",
+              "affiliation": "Koita Center for Digital Health IIT Bombay Mumbai, India"
+            }
+          ]
+        },
+        {
+          "id": 111,
+          "paper_id": "6069",
+          "paper_title": "Low Level Detection of CH3OH Sensing  via MoS_2  /PANI Heterojunction Transistor",
+          "abstract": "The proposed article analyzes the sensing performance of molybdenum disulfide (M oS2) and polyaniline (PANI) heterostructure for methanol (CH3OH) gas at room temperature\r\nthrough the evaluation of charge transfer and adsorption energy. In this article, density function theory (DFT) is utilized to calculate the charge transfer and adsorption energy for a single molecule. This has been further scaled up and utilized in the proposed thin-film transistor (TFT) based sensor. Due to the corresponding charge transfer, variation in different electrical parameters such as drain current (ID ), transconductance (gm), and mobility (μ) is recorded as a sensing parameter. The proposed sensor is tested for 1 ppb CH3OH, and it is the lowest detection limit reported to date, to the best of the authors’ knowledge. Sensitivity of the proposed sensor is recorded as 3.48 %,3.96%, 3.76 %, and 4.8 % for output transconductance(gd), μ, gm and ID , respectively. With the extremely low limit of detection (LOD), the proposed sensor can be utilized in various real-time applications such as environmental monitoring, health-care",
+          "track": "Environment & Climate Change Monitoring IV",
+          "other_track": null,
+          "corresponding_author": "Sajal Agarwal",
+          "corresponding_author_email": "sagarwal@rgipt.ac.in",
+          "email": "shivangis1@rgipt.ac.in",
+          "mobile": null,
+          "affiliation": "Department of Electrical & Electronics Engineering ,Rajiv Gandhi Institute of Petroleum Technology",
+          "google_id": "111661192881761350804",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/VJn16A6Nnn8tVtVsozYGO8ab3YsCtt9E2CWKsW7a.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:30:00",
+          "end_date_time": "12-02-2026 14:40:00",
+          "co_author": [
+            {
+              "name": "Shivangi Srivasatava",
+              "email": "shivangis1@rgipt.ac.in",
+              "affiliation": "Department of Electrical & Electronics Engineering ,Rajiv Gandhi Institute of Petroleum Technology"
+            }
+          ]
+        },
+        {
+          "id": 107,
+          "paper_id": "6150",
+          "paper_title": "Design and Analysis of High-Resolution Airborne SAR Sensor at X Band Using LFM for Remote Sensing Applications",
+          "abstract": "This study describes the design and analysis of a 16x16 antenna arrays for high resolution airborne synthetic aperture radar sensor at X-band with a linear frequency modulated waveform for advanced remote sensing applications. The suggested SAR system is designed for deployment on lightweight aerial platforms such as UAVs and small aircraft, allowing for high-resolution imaging in all weather and day night settings. The antenna array elements dimensions are 7.2x7.2 mm2 width and length with a height of 1.6mm roger 5880 substrate and the antenna arrays spacing of 0.5. The system uses a 600MHz LFM pulse for sub meter range resolution and Doppler-based azimuth compression for precise spatial accuracy. The system design consists of a compact high-gain antenna array, effective pulse compression techniques, and motion-compensated SAR imaging algorithms. Full-wave electromagnetic simulations and MATLAB-based signal processing validate the radar's capabilities, the reflection coefficient S11 at 12 GHz is -32 dB with a high gain of 33.79 dBi, this revealing strong picture generation with low sidelobe levels and a high signal to clutter ratio. The proposed design has applications in environmental monitoring, disaster assessment, and tactical reconnaissance.",
+          "track": "Environment & Climate Change Monitoring IV",
+          "other_track": null,
+          "corresponding_author": "Bhukya Venkanna Naik",
+          "corresponding_author_email": "bnaik@iiitn.ac.in",
+          "email": "n200213@rguktn.ac.in",
+          "mobile": null,
+          "affiliation": "RGUKT-Nuzvid Vijayawada ,AP,India",
+          "google_id": "100415455398530625293",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/dLS9I4sK84bEROCflM2hKjt0pCRDA6zYbtqrL6M9.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:40:00",
+          "end_date_time": "12-02-2026 14:50:00",
+          "co_author": [
+            {
+              "name": "Nagaraju Chintha",
+              "email": "n200213@rguktn.ac.in",
+              "affiliation": "RGUKT-Nuzvid Vijayawada ,AP,India"
+            },
+            {
+              "name": "P Vinod Kumar",
+              "email": "vinod@rguktn.ac.in",
+              "affiliation": "RGUKT-Nuzvid Vijayawada ,AP,India"
+            }
+          ]
+        },
+        {
+          "id": 112,
+          "paper_id": "6206",
+          "paper_title": "A Study on Remote Sensing and Smart Sensors for Urban Air Quality and Carbon Footprint Management",
+          "abstract": "There is a need of effective strategies permitting feasible spatiotemporal monitoring and enabling actionable measures for urban air management through simulacrum and aerological gauge use (and similar). Although Continuous Ambient Air Quality Monitoring Stations (CAAQMS) data produced by Chemical Analytical methods are very accurate, they are limited due to limited spatial coverage and high cost. In this paper, we present a quantitative case-based assessment of Indore, India to show how a layered monitoring framework incorporating reference-grade stations, low-cost optical sensors and governance-driven analytics, combined with more general urban. Air quality parameters which are For 6 months, PM2.5, PM10, and Air Quality Index (AQI) was studied from traffic and residential sites.  The low-cost sensor data was calibrated with the help of co-located data from CAAQMS using Pearson correlation, Root mean square error, and mean absolute error for checking accuracy and reliability of low-cost sensors. The study used a descriptive analysis and one-way ANOVA of frequent samples to characterize and analyze the particulate matter. The findings reveal a strong statistical relationship between the calibrated low-cost sensors and the reference stations. Also, there was a noticeable difference in the spatial variation and seasonal behaviour. The high-traffic corridors had witnessed the persistent hotspots more. Sensors placed in highly populated regions recorded large outputs. The sensor-based governance model can potentially be employed at scale and be translated to other contexts but requires adequate.",
+          "track": "Environment & Climate Change Monitoring IV",
+          "other_track": null,
+          "corresponding_author": "Dr. Chandni Keswani",
+          "corresponding_author_email": "drchandnisvim@gmail.com",
+          "email": "shyamsunderagrawal8@gmail.com",
+          "mobile": null,
+          "affiliation": "Mittal School of Business Lovely Professional University",
+          "google_id": "116071458386414255348",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/8lNdqyPjTBDL5oKxJ1acbstMVNw3PnJdHx4ZyVH7.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:50:00",
+          "end_date_time": "12-02-2026 15:00:00",
+          "co_author": [
+            {
+              "name": "Dr. Shyam Sunder Agrawal",
+              "email": "shyamsunderagrawal8@gmail.com",
+              "affiliation": "Mittal School of Business Lovely Professional University"
+            }
+          ]
+        },
+        {
+          "id": 138,
+          "paper_id": "6382",
+          "paper_title": "Label-Free Electrochemical Detection of Acetaminophen Using a Gold Nanoparticle–Modified Stainless Steel Electrode",
+          "abstract": "Acetaminophen (AAP), also known as paracetamol, is a widely used ’over-the-counter’ medicine and one of the leading causes of soil and water contamination worldwide. The improper disposal of pharmaceutical residues during their production and from households poses a serious threat to aquatic systems and the environment. Hence, the development of simple, cost-effective, and reliable methods for AAP detection is of great importance for both health and environmental monitoring. In this work, we report the fabrication and characterization of an inexpensive label-free sensor for AAP detection based on AuNPs electrodeposited onto a stainless steel substrate. The electrochemical response of AAP by the Au-modified electrode exhibited well-defined redox peaks in cyclic voltammetry. Under optimized conditions (pH 5.96 in 0.1 M KH2PO4), the sensor demonstrated a dual detection behavior: a linear response in the low concentration range (0.8 μM to 0.03 mM) with a sensitivity of 2.08 mA mM−1 and a sigmoidal response in the higher concentration range (0.03-6.65 mM) with a sensitivity of 0.97 mA mM−1. The limit of detection (LOD) in the linear range was calculated to be 0.8 μM. The low-cost fabrication and promising performance of the fabricated sensor highlight its potential for integration into portable devices to monitor AAP contamination in water.",
+          "track": "Environment & Climate Change Monitoring IV",
+          "other_track": null,
+          "corresponding_author": "Jose Joseph",
+          "corresponding_author_email": "jose.joseph@duk.ac.in",
+          "email": "nikilanr1@gmail.com",
+          "mobile": null,
+          "affiliation": "Digital University Kerala, Thiruvananthapuram, Kerala",
+          "google_id": "102498866767603129385",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/QdmepioCZZhOEwMY9LY9FdXUqnmwfYgM85RtcWvY.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:00:00",
+          "end_date_time": "12-02-2026 15:10:00",
+          "co_author": [
+            {
+              "name": "Nikila Nair",
+              "email": "nikilanr1@gmail.com",
+              "affiliation": "Digital University Kerala, Thiruvananthapuram, Kerala"
+            }
+          ]
+        },
+        {
+          "id": 147,
+          "paper_id": "6395",
+          "paper_title": "Large-scale fabrication of fully printed, photoactivated Au decorated Tin Oxide based room-temperature NO2 sensors with ultra-high response on paper substrates",
+          "abstract": "Conventional metal oxide gas sensors require high-temperature operation (200-300°C), which limits integration with sustainable and biodegradable substrates and contributes to electronic waste. Herein, we demonstrate fully screen printed, room-temperature NO₂ sensors using UV-photoactivated Au decorated SnO/SnO₂ nanoparticles on paper. Tin oxide nanoparticles have been synthesized via precipitation and annealing, followed by controlled Au decoration (0.5 wt.%) through ascorbic acid reduction. Subsequently, screen printing enables scalable device fabrication with interdigitated Ag electrodes and Au-SnO/SnO₂ sensing layers on photo paper. Under 365 nm UV illumination (2.1 mW/cm²), the sensors have exhibited excellent response of 871 for 3.2 ppm NO₂, at room temperature. The devices demonstrated remarkable sensitivity across 1.4-3.2 ppm level. Response and recovery times have been 225 s and 1020 s, respectively. Excellent selectivity has been achieved with 175% response to NO₂ versus 17% for Cl₂ and negligible response to NH₃. Successful integration into a portable USB-powered module has been demonstrated to showcase practical deployment capability. This approach offers a sustainable, scalable route for room-temperature gas sensing suitable for environmental and occupational health monitoring.",
+          "track": "Environment & Climate Change Monitoring IV",
+          "other_track": null,
+          "corresponding_author": "Subho Dasgupta",
+          "corresponding_author_email": "dasgupta@iisc.ac.in",
+          "email": "amarakondac@iisc.ac.in",
+          "mobile": null,
+          "affiliation": "Indian Institute of Science Bengaluru",
+          "google_id": "115341529938227533259",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/4ZDdL4bV11uazP1BGHNnumd3uBZd4TD3yZyhuZjq.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:10:00",
+          "end_date_time": "12-02-2026 15:20:00",
+          "co_author": [
+            {
+              "name": "Siri Chandana Amarakonda",
+              "email": "amarakondac@iisc.ac.in",
+              "affiliation": "Indian Institute of Science Bengaluru"
+            },
+            {
+              "name": "Manvendra Singh",
+              "email": "smanvendra@iisc.ac.in",
+              "affiliation": "Indian Institute of Science Bengaluru"
+            },
+            {
+              "name": "Mohammed Hadhi Pazhaya Puthanveettil",
+              "email": "mohammedhp@iisc.ac.in",
+              "affiliation": "Indian Institute of Science Bengaluru"
+            }
+          ]
+        },
+        {
+          "id": 139,
+          "paper_id": "6393",
+          "paper_title": "Analysis of Mxene and Mxene/ZnO Composite based I-V Sensing for Antibiotic Detection",
+          "abstract": "The increasing presence of antibiotic pollutants, particularly\r\nsulfamethoxazole (SMX), in water sources necessitates the\r\ndevelopment of highly sensitive and selective detection methods.\r\nIn this study, the presented work is a current versus voltage (I-V)\r\nsensor based on MXene/zinc oxide (ZnO) composite, which outperforms\r\nMXene in detecting SMX with sensitivity. The sensor is\r\nfabricated by spin-coating MXene, ZnO, and ZnO-MXene composite\r\nfilms onto a flexible polyethylene terephthalate (PET) substrate\r\nwith an integrated conductive layer. The electrical response of the\r\ndevice is analyzed using I-V characterization under varying SMX concentrations, demonstrating that pristine. The\r\nsensitivity of MXene/ZnO composite 1.44×10-5 A/μg is attained by the compositing MXene and ZnO, which increases\r\n11 times to the pure Mxene’s sensitivity 1.29×10-6 A/μg. This is achieved by the active site created\r\nby ZnO on the MXene sheets. The results highlight MXene/ZnO composite potential as a next-generation material\r\nfor sensing applications, providing a promising alternative for real-time and on-site water quality monitoring.",
+          "track": "Environment & Climate Change Monitoring IV",
+          "other_track": null,
+          "corresponding_author": "E Manikandan",
+          "corresponding_author_email": "manikandan.e@vit.ac.in",
+          "email": null,
+          "mobile": null,
+          "affiliation": null,
+          "google_id": "102242838012924496495",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/2RtWRZ6c6maW49RC5lb5EJnSC7Ef8ikNrYA7Glsd.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:20:00",
+          "end_date_time": "12-02-2026 15:30:00",
+          "co_author": []
+        },
+        {
+          "id": 116,
+          "paper_id": "6409",
+          "paper_title": "Comparative Chemiluminescence Sensing of Hydrogen Peroxide Using a Miniaturized Chip using Cobalt Catalyst versus Electrogenerated Emission at a Graphite Electrode",
+          "abstract": "Hydrogen peroxide (H₂O₂) is a critical biomarker involved in oxidative stress and enzymatic pathways, necessitating sensitive and portable detection strategies for biomedical and point-of-care (POC) applications. In this work, we present a comparative study of two chemiluminescence (CL) methodologies on a miniaturized 3D-printed microfluidic chip: catalyst-assisted CL using cobalt chloride hexahydrate and electrogenerated chemiluminescence (ECL) at a graphite electrode. The cobalt-catalyzed CL method provided higher signal output about 85–90 a.u. with a linear range of 0.1–0.9mM, a limit of detection (LOD) of 0.0131mM (13 µM), and a limit of quantification LOQ of 0.043mM (43µM). In contrast, graphite electrode–based ECL achieved linear detection range 0.4–0.9mM, an LOD of 0. 036mM (36 µM) and an LOQ of 0.120mM (120 µM). The time analysis further revealed rapid emission and falloff kinetics, necessary for accurate quantification. The experimental results highlight the tradeoff between catalyst driven CL and electrogenerated ECL, offering valuable insights for the design of compact and reliable biosensing platforms.",
+          "track": "Environment & Climate Change Monitoring IV",
+          "other_track": null,
+          "corresponding_author": "Kavita Manekar",
+          "corresponding_author_email": "manekarkp@rknec.edu",
+          "email": "hasamnisma@rknec.edu",
+          "mobile": null,
+          "affiliation": "School of Electrical and Electronics Engineering, Shri. Ramdeobaba College of Engineering and Management, Nagpur, India",
+          "google_id": "106698603515718449030",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/3jus8iG03liZaxICdzthDLuiJOBHUx3Exg0KHl6Y.jpg",
+          "url": null,
+          "start_date_time": "12-02-2026 15:30:00",
+          "end_date_time": "12-02-2026 15:40:00",
+          "co_author": [
+            {
+              "name": "Meghana A. Hasamnis",
+              "email": "hasamnisma@rknec.edu",
+              "affiliation": "School of Electrical and Electronics Engineering, Shri. Ramdeobaba College of Engineering and Management, Nagpur, India"
             }
           ]
         }
@@ -103,62 +1078,535 @@
     },
     {
       "screen_number": 6,
-      "screen_start_time": "11-02-2026 02:00:00",
-      "screen_end_time": "11-02-2026 02:10:00",
-      "no_of_records_in_screen": 2,
+      "screen_start_time": "12-02-2026 14:20:00",
+      "screen_end_time": "12-02-2026 15:10:00",
+      "no_of_records_in_screen": 5,
       "records": [
         {
-          "id": 67,
-          "paper_id": "6039",
-          "paper_title": "VITAL Net: A Hybrid Framework for SpO2 and HR Estimation Using Smartphone rPPG Video",
-          "abstract": "VITAL Net: A Hybrid Framework for SpO2 and HR Estimation Using Smartphone rPPG Video",
-          "track": "Medical and Digital Healthcare",
+          "id": 132,
+          "paper_id": "6037",
+          "paper_title": "Design and Implement of Advanced Algorithm in MATLAB for Efficient Solar Dish Orientation",
+          "abstract": "Precise determination of the Sun’s position in Line of Sight (LOS) is essential for applications including solar energy harvesting, satellite communications, and environmental monitoring. Accuracy in solar positioning enhances the efficiency of solar tracking systems, maximizes energy capture, and ensures reliable data transmission. In this work, a refined algorithm is developed by incorporating detailed orbital parameters into solar coordinate calculations. The computation is performed in MATLAB, and the same formulations are integrated into a Graphical User Interface (GUI) for user-friendly access. Our proposed algorithm demonstrates improved accuracy compared to simplified models reported in the literature, where only a limited set of parameters were used. Comparative analysis between the base algorithm and the refined model reveals significant error reduction. In particular, additional orbital parameters—mean anomaly (M), mean longitude (L₀), ecliptic longitude (λ), and obliquity of the ecliptic (ε) are introduced to enhance precision. Corrections for sidereal time and Julian date are also applied, thereby addressing variations due to Earth’s orbital and rotational dynamics. The improved computational approach, integrated into a MATLAB GUI, offers both high-accuracy solar tracking and accessibility for real-time applications where precise solar alignment is critical.",
+          "track": "Infrastructure & Sustainability II",
           "other_track": null,
-          "corresponding_author": "Vishal Singh Roha",
-          "corresponding_author_email": "vishal.roha@monash.edu",
-          "email": "rahul.ranjan@monash.edu",
+          "corresponding_author": "Arnav Sharma",
+          "corresponding_author_email": "arnav8205@gmail.com",
+          "email": "purnima.hazra@smvdu.ac.in",
           "mobile": null,
-          "affiliation": "Monash University",
-          "google_id": "107550482234828240525",
-          "eposter_file": "https://myeposter.com/storage/eposter-pdf/6B2xvHGhI4kqO4QzOxt2bZadDcb1HblBH3VX0b4U.png",
+          "affiliation": "Shri Mata Vaishno Devi University, J&K",
+          "google_id": "112210610828838698921",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/lcCyBHzFqaT0J5VcjCBYdpeBwhRjrL7mbfOI2Ayc.png",
           "url": null,
-          "start_date_time": "11-02-2026 02:00:00",
-          "end_date_time": "11-02-2026 02:05:00",
+          "start_date_time": "12-02-2026 14:20:00",
+          "end_date_time": "12-02-2026 14:30:00",
           "co_author": [
             {
-              "name": "Rahul Ranjan",
-              "email": "rahul.ranjan@monash.edu",
-              "affiliation": "Monash University"
+              "name": "Purnima Hazra",
+              "email": "purnima.hazra@smvdu.ac.in",
+              "affiliation": "Shri Mata Vaishno Devi University, J&K"
+            }
+          ]
+        },
+        {
+          "id": 137,
+          "paper_id": "6063",
+          "paper_title": "Low-Cost AI-Driven Footfall Monitoring System with Enhanced Detection Range for Smart City Applications",
+          "abstract": "In recent times, demand for efficient football monitoring system has increased due to the rise of urbanization and necessity for resource management in public places. This Paper introduces a concise system that leverages dual IR sensors, LM358 comparator IC and IC 555 timer. The core functionality of the given system uses two strategically placed advanced IR sensors to count number of individuals entering and exiting the specific area to improve the detection accuracy and minimize error that may occur during the counting. Basic principle\r\nof IR sensor is emitting and detecting IR light which allows it to capture movement in real time. This system is configured to extend the detection range from one foot to maximum ten foot. As it overcomes the limitations of restricted range, thus it will be capable to capture\r\naccurate data in larger venues and can be represented as one of the possible low-cost solutions to use in smart city applications. With an accuracy of 90-95% and large distance coverage feature, this system addresses the most common challenge faced in footfall counting systems. Moreover, the data acquired is transmitted to cloud via ThingSpeak IoT platform enabling real time data analysis to make informed decisions over time.",
+          "track": "Infrastructure & Sustainability II",
+          "other_track": null,
+          "corresponding_author": "Purnima Hazra",
+          "corresponding_author_email": "purnima.hazra@smvdu.ac.in",
+          "email": "arnav8205@gmail.com",
+          "mobile": null,
+          "affiliation": "Shri Mata Vaishno Devi University",
+          "google_id": "108153059252270071133",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/IGgfXsulEbZas2LrQZEyYvu7mfvH8Vm6D9wySBh5.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:30:00",
+          "end_date_time": "12-02-2026 14:40:00",
+          "co_author": [
+            {
+              "name": "Arnav Sharma",
+              "email": "arnav8205@gmail.com",
+              "affiliation": "Shri Mata Vaishno Devi University"
             },
             {
-              "name": "Mehmet Rasit Yuce",
-              "email": "mehmet.yuce@monash.edu",
+              "name": "Solihah Jan",
+              "email": "solihahtariq@gmail.com",
+              "affiliation": "Shri Mata Vaishno Devi University"
+            },
+            {
+              "name": "Satyendra Kumar Singh",
+              "email": "satyendra.ece@mietjammu.in",
+              "affiliation": "Model Institute of Engineering and Technology (MIET), Jammu"
+            },
+            {
+              "name": "Bhawani Singh",
+              "email": "bhawani.singh@smvdu.ac.in",
+              "affiliation": "Shri Mata Vaishno Devi University"
+            }
+          ]
+        },
+        {
+          "id": 100,
+          "paper_id": "6256",
+          "paper_title": "A Robust IoT Architecture for Real-Time Battery and Environmental Monitoring in Coal-Mine Infrastructure",
+          "abstract": "This paper presents the design and validation of an intelligent IoT-enabled architecture for integrated battery and\r\nenvironmental health monitoring in coal-mine Wi-Fi towers. The proposed system combines voltage and environmental sensing\r\nwith both cloud and local interfaces to ensure data visibility and resilience under connectivity disruptions. Three hardware prototypes were iteratively developed to balance cost, sustainability, and industrial durability, using modular sensor integration and robust enclosures. Experimental evaluation on a lab-grade battery confirmed stable voltage tracking and reliable temperature, humidity, pressure, and air-quality measurements. A real-time web dashboard enables visualization, alerting, and geolocation-based monitoring of distributed units. The results demonstrate a dependable, low-cost platform suitable for deployment in harsh field environments. Future extensions will focus on large-scale field validation, predictive analytics for battery health estimation, and enhanced communication redundancy for industrial-scale energy monitoring.",
+          "track": "Infrastructure & Sustainability II",
+          "other_track": null,
+          "corresponding_author": "Sujay Kadam",
+          "corresponding_author_email": "sujay_kadam@dau.ac.in",
+          "email": "202101251@dau.ac.in",
+          "mobile": null,
+          "affiliation": "Dhirubhai Ambani University",
+          "google_id": "110926957036004336828",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/7SPxamS686gCIZ9f0S4tMws7vO5ngjsiPxHwx3P1.png",
+          "url": "https://youtu.be/Saa9_uIBWT4",
+          "start_date_time": "12-02-2026 14:40:00",
+          "end_date_time": "12-02-2026 14:50:00",
+          "co_author": [
+            {
+              "name": "David Tandel",
+              "email": "202101251@dau.ac.in",
+              "affiliation": "Dhirubhai Ambani University"
+            },
+            {
+              "name": "Musab Bin Khaleeq",
+              "email": "musab_khaleeq@dau.ac.in",
+              "affiliation": "Dhirubhai Ambani University"
+            },
+            {
+              "name": "Rahul Mishra",
+              "email": "rahul_mishra@iitp.ac.in",
+              "affiliation": "IIT Patna"
+            },
+            {
+              "name": "Tapas Kumar Maiti",
+              "email": "tapas_kumar@dau.ac.in",
+              "affiliation": "Dhirubhai Ambani University"
+            }
+          ]
+        },
+        {
+          "id": 125,
+          "paper_id": "6396",
+          "paper_title": "Design and Fabrication of Anthracite Coal-Derived Graphene Oxide Humidity Sensor for Moisture Sensing in Transformer Oil",
+          "abstract": "Sensor-based moisture monitoring in transformer oil is needed for preserving transformer health and preventing failures. This work reports the development and response of a humidity sensor fabricated using Indian anthracite coal-derived graphene oxide (AC-GO) as the sensing material, a novel approach for moisture monitoring in transformer oil. AC-GO is synthesized using a one-pot technique. The screen-printed electrode (AgCl) is used to offer a highly conductive platform on a glass substrate for the fabrication of a sensor. The behavior of the sensor represents both capacitive and impedance response with respect to a change in relative humidity (%RH), allowing effective moisture detection. The sensor is tested in a transformer oil environment for moisture sensing across a wide range of frequencies and temperatures. Experimental results show that noticeable change in both capacitance and impedance as %RH levels and temperature changes, offering the sensor’s strong ability to monitor moisture accurately. The sensor’s response under varying %RH (5-90 %RH) and different transformer oil temperatures (20⁰C to 110⁰C) at different frequencies is thoroughly evaluated.",
+          "track": "Infrastructure & Sustainability II",
+          "other_track": null,
+          "corresponding_author": "Prasenjit Basak",
+          "corresponding_author_email": "prasenjit@thapar.edu",
+          "email": "vranjan_phd21@thapar.edu",
+          "mobile": null,
+          "affiliation": "Research Scholar, Department of Electrical and Instrumentation Engineering, TIET-VT, Center of Excellence in Emerging Materials, Thapar Institute of Engineering and Technology, Patiala-147004",
+          "google_id": "108528402652050314310",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/EbfI4rUc2GryTbEI3IbQPLSngBxao2MWXYp03Tv0.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:50:00",
+          "end_date_time": "12-02-2026 15:00:00",
+          "co_author": [
+            {
+              "name": "Vikash Ranjan",
+              "email": "vranjan_phd21@thapar.edu",
+              "affiliation": "Research Scholar, Department of Electrical and Instrumentation Engineering, TIET-VT, Center of Excellence in Emerging Materials, Thapar Institute of Engineering and Technology, Patiala-147004"
+            },
+            {
+              "name": "Shailesh Kumar",
+              "email": "shailesh_dgp@yahoo.co.in",
+              "affiliation": "Associate Professor, Department of Electrical and Electronics Engineering, School of Engineering & IT, Arka Jain University, Jharkhand-832108"
+            }
+          ]
+        },
+        {
+          "id": 134,
+          "paper_id": "6405",
+          "paper_title": "Sustainable, Flexible and Ambient Temperature Operated Polyaniline-based  Chemiresistive Ammonia Sensor with Eco-Friendly Design",
+          "abstract": "In this work, an eco-friendly, flexible and ambient temperature (~27 °C ± 2 °C) operated ammonia (NH3) sensor has been developed using electrospun polyaniline (PANI) fibers deposited on an eco-friendly paper substrate having printed graphene-carbon (G-C) interdigitated electrodes (IDEs). The sensor was designed to detect ammonia (NH₃) over a broad concentration range of 0.5 to 500 ppm, targeting applications in environmental and healthcare monitoring. Structural, elemental and morphological properties of the sensing layer were characterized using X-ray diffraction (XRD), energy-dispersive X-ray spectroscopy (EDX) and scanning electron microscopy (SEM), confirming the formation of well-aligned PANI fibers with entangled networks and rougher surface. The sensor exhibited excellent % response (1261 % at 500 ppm), reproducibility and good repeatability over multiple cycles. Selectivity studies showed a multifold % response towards ammonia gas as compared to interfering gases such as CO2, CO, SO2, and NO2. The use of paper as a low-cost, eco-friendly substrate, combined with the scalable fabrication route, highlights the potential of this work for sustainable and disposable ammonia sensing platforms and environmentally-friendly sensing solutions.",
+          "track": "Infrastructure & Sustainability II",
+          "other_track": null,
+          "corresponding_author": "Ajay Beniwal",
+          "corresponding_author_email": "ajay.beniwal@glasgow.ac.uk",
+          "email": "rahul.21eez0001@iitrpr.ac.in",
+          "mobile": null,
+          "affiliation": "Department of Electrical Engineering, Indian Institute of Technology, Ropar, Rupnagar 140001, India.",
+          "google_id": "107587770798635717591",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/EpMmQ5GUsIOg6F1jBaHvIJKkHc4ZAkjI7NhXAUZs.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:00:00",
+          "end_date_time": "12-02-2026 15:10:00",
+          "co_author": [
+            {
+              "name": "Rahul Gond",
+              "email": "rahul.21eez0001@iitrpr.ac.in",
+              "affiliation": "Department of Electrical Engineering, Indian Institute of Technology, Ropar, Rupnagar 140001, India."
+            },
+            {
+              "name": "Xenofon Karagiorgis",
+              "email": "2586807K@student.gla.ac.uk",
+              "affiliation": "Electronics and Nanoscale Engineering, James Watt School of Engineering, University of Glasgow, G12 8QQ Glasgow, United Kingdom."
+            },
+            {
+              "name": "Brajesh Rawat",
+              "email": "r.brajesh@iitrpr.ac.in",
+              "affiliation": "Department of Electrical Engineering, Indian Institute of Technology, Ropar, Rupnagar 140001, India."
+            },
+            {
+              "name": "Chong Li",
+              "email": "Chong.Li@glasgow.ac.uk",
+              "affiliation": "Electronics and Nanoscale Engineering, James Watt School of Engineering, University of Glasgow, G12 8QQ Glasgow, United Kingdom."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_number": 7,
+      "screen_start_time": "12-02-2026 14:20:00",
+      "screen_end_time": "12-02-2026 16:00:00",
+      "no_of_records_in_screen": 10,
+      "records": [
+        {
+          "id": 66,
+          "paper_id": "6038",
+          "paper_title": "Accurately Quantified Heart Rate Variability through Non-Contact Wearable Radar Sensing",
+          "abstract": "xx",
+          "track": "Wearables and Immersive Tecnologies",
+          "other_track": null,
+          "corresponding_author": "Mehmet R. Yuce",
+          "corresponding_author_email": "mehmet.yuce@monash.edu",
+          "email": "zainab.riaz@monash.edu",
+          "mobile": null,
+          "affiliation": "Monash University",
+          "google_id": "110294653351975614880",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/J5BYnAaSyyUJlvW9tAaDcfry2hGPVZGDLvGwIdet.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:20:00",
+          "end_date_time": "12-02-2026 14:30:00",
+          "co_author": [
+            {
+              "name": "Zainab Riaz",
+              "email": "zainab.riaz@monash.edu",
               "affiliation": "Monash University"
             }
           ]
         },
         {
-          "id": 70,
-          "paper_id": "6247",
-          "paper_title": "Comparative Analysis of Hydrogen Peroxide Detection Using Paper-Based Micropads and Glass Vials",
-          "abstract": "In this work, a comparative study of chemiluminescence-based H2O2 detection is given using two platforms: paper-based micropads and glass vials. Paper micro pads showed better Linear Regression of 0.9788 as compared to vials with 0.9573.",
-          "track": "Medical & Digital Healthcare IX",
+          "id": 124,
+          "paper_id": "6089",
+          "paper_title": "AI-Driven Generation of Cortisol-Binding Peptides for Non-Invasive Stress Detection",
+          "abstract": "Cortisol is a primary biomarker of stress, released in sweat at concentrations that directly correlate with physiological stress levels. Detecting cortisol non-invasively offers significant potential for real-time stress monitoring and healthcare applications. Biosensors capable of binding cortisol can thus enable the development of novel diagnostic platforms for personalised health management. In our earlier work, a 38-mer peptide fragment derived from the protein 2V95 was identified as a functional binder to cortisol. In the present study, we applied generative artificial intelligence (AI) approaches to expand the sequence space and identify superior candidate peptides with improved binding affinity. By integrating sequence-based and structure-based AI models, we generated and screened a peptide library of nearly 10,000 sequences against cortisol, leading to the identification of high-affinity candidates for further evaluation.\r\nKeywords—cortisol, biosensors, stress detection, generative AI, peptide design",
+          "track": "Wearables & Immersive Technologies II",
           "other_track": null,
-          "corresponding_author": "Prithvi Chawla",
-          "corresponding_author_email": "prithvichawla@gmail.com",
-          "email": "hasamnisma@rknec.edu",
+          "corresponding_author": "Sucharita Banerjee",
+          "corresponding_author_email": "sucharita.banerjee@monash.edu",
+          "email": "parijat.deshpande@tcs.com",
           "mobile": null,
-          "affiliation": "Ramdeobaba University, Nagpur",
-          "google_id": "100554950855813811020",
-          "eposter_file": "https://myeposter.com/storage/eposter-pdf/3JcgMC6hZ1asWHbyBwm95wSsX7j3b6k30JJW2OLf.png",
+          "affiliation": "TCS",
+          "google_id": "106892135906265625631",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/r8m8yaXtuGpgCIm41SlK2Nn4xEEybS3jqpt0LTf6.png",
           "url": null,
-          "start_date_time": "11-02-2026 02:05:00",
-          "end_date_time": "11-02-2026 02:10:00",
+          "start_date_time": "12-02-2026 14:30:00",
+          "end_date_time": "12-02-2026 14:40:00",
           "co_author": [
             {
-              "name": "Meghana Hasamnis",
-              "email": "hasamnisma@rknec.edu",
-              "affiliation": "Ramdeobaba University, Nagpur"
+              "name": "Parijat Deshpande",
+              "email": "parijat.deshpande@tcs.com",
+              "affiliation": "TCS"
+            }
+          ]
+        },
+        {
+          "id": 65,
+          "paper_id": "6104",
+          "paper_title": "Multi-Command Control of Prosthetic Arm Using a Low-Cost EEG Blink Sequencer",
+          "abstract": "We present a low-cost blink-based BCI using a Muse EEG headset that classifies blink sequences to enable real-time prosthetic arm control with 90.6% accuracy.",
+          "track": "Wearables and Immersive Technologies",
+          "other_track": null,
+          "corresponding_author": "Anukha Vusirikala",
+          "corresponding_author_email": "anukha.vusiri@gmail.com",
+          "email": "simarjeet.saini@uwaterloo.ca",
+          "mobile": null,
+          "affiliation": "University of Waterloo",
+          "google_id": "109706009390787426284",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/avzxqUuZl2YWamPDLU37jkBSiuLexus45emf9sez.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:40:00",
+          "end_date_time": "12-02-2026 14:50:00",
+          "co_author": [
+            {
+              "name": "Simarjeet Singh Saini",
+              "email": "simarjeet.saini@uwaterloo.ca",
+              "affiliation": "University of Waterloo"
+            }
+          ]
+        },
+        {
+          "id": 120,
+          "paper_id": "6109",
+          "paper_title": "Multi-Sensor Smart Insole System: Design, Fabrication and Evaluation for Real-Time Gait Analysis",
+          "abstract": "Traditional gait analysis systems, such as optical motion capture and force plates, represent the gold standard in biomechanics but are prohibitively expensive, spatially confined to specialized laboratories, and require expert operation. These limitations restrict their utility for continuous, long-term moni toring in naturalistic environments, which is crucial for detecting intermittent pathologies and tracking rehabilitation progress. Addressing these challenges, this paper presents the comprehen sive design, implementation, and evaluation of SoleSync, a cost effective, multi-sensor smart insole system engineered for real time capture of plantar pressure distribution and gait dynamics. The system strategically integrates five force-sensing resistors (FSRs) distributed across key anatomical weight-bearing loca tions and a 6-axis inertial measurement unit (IMU) for kinematic context. A custom-designed, miniaturized printed circuit board (PCB) based on the STM32G070 microcontroller provides stable analog signal acquisition, noise-resistant sampling at up to 50 Hz, and reliable Bluetooth Low Energy (BLE) communication. A dedicated cross-platform web application visualizes this data through real-time interpolated pressure heatmaps and 3D foot orientation rendering. Advanced sensor fusion algorithms extract critical gait events including heel strike and toe-off with high temporal precision. Comprehensive calibration methodologies for FSR characterization significantly improve measurement accuracy and inter-user repeatability. This work establishes a scalable, validated platform for wearable biomechanics research with significant applications in clinical gait analysis, athletic performance optimization, and remote patient monitoring.",
+          "track": "Wearables & Immersive Technologies II",
+          "other_track": null,
+          "corresponding_author": "Yash Agarwal",
+          "corresponding_author_email": "yash22585@iiitd.ac.in",
+          "email": "karanjeet22235@iiitd.ac.in",
+          "mobile": null,
+          "affiliation": "IIITD",
+          "google_id": "115035704064984698275",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/TiKZHvUYXPysjgoMPP3FiiN4j73NdmbxlLut1r76.png",
+          "url": null,
+          "start_date_time": "12-02-2026 14:50:00",
+          "end_date_time": "12-02-2026 15:00:00",
+          "co_author": [
+            {
+              "name": "Karanjeet Singh",
+              "email": "karanjeet22235@iiitd.ac.in",
+              "affiliation": "IIITD"
+            },
+            {
+              "name": "Rayhankhan Pathan",
+              "email": "rayhan22269@iiitd.ac.in",
+              "affiliation": "IIITD"
+            }
+          ]
+        },
+        {
+          "id": 102,
+          "paper_id": "6178",
+          "paper_title": "Wearable Fingertip PPG Compared to Wrist PPG for Emergency Alerting via Bluetooth or Cellular",
+          "abstract": "Wearable fitness and biomedical devices are becoming increasingly popular for portable and real-time monitoring of vital signs for applications ranging from athletic performance to disease monitoring. Wearable devices, when combined with machine learning-derived algorithms to detect complex physiological responses, also have the potential to save lives through earlier prediction of emergencies such as opioid overdoses. We recommend that such devices use non-invasive sensing methods such as photoplethysmography (PPG) and pulse oximetry and be capable of alerting emergency services directly without the need for the user to possess a mobile phone. In this paper, we demonstrate a custom-built system with a microcontroller and PPG sensor with embedded software and firmware for reliable data acquisition from the fingertip. We compare this device with two other devices: 1) a similar custom-built device designed to obtain signals from the wrist; and 2) a commercially available cell phone compatible ring-type finger device. We compare measurements to ensure that data quality is sufficient to train machine learning algorithms. The custom devices support Bluetooth communication and existing emergency services alerting technology, yet are small enough to ensure comfort and wearability. The findings from this paper contribute to the body of knowledge in a large public health project that is building wearable devices for predicting and preventing accidental opioid overdoses.",
+          "track": "Wearables & Immersive Technologies II",
+          "other_track": null,
+          "corresponding_author": "Henry Tran",
+          "corresponding_author_email": "phatt@sfu.ca",
+          "email": "jbahari@sfu.ca",
+          "mobile": null,
+          "affiliation": "Microinstrumentation Lab, School of Engineering Science, Simon Fraser University (SFU), Burnaby, BC, Canada",
+          "google_id": "112528409388443248600",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/s6TqxukStz0JDTtpOtchXsduUohiKxPM7M8byrY9.png",
+          "url": "https://drive.google.com/drive/folders/1NfgzHJHLvlkprcd7aTMLARb-FglZcama?usp=drive_link",
+          "start_date_time": "12-02-2026 15:00:00",
+          "end_date_time": "12-02-2026 15:10:00",
+          "co_author": [
+            {
+              "name": "Jamal Bahari",
+              "email": "jbahari@sfu.ca",
+              "affiliation": "Microinstrumentation Lab, School of Engineering Science, Simon Fraser University (SFU), Burnaby, BC, Canada"
+            },
+            {
+              "name": "Alex McGovern",
+              "email": "mcgovern.alex@outlook.com",
+              "affiliation": "Lifeguard Labs, Lifeguard Digital Health Inc. (LDH), Vancouver, BC, Canada"
+            },
+            {
+              "name": "Carissa Ruscheinsky",
+              "email": "cruscheinsky@lifeguarddh.com",
+              "affiliation": "Lifeguard Labs, Lifeguard Digital Health Inc. (LDH), Vancouver, BC, Canada"
+            },
+            {
+              "name": "Justin Tsang",
+              "email": "jtsang@lifeguarddh.com",
+              "affiliation": "Lifeguard Labs, Lifeguard Digital Health Inc. (LDH), Vancouver, BC, Canada"
+            },
+            {
+              "name": "Siddiqui Hakim",
+              "email": "shakim@lifeguarddh.com",
+              "affiliation": "Lifeguard Labs, Lifeguard Digital Health Inc. (LDH), Vancouver, BC, Canada"
+            },
+            {
+              "name": "Chandana Unnithan",
+              "email": "chandana@lifeguarddh.com",
+              "affiliation": "Lifeguard Labs, Lifeguard Digital Health Inc. (LDH), Vancouver, BC, Canada"
+            },
+            {
+              "name": "Bonnie L. Gray",
+              "email": "bonnie_gray@sfu.ca",
+              "affiliation": "Microinstrumentation Lab, School of Engineering Science, Simon Fraser University (SFU), Burnaby, BC, Canada"
+            }
+          ]
+        },
+        {
+          "id": 104,
+          "paper_id": "6179",
+          "paper_title": "Graphene Based Flexible Piezoresistive Strain Sensor",
+          "abstract": "Flexible and stretchable strain sensors are indis- pensable devices in several modern day applications including robotics and healthcare. Graphene based piezoresistive strain sensors are attractive as they combine the advantages of graphene and piezoresistive sensors such as high electrical conductivity, linearity and ease of fabrication among others. In the present work, a graphene nanoplatelets based piezoresistive strain sensor which also acts as a pressure sensor is fabricated and characterized. The strain sensor achieves a high gauge factor (22.29) implying good sensitivity to tensile strain and is found to be bendable and durable. COMSOL Multiphysics (version 6.0) simulation software has been used to evaluate the performance of the graphene piezoresistive strain sensor as a pressure sensor. The simulation of a linear relation between the force applied and the resistance of the sensor has been experimentally demonstrated by applying varying weights to the sensor. The practical demonstration of the pressure sensor paves way for future integration into engineering applications such as pressure monitoring in construction industry.",
+          "track": "Wearables & Immersive Technologies II",
+          "other_track": null,
+          "corresponding_author": "Alex James",
+          "corresponding_author_email": "apj@ieee.org",
+          "email": null,
+          "mobile": null,
+          "affiliation": "Digital University Kerala",
+          "google_id": "106169326522390029454",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/IWBB5o4VHS0jmOkRIiAExtGZwmcCmtOr28RXe7ML.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:10:00",
+          "end_date_time": "12-02-2026 15:20:00",
+          "co_author": [
+            {
+              "name": "Remya Kunjuveettil G",
+              "email": null,
+              "affiliation": "Digital University Kerala"
+            },
+            {
+              "name": "Aleena Kabeer",
+              "email": null,
+              "affiliation": "Digital University Kerala"
+            },
+            {
+              "name": "Malavika Prasad S",
+              "email": null,
+              "affiliation": "Digital University Kerala"
+            }
+          ]
+        },
+        {
+          "id": 95,
+          "paper_id": "6189",
+          "paper_title": "Design of Wearable and Wireless Motion Capture System for Biomechanical application",
+          "abstract": "Motion capture is an essential biomechanical tool to analyze body part movements and to analyze gait using it. This usually involves fixed motion cameras focused on a particular area for recording movements.  This research was achieving kinematic analysis with complex motion capture using simple LED active markers and modest mobile. The video recorded via mobile camera was analyzed to visualize the dynamic angular changes of any joint graphically. With the help of active markers, video has been recorded and analyzed using MATLAB by manual allocation of joint markers. Further angle calculation was done using extracted coordinates of those markers which were finally displayed graphically, and the results were exported both vector-angle representation in the video as .mp4 and angle-frame data as .csv files. This shows the strong feasibility of using integrated mobile-MATLAB system for kinematic motion capture analysis. It has a significant implication in stability analysis of gait affected patients like in case of post-physiotherapy monitoring and other gait parameters like antalgic gait, propulsive gait, scissors gait and sports biomechanics like injury recovery biomechanics.\r\nKeywords- kinematic analysis, markers, coordinates, gait.",
+          "track": "Wearables & Immersive Technologies II",
+          "other_track": null,
+          "corresponding_author": "Celestin Jerald A",
+          "corresponding_author_email": "celestinjerald@scbt.sastra.edu",
+          "email": "p.prasanna1419@gmail.com",
+          "mobile": null,
+          "affiliation": "Student, SASTRA Deemed to be University",
+          "google_id": "104137942299340099741",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/s5765kE03LThF7lLNxW381t4BacKJmVMIDqxFZVw.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:20:00",
+          "end_date_time": "12-02-2026 15:30:00",
+          "co_author": [
+            {
+              "name": "Prasanna P",
+              "email": "p.prasanna1419@gmail.com",
+              "affiliation": "Student, SASTRA Deemed to be University"
+            }
+          ]
+        },
+        {
+          "id": 87,
+          "paper_id": "6388",
+          "paper_title": "ACSRR–IDC Based Microwave Biosensor for Non-Invasive Creatinine Detection",
+          "abstract": "Rapid detection of creatinine level is significant for the diagnosis of renal dysfunction. Conventional methods used for creatinine detection are not portable and cannot provide real-time results. This paper describes the design and validation of a microwave biosensor to overcome these limitations. The resonator is designed using a complementary split-ring resonator (CSRR) and an interdigitated capacitor (IDC) fabricated on a FR-4 substrate of dimensions 50×25 mm2. Simulations showed a resonance frequency of 2.013 GHz, while measurement results yielded a resonance of 1.941 GHz, with a deviation of 72 MHz. The fabricated device was tested with 10μL creatinine samples of 0.8 to 2.0 mg/dL, which are in the physiological range. A sensitivity of 0.77% is achieved for the detection of concentration change in chemical solutions. These results show the capability of the biosensor for real-time biomedical diagnosis.",
+          "track": "Wearables & Immersive Technologies II",
+          "other_track": null,
+          "corresponding_author": "Andleeb Zahra",
+          "corresponding_author_email": "andleeb.zahra@research.iiit.ac.in",
+          "email": "teja.jetti@research.iiit.ac.in",
+          "mobile": null,
+          "affiliation": "Center for VLSI and Embedded Systems Technology (CVEST), International Institute of Information Technology Hyderabad (IIITH), Hyderabad, India",
+          "google_id": "115841832442350081758",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/XulMJXMLoznb88jqfVxohPs5Pr4Z7dL5OcMTjG6O.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:30:00",
+          "end_date_time": "12-02-2026 15:40:00",
+          "co_author": [
+            {
+              "name": "Teja Jetti",
+              "email": "teja.jetti@research.iiit.ac.in",
+              "affiliation": "Center for VLSI and Embedded Systems Technology (CVEST), International Institute of Information Technology Hyderabad (IIITH), Hyderabad, India"
+            },
+            {
+              "name": "Swarim Sinha",
+              "email": "swarnim.sinha@research.iiit.ac.in",
+              "affiliation": "Center for VLSI and Embedded Systems Technology (CVEST), International Institute of Information Technology Hyderabad (IIITH), Hyderabad, India"
+            },
+            {
+              "name": "Syed Azeemuddin",
+              "email": "syed@psu.edu",
+              "affiliation": "Electrical and Computer Engineering, Penn State Erie, The Behrend College, 16563, PA, USA"
+            },
+            {
+              "name": "Zia Abbas",
+              "email": "zia.abbas@iiit.ac.in",
+              "affiliation": "Center for VLSI and Embedded Systems Technology (CVEST), International Institute of Information Technology Hyderabad (IIITH), Hyderabad, India"
+            }
+          ]
+        },
+        {
+          "id": 145,
+          "paper_id": "6414",
+          "paper_title": "A LoRa-Based V2I System for Collision Warning at Blind-Turn",
+          "abstract": "To mitigate fatal collisions at non-line-of-sight (NLOS) blind curves, this paper presents the Blind Turn Accident\r\nAlert System (BTAAS), a low-cost, solar-powered Vehicle-to-Infrastructure (V2I) solution utilizing sub-GHz LoRa. The\r\nsystem uses intelligent nodes at curves to detect vehicles approaching from opposite directions via a motion-gated,\r\nbidirectional logic and broadcasting real-time warnings of potential collision risks. Field validation demonstrated a reliable\r\nlink at a 150 m target distance (RSSI of -91.3 dBm) and robust operation at extended ranges with a negative SNR of -3\r\ndB. Furthermore, an IMU-based Vector-Track algorithm effectively distinguishes between safe and converging trajectories.\r\nOffering a 10× cost advantage over radar, estimated at Rs 3500 ($39) per roadside unit and Rs 1000 ($12) per vehicle\r\nunit. BTAAS provides a validated, scalable technology for accident prevention in high-risk regions.",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Shubham Gupta",
+          "corresponding_author_email": "shubham22493@iiitd.ac.in",
+          "email": "shubham22493@iiitd.ac.in",
+          "mobile": null,
+          "affiliation": "Centre for Intelligent Product Development, IIIT-Delhi",
+          "google_id": "108141318391722466710",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/OzA6D0DCa7NvYAueGTnR85IogmrxVHtdzO9tBe12.png",
+          "url": null,
+          "start_date_time": "12-02-2026 15:40:00",
+          "end_date_time": "12-02-2026 15:50:00",
+          "co_author": [
+            {
+              "name": "Shubham Gupta",
+              "email": "shubham22493@iiitd.ac.in",
+              "affiliation": "Centre for Intelligent Product Development, IIIT-Delhi"
+            },
+            {
+              "name": "Pratyush Gupta",
+              "email": "pratyush22375@iiitd.ac.in",
+              "affiliation": "Centre for Intelligent Product Development, IIIT-Delhi"
+            },
+            {
+              "name": "Theajus Prakash",
+              "email": "theajus23555@iiitd.ac.in",
+              "affiliation": "Centre for Intelligent Product Development, IIIT-Delhi"
+            },
+            {
+              "name": "Ramendra S. Baoni",
+              "email": "rsbaoni@bisquare.com",
+              "affiliation": "Bisquare Systems Pvt. Ltd."
+            },
+            {
+              "name": "Anuj Grover",
+              "email": "anuj@iiitd.ac.in",
+              "affiliation": "IIIT Delhi"
+            }
+          ]
+        },
+        {
+          "id": 171,
+          "paper_id": "6418",
+          "paper_title": "A Multi-Modal Communication Framework for Enhanced Vehicular Coordination and Aerial Surveillance",
+          "abstract": "This paper presents a multi-modal communication framework to improve vehicular coordination and aerial surveillance in urban environments. The proposed system integrates ground vehicles through 5G-V2X, edge cloud infrastructure, and drones to enable real-time tracking and reliable data exchange for high-priority transportation. We incorporate a channel model that addresses small-scale and large-scale fading effects, enhancing communication reliability in diverse, dynamic environments. Experimental evaluations validate the framework’s robustness and adaptability, demonstrating its potential for priority vehicle coordination, real-time traffic management, and other critical applications in smart cities.",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Annu Annu",
+          "corresponding_author_email": "ee21resch01010@iith.ac.in",
+          "email": "tihan.hto@iith.ac.in",
+          "mobile": null,
+          "affiliation": "TiHAN-IIT HYDERABAD",
+          "google_id": "105774907495902500082",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/JD2oBPYOSUmUxsH7IPmSwLqvpoDvqODju82VMqnw.jpg",
+          "url": null,
+          "start_date_time": "12-02-2026 15:50:00",
+          "end_date_time": "12-02-2026 16:00:00",
+          "co_author": [
+            {
+              "name": "Syam Narayanan S",
+              "email": "tihan.hto@iith.ac.in",
+              "affiliation": "TiHAN-IIT HYDERABAD"
+            },
+            {
+              "name": "Rajalakshmi Pachamuthu",
+              "email": "raji@ee.iith.ac.in",
+              "affiliation": "IIT HYDERABAD"
+            },
+            {
+              "name": "Shaik Jani Basha",
+              "email": "shaik.janibasha@tihaniith.in",
+              "affiliation": "TiHAN-IIT HYDERABAD"
+            },
+            {
+              "name": "Vijay Kumar Gudimetla",
+              "email": null,
+              "affiliation": "TiHAN-IIT HYDERABAD"
             }
           ]
         }
@@ -167,81 +1615,67 @@
   ],
   "booking_slot": [
     {
-      "booking_id": 27,
-      "date": "2026-02-11",
-      "time": "12:45 PM",
-      "screen": "1",
-      "paper_id": "169",
-      "booking_email": "luckyabhi49@gmail.com",
-      "google_event_id": "cn9vju23doi3naghhfneouigsk",
-      "ical_uid": "cn9vju23doi3naghhfneouigsk@google.com",
-      "meeting_response": null,
-      "status": null,
-      "paper_details": {
-        "id": 169,
-        "paper_id": "1",
-        "paper_title": "Testing",
-        "abstract": "Eposter testing",
-        "track": "Transportation Systems & AI for Sensing",
-        "other_track": null,
-        "corresponding_author": "Kalpan",
-        "corresponding_author_email": "solankikalpan05@gmail.com",
-        "email": "kalpansolanki5@gmail.com",
-        "mobile": null,
-        "affiliation": "Pegasus Automation",
-        "google_id": "100878942786067193507",
-        "eposter_file": "https://myeposter.com/storage/eposter-pdf/CKyFhhi98PAXVibvj10uTVkBLCbKXKpKD7eByjLL.jpg",
-        "url": null,
-        "start_date_time": "11-02-2026 12:45:00",
-        "end_date_time": "11-02-2026 13:00:00",
-        "co_author": [
-          {
-            "name": null,
-            "email": null,
-            "affiliation": null
-          }
-        ]
-      }
+      "screen_number": 1,
+      "screen_start_time": "12-02-2026 14:00:00",
+      "screen_end_time": "12-02-2026 14:15:00",
+      "no_of_records_in_screen": 1,
+      "records": [
+        {
+          "id": 168,
+          "paper_id": "123",
+          "paper_title": "Testing",
+          "abstract": "Testing for eposter-screening",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Jai",
+          "corresponding_author_email": "joymehtani1512@gmail.com",
+          "email": "joymehtani1512@gmail.com",
+          "mobile": null,
+          "affiliation": "Pegasus Automation",
+          "google_id": "112098188252455477266",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/5jdpmP3j1Hczsjc20tVe3mE4ry5DOfUWkep29JtV.jpg",
+          "url": null,
+          "start_date_time": "12-02-2026 14:00:00",
+          "end_date_time": "12-02-2026 14:15:00",
+          "co_author": [
+            {
+              "name": "malani",
+              "email": "malani3851@gmail.com",
+              "affiliation": "testing"
+            }
+          ]
+        }
+      ]
     },
     {
-      "booking_id": 28,
-      "date": "2026-02-11",
-      "time": "12:45 PM",
-      "screen": "1",
-      "paper_id": "168",
-      "booking_email": "luckyabhi49@gmail.com",
-      "google_event_id": "4pc6t38gagjrd7bkvbb7kgmcq4",
-      "ical_uid": "4pc6t38gagjrd7bkvbb7kgmcq4@google.com",
-      "meeting_response": null,
-      "status": null,
-      "paper_details": {
-        "id": 168,
-        "paper_id": "123",
-        "paper_title": "Testing",
-        "abstract": "Testing for eposter-screening",
-        "track": "Analytical Instrumentation",
-        "other_track": null,
-        "corresponding_author": "Jai",
-        "corresponding_author_email": "joymehtani1512@gmail.com",
-        "email": "joymehtani1512@gmail.com",
-        "mobile": null,
-        "affiliation": "Pegasus Automation",
-        "google_id": "112098188252455477266",
-        "eposter_file": "https://myeposter.com/storage/eposter-pdf/5jdpmP3j1Hczsjc20tVe3mE4ry5DOfUWkep29JtV.jpg",
-        "url": null,
-        "start_date_time": "11-02-2026 12:45:00",
-        "end_date_time": "11-02-2026 13:00:00",
-        "co_author": [
-          {
-            "name": null,
-            "email": null,
-            "affiliation": null
-          }
-        ]
-      }
+      "screen_number": 2,
+      "screen_start_time": "12-02-2026 14:00:00",
+      "screen_end_time": "12-02-2026 14:15:00",
+      "no_of_records_in_screen": 1,
+      "records": [
+        {
+          "id": 169,
+          "paper_id": "1",
+          "paper_title": "Testing",
+          "abstract": "Eposter testing",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Kalpan",
+          "corresponding_author_email": "solankikalpan05@gmail.com",
+          "email": "kalpansolanki5@gmail.com",
+          "mobile": null,
+          "affiliation": "Pegasus Automation",
+          "google_id": "100878942786067193507",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/CKyFhhi98PAXVibvj10uTVkBLCbKXKpKD7eByjLL.jpg",
+          "url": null,
+          "start_date_time": "12-02-2026 14:00:00",
+          "end_date_time": "12-02-2026 14:15:00",
+          "co_author": []
+        }
+      ]
     }
   ],
-  "fetched_at": "12-02-2026-01:29:05",
+  "fetched_at": "12-02-2026-18:43:05",
   "fetched_date": "12-02-2026",
-  "fetched_time": "01:29:05"
+  "fetched_time": "18:43:05"
 }

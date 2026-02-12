@@ -76,7 +76,7 @@ def get_device_records(device_id):
         log(f"Error parsing records: {e}", "ERROR")
         return [], 5
 
-def get_booking_records():
+def get_booking_records(device_id):
     if not API_DATA_JSON.exists():
         return []
     try:
@@ -85,6 +85,8 @@ def get_booking_records():
         bookings = data.get("booking_slot", [])
         records = []
         for b in bookings:
+            if str(b.get("screen")) != str(device_id):
+                continue
             details = b.get("paper_details") or {}
             if details:
                 records.append(details)
@@ -100,7 +102,7 @@ def refresh_data_and_cache(poster_token, device_id):
         if new_data:
             with open(API_DATA_JSON, 'w') as f: json.dump(new_data, f)
     records, duration = get_device_records(device_id)
-    booking_records = get_booking_records()
+    booking_records = get_booking_records(device_id)
     cache_handler.sync_cache((records or []) + (booking_records or []))
     return records, duration
 
