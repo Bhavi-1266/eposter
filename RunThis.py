@@ -71,39 +71,36 @@ def get_device_records(device_id):
                 r["start_dt"] = s
                 r["end_dt"] = e
                 records.append(r)
+
+        bookings = data.get("booking_slot", [])
+        for b in bookings:
+            if str(b.get("screen_number")) != str(device_id):
+                continue
+            details = b.get("records") or {}
+            if details:
+                for r in details:
+                    s = parse_datetime(r.get("start_date_time"))
+                    e = parse_datetime(r.get("end_date_time"))
+                    if s and e:
+                        r["start_dt"] = s
+                        r["end_dt"] = e
+                        records.append(r)
         return records, my_screen.get("minutes_per_record", 5)
     except Exception as e:
         log(f"Error parsing records: {e}", "ERROR")
         return [], 5
 
-def get_booking_records(device_id):
-    if not API_DATA_JSON.exists():
-        return []
-    try:
-        with open(API_DATA_JSON, 'r') as f:
-            data = json.load(f)
-        bookings = data.get("booking_slot", [])
-        records = []
-        for b in bookings:
-            if str(b.get("screen")) != str(device_id):
-                continue
-            details = b.get("paper_details") or {}
-            if details:
-                records.append(details)
-        return records
-    except Exception as e:
-        log(f"Error parsing booking slots: {e}", "ERROR")
-        return []
-
+  
 def refresh_data_and_cache(poster_token, device_id):
+    
     log(f"--- Refreshing Data for Device: {device_id} ---", "INFO")
     if wifi_connect.ensure_wifi_connection():
         new_data = api_handler.fetch_posters(poster_token)
         if new_data:
             with open(API_DATA_JSON, 'w') as f: json.dump(new_data, f)
     records, duration = get_device_records(device_id)
-    booking_records = get_booking_records(device_id)
-    cache_handler.sync_cache((records or []) + (booking_records or []))
+    
+    cache_handler.sync_cache((records or []))
     return records, duration
 
 # ---------------------------------------------------------
@@ -215,6 +212,7 @@ def run_scroll_mode(screen, clock):
         return sorted([f for f in CACHE_DIR.glob('*') if f.suffix.lower() in ['.png', '.jpg', '.jpeg']])
 
     records, _ = get_device_records(device_id)
+
     images = get_valid_images(records)
     index = 0
     next_switch = 0
@@ -349,6 +347,7 @@ def run_menu_mode(screen, clock):
                                 # URL on top of preview
                                 menu_img_id = item['path'].stem
                                 menu_records, _ = get_device_records(device_id)
+                                
                                 menu_paper_id = next((r.get("paper_id") for r in menu_records if str(r.get("id")) == str(menu_img_id)), menu_img_id)
                                 display_handler.display_url(screen, PHY_W, PHY_H, rotation, poster_id=menu_paper_id)
                                 pygame.display.flip()

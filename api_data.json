@@ -1,14 +1,79 @@
 {
   "status": true,
-  "date": "12-02-2026",
+  "date": "13-02-2026",
   "total_screen": 7,
   "screens": [
     {
       "screen_number": 1,
-      "screen_start_time": "12-02-2026 19:55:00",
-      "screen_end_time": "12-02-2026 20:03:00",
-      "no_of_records_in_screen": 8,
+      "screen_start_time": "13-02-2026 13:30:00",
+      "screen_end_time": "13-02-2026 13:39:00",
+      "no_of_records_in_screen": 9,
       "records": [
+        {
+          "id": 100,
+          "paper_id": "6256",
+          "paper_title": "A Robust IoT Architecture for Real-Time Battery and Environmental Monitoring in Coal-Mine Infrastructure",
+          "abstract": "This paper presents the design and validation of an intelligent IoT-enabled architecture for integrated battery and\r\nenvironmental health monitoring in coal-mine Wi-Fi towers. The proposed system combines voltage and environmental sensing\r\nwith both cloud and local interfaces to ensure data visibility and resilience under connectivity disruptions. Three hardware prototypes were iteratively developed to balance cost, sustainability, and industrial durability, using modular sensor integration and robust enclosures. Experimental evaluation on a lab-grade battery confirmed stable voltage tracking and reliable temperature, humidity, pressure, and air-quality measurements. A real-time web dashboard enables visualization, alerting, and geolocation-based monitoring of distributed units. The results demonstrate a dependable, low-cost platform suitable for deployment in harsh field environments. Future extensions will focus on large-scale field validation, predictive analytics for battery health estimation, and enhanced communication redundancy for industrial-scale energy monitoring.",
+          "track": "Infrastructure & Sustainability II",
+          "other_track": null,
+          "corresponding_author": "Sujay Kadam",
+          "corresponding_author_email": "sujay_kadam@dau.ac.in",
+          "email": "202101251@dau.ac.in",
+          "mobile": null,
+          "affiliation": "Dhirubhai Ambani University",
+          "google_id": "110926957036004336828",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/7SPxamS686gCIZ9f0S4tMws7vO5ngjsiPxHwx3P1.png",
+          "url": "https://youtu.be/Saa9_uIBWT4",
+          "start_date_time": "13-02-2026 13:30:00",
+          "end_date_time": "13-02-2026 13:31:00",
+          "co_author": [
+            {
+              "name": "David Tandel",
+              "email": "202101251@dau.ac.in",
+              "affiliation": "Dhirubhai Ambani University"
+            },
+            {
+              "name": "Musab Bin Khaleeq",
+              "email": "musab_khaleeq@dau.ac.in",
+              "affiliation": "Dhirubhai Ambani University"
+            },
+            {
+              "name": "Rahul Mishra",
+              "email": "rahul_mishra@iitp.ac.in",
+              "affiliation": "IIT Patna"
+            },
+            {
+              "name": "Tapas Kumar Maiti",
+              "email": "tapas_kumar@dau.ac.in",
+              "affiliation": "Dhirubhai Ambani University"
+            }
+          ]
+        },
+        {
+          "id": 98,
+          "paper_id": "6400",
+          "paper_title": "Magnetic Characterization and an Arctan-based Multi-Component Nonlinear Modelling of Mangifera Indica L. Tissues for PBC Applications",
+          "abstract": "The growing global population and rising food demand, coupled with environmental challenges, call for advanced agricultural technologies. Plant Body Communication (PBC) is an emerging approach that utilizes intrinsic plant tissues for signal transmission, enabling seamless integration of plant sensors via a unified gateway for real-time monitoring and controlled magnetic and/or electric stimuli across growth stages. Realizing PBC requires precise characterization of the electrical and magnetic properties of plant tissues. In this work, the M - H characteristics of different types of Mangifera indica L. tissues were measured across different seasons using a vibrating sample magnetometer under magnetic fields up to 1.8 ×104 Oe at room temperature. The measured data were analyzed using an arctan-based multi-component nonlinear model, with parameters extracted via nonlinear least-squares optimization, capturing seasonal and tissue-specific variations. The reliability of the extracted magnetic parameters was validated using the coefficient of determination (R2). These findings provide new insights into plant-based biomagnetism and support the development of robust PBC systems (for continuous monitoring and nutrient diagnostics) in precision agriculture.",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "corresponding_author": "Nagendra Prasad Pathak",
+          "corresponding_author_email": "nagendra.pathak@ece.iitr.ac.in",
+          "email": "gunjan_k@ec.iitr.ac.in",
+          "mobile": null,
+          "affiliation": "RFIC Lab, Department of Electronics and Communication Engineering, Indian Institute of Technology Roorkee, 247667 Roorkee, India",
+          "google_id": "112487378406910274621",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/cQuoRXTpso4MHV7MazL6eZACGoaIHkHwooJZ1Kfg.png",
+          "url": null,
+          "start_date_time": "13-02-2026 13:31:00",
+          "end_date_time": "13-02-2026 13:32:00",
+          "co_author": [
+            {
+              "name": "Gunjan Kumari",
+              "email": "gunjan_k@ec.iitr.ac.in",
+              "affiliation": "RFIC Lab, Department of Electronics and Communication Engineering, Indian Institute of Technology Roorkee, 247667 Roorkee, India"
+            }
+          ]
+        },
         {
           "id": 77,
           "paper_id": "6009",
@@ -24,8 +89,8 @@
           "google_id": "100566191742617336256",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/LA04WtkEy96tulbndFjvRR83fPNjPBSNGuMeSxK4.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:55:00",
-          "end_date_time": "12-02-2026 19:56:00",
+          "start_date_time": "13-02-2026 13:32:00",
+          "end_date_time": "13-02-2026 13:33:00",
           "co_author": [
             {
               "name": "Rakesh M D",
@@ -54,8 +119,8 @@
           "google_id": "100870403711341561485",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/hq2DaX6yUDnoVJQzULmuvTq4ojI46RnVOpqxisyL.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:56:00",
-          "end_date_time": "12-02-2026 19:57:00",
+          "start_date_time": "13-02-2026 13:33:00",
+          "end_date_time": "13-02-2026 13:34:00",
           "co_author": [
             {
               "name": "Nitin yadav",
@@ -79,8 +144,8 @@
           "google_id": "102751378279614146893",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/Mf1MQK3qwMgJYurJTRLX5zVHUIE6RpLb641fkBFL.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:57:00",
-          "end_date_time": "12-02-2026 19:58:00",
+          "start_date_time": "13-02-2026 13:34:00",
+          "end_date_time": "13-02-2026 13:35:00",
           "co_author": [
             {
               "name": "Manish Kumar Sharma",
@@ -109,8 +174,8 @@
           "google_id": "108340673211352909392",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/AEaQjUtbBleIp5qXT4ug7pPJEUCHxPw1Jusj33rx.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:58:00",
-          "end_date_time": "12-02-2026 19:59:00",
+          "start_date_time": "13-02-2026 13:35:00",
+          "end_date_time": "13-02-2026 13:36:00",
           "co_author": [
             {
               "name": "Pooja Prasad",
@@ -139,8 +204,8 @@
           "google_id": "104803638162589022349",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/elYPC8dz6zupu6QPX1xoT3c2EAEQzoc5XobcYQ2M.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:59:00",
-          "end_date_time": "12-02-2026 20:00:00",
+          "start_date_time": "13-02-2026 13:36:00",
+          "end_date_time": "13-02-2026 13:37:00",
           "co_author": [
             {
               "name": "Sohom Adhikari",
@@ -179,8 +244,8 @@
           "google_id": "114185096129305524099",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/6xDg2fohzmPTfPDSM9tDWp3Oyb8MRBZs8ocoELqY.png",
           "url": null,
-          "start_date_time": "12-02-2026 20:00:00",
-          "end_date_time": "12-02-2026 20:01:00",
+          "start_date_time": "13-02-2026 13:37:00",
+          "end_date_time": "13-02-2026 13:38:00",
           "co_author": [
             {
               "name": "Temitope Odedeyi",
@@ -209,8 +274,8 @@
           "google_id": "",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/cQuoRXTpso4MHV7MazL6eZACGoaIHkHwoojz2Kfg.png",
           "url": null,
-          "start_date_time": "12-02-2026 20:01:00",
-          "end_date_time": "12-02-2026 20:02:00",
+          "start_date_time": "13-02-2026 13:38:00",
+          "end_date_time": "13-02-2026 13:39:00",
           "co_author": [
             {
               "name": "Swagatam Bose Choudhury",
@@ -228,38 +293,13 @@
               "affiliation": ""
             }
           ]
-        },
-        {
-          "id": 98,
-          "paper_id": "6400",
-          "paper_title": "Magnetic Characterization and an Arctan-based Multi-Component Nonlinear Modelling of Mangifera Indica L. Tissues for PBC Applications",
-          "abstract": "The growing global population and rising food demand, coupled with environmental challenges, call for advanced agricultural technologies. Plant Body Communication (PBC) is an emerging approach that utilizes intrinsic plant tissues for signal transmission, enabling seamless integration of plant sensors via a unified gateway for real-time monitoring and controlled magnetic and/or electric stimuli across growth stages. Realizing PBC requires precise characterization of the electrical and magnetic properties of plant tissues. In this work, the M - H characteristics of different types of Mangifera indica L. tissues were measured across different seasons using a vibrating sample magnetometer under magnetic fields up to 1.8 ×104 Oe at room temperature. The measured data were analyzed using an arctan-based multi-component nonlinear model, with parameters extracted via nonlinear least-squares optimization, capturing seasonal and tissue-specific variations. The reliability of the extracted magnetic parameters was validated using the coefficient of determination (R2). These findings provide new insights into plant-based biomagnetism and support the development of robust PBC systems (for continuous monitoring and nutrient diagnostics) in precision agriculture.",
-          "track": "Agriculture & Food Technology III",
-          "other_track": null,
-          "corresponding_author": "Nagendra Prasad Pathak",
-          "corresponding_author_email": "nagendra.pathak@ece.iitr.ac.in",
-          "email": "gunjan_k@ec.iitr.ac.in",
-          "mobile": null,
-          "affiliation": "RFIC Lab, Department of Electronics and Communication Engineering, Indian Institute of Technology Roorkee, 247667 Roorkee, India",
-          "google_id": "112487378406910274621",
-          "eposter_file": "https://myeposter.com/storage/eposter-pdf/cQuoRXTpso4MHV7MazL6eZACGoaIHkHwooJZ1Kfg.png",
-          "url": null,
-          "start_date_time": "12-02-2026 20:02:00",
-          "end_date_time": "12-02-2026 20:03:00",
-          "co_author": [
-            {
-              "name": "Gunjan Kumari",
-              "email": "gunjan_k@ec.iitr.ac.in",
-              "affiliation": "RFIC Lab, Department of Electronics and Communication Engineering, Indian Institute of Technology Roorkee, 247667 Roorkee, India"
-            }
-          ]
         }
       ]
     },
     {
       "screen_number": 2,
-      "screen_start_time": "12-02-2026 19:55:00",
-      "screen_end_time": "12-02-2026 20:04:00",
+      "screen_start_time": "13-02-2026 13:30:00",
+      "screen_end_time": "13-02-2026 13:39:00",
       "no_of_records_in_screen": 9,
       "records": [
         {
@@ -277,8 +317,8 @@
           "google_id": "109606509339071791758",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/PGTDtzcN0N3kplnxenrP53MCgeEIn5cfAR50brdH.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:55:00",
-          "end_date_time": "12-02-2026 19:56:00",
+          "start_date_time": "13-02-2026 13:30:00",
+          "end_date_time": "13-02-2026 13:31:00",
           "co_author": [
             {
               "name": "Manjiri Pande",
@@ -312,8 +352,8 @@
           "google_id": "117965627901873207634",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/bHV7Et9Wa0lPvvXMkQecYo3fe2z0vYZx6mmy1533.png",
           "url": "https://drive.google.com/file/d/14JJk6Mxa0TUSXJ_Pw08CsTZbBNUGdzii/view?usp=sharing",
-          "start_date_time": "12-02-2026 19:56:00",
-          "end_date_time": "12-02-2026 19:57:00",
+          "start_date_time": "13-02-2026 13:31:00",
+          "end_date_time": "13-02-2026 13:32:00",
           "co_author": [
             {
               "name": "Alok Rajput",
@@ -352,8 +392,8 @@
           "google_id": "115174557465037234175",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/DvK4phX1nfnDAHN8Sazi4TeFdYyuDQRoPcST8kO5.jpg",
           "url": null,
-          "start_date_time": "12-02-2026 19:57:00",
-          "end_date_time": "12-02-2026 19:58:00",
+          "start_date_time": "13-02-2026 13:32:00",
+          "end_date_time": "13-02-2026 13:33:00",
           "co_author": [
             {
               "name": "K. K. D. V. N. Kannangara",
@@ -377,8 +417,8 @@
           "google_id": "108413323379130976819",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/FmMexeAujgDzxPQe2ir5ja9lYlhHm4G97fmfEyIV.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:58:00",
-          "end_date_time": "12-02-2026 19:59:00",
+          "start_date_time": "13-02-2026 13:33:00",
+          "end_date_time": "13-02-2026 13:34:00",
           "co_author": [
             {
               "name": "Isabela Fernandes Silva Reis",
@@ -412,8 +452,8 @@
           "google_id": "116567651566525585410",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/SaghI8b4qkh0UACSefUXBValhfKMo1pycW9hYEp1.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:59:00",
-          "end_date_time": "12-02-2026 20:00:00",
+          "start_date_time": "13-02-2026 13:34:00",
+          "end_date_time": "13-02-2026 13:35:00",
           "co_author": [
             {
               "name": "Muthuserpi Sasikumar",
@@ -442,8 +482,8 @@
           "google_id": "111127126754356058886",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/0Jnfw7Closrr39xqv47caBG9jR6L35fNrsRqfLRr.png",
           "url": null,
-          "start_date_time": "12-02-2026 20:00:00",
-          "end_date_time": "12-02-2026 20:01:00",
+          "start_date_time": "13-02-2026 13:35:00",
+          "end_date_time": "13-02-2026 13:36:00",
           "co_author": [
             {
               "name": "Shailendra Prajapati",
@@ -467,8 +507,8 @@
           "google_id": "111647064374090956509",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/Th0NE6MAe0OpTUxUakzVnYGCQ5YGSMGfrfrVo7SV.png",
           "url": null,
-          "start_date_time": "12-02-2026 20:01:00",
-          "end_date_time": "12-02-2026 20:02:00",
+          "start_date_time": "13-02-2026 13:36:00",
+          "end_date_time": "13-02-2026 13:37:00",
           "co_author": [
             {
               "name": "Manjeet Singh",
@@ -507,8 +547,8 @@
           "google_id": "108601139929307149984",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/Wo1pOeDQ26dcnZDAA2fpp964Rjrpvg1IK9ZHF19x.png",
           "url": null,
-          "start_date_time": "12-02-2026 20:02:00",
-          "end_date_time": "12-02-2026 20:03:00",
+          "start_date_time": "13-02-2026 13:37:00",
+          "end_date_time": "13-02-2026 13:38:00",
           "co_author": [
             {
               "name": "Subham Koley",
@@ -532,8 +572,8 @@
           "google_id": "115482727338106647680",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/0kmfNZWa1gYvWqxrXOaJHVLbrskCeNRUCfXzZ99K.png",
           "url": null,
-          "start_date_time": "12-02-2026 20:03:00",
-          "end_date_time": "12-02-2026 20:04:00",
+          "start_date_time": "13-02-2026 13:38:00",
+          "end_date_time": "13-02-2026 13:39:00",
           "co_author": [
             {
               "name": "Prachi Soni",
@@ -566,8 +606,8 @@
     },
     {
       "screen_number": 3,
-      "screen_start_time": "12-02-2026 19:55:00",
-      "screen_end_time": "12-02-2026 19:59:00",
+      "screen_start_time": "13-02-2026 13:30:00",
+      "screen_end_time": "13-02-2026 13:34:00",
       "no_of_records_in_screen": 4,
       "records": [
         {
@@ -585,8 +625,8 @@
           "google_id": "111515008947351318081",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/y2hEuuBEZR7mpVA4ORiN5BH0Jz2QKREuhe0JtuYS.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:55:00",
-          "end_date_time": "12-02-2026 19:56:00",
+          "start_date_time": "13-02-2026 13:30:00",
+          "end_date_time": "13-02-2026 13:31:00",
           "co_author": [
             {
               "name": "Jinmoo Heo",
@@ -625,8 +665,8 @@
           "google_id": "113962613992000633889",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/D0wOc2XFnJCVS4HKoMmK1ZWd2ax723YydSf3ajQq.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:56:00",
-          "end_date_time": "12-02-2026 19:57:00",
+          "start_date_time": "13-02-2026 13:31:00",
+          "end_date_time": "13-02-2026 13:32:00",
           "co_author": [
             {
               "name": "Dayarnab Baidya",
@@ -650,8 +690,8 @@
           "google_id": "112329868356698953231",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/uiSCEzEQpsuZaA8vGjTxe1frNuGRevuMGLUJSlie.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:57:00",
-          "end_date_time": "12-02-2026 19:58:00",
+          "start_date_time": "13-02-2026 13:32:00",
+          "end_date_time": "13-02-2026 13:33:00",
           "co_author": [
             {
               "name": "Riya Rani SS",
@@ -675,8 +715,8 @@
           "google_id": "113374633736902058939",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/aNqGM6c7QiekOdzJGSbKYgndvuvyURGVRvx7i60q.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:58:00",
-          "end_date_time": "12-02-2026 19:59:00",
+          "start_date_time": "13-02-2026 13:33:00",
+          "end_date_time": "13-02-2026 13:34:00",
           "co_author": [
             {
               "name": "Vishal Sahu",
@@ -694,8 +734,8 @@
     },
     {
       "screen_number": 4,
-      "screen_start_time": "12-02-2026 19:55:00",
-      "screen_end_time": "12-02-2026 20:00:00",
+      "screen_start_time": "13-02-2026 13:30:00",
+      "screen_end_time": "13-02-2026 13:35:00",
       "no_of_records_in_screen": 5,
       "records": [
         {
@@ -713,8 +753,8 @@
           "google_id": "114795112347503127646",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/1HxBsBurnfxKGXusxozlOVhkNCPayhductsfSBhQ.png",
           "url": "NA",
-          "start_date_time": "12-02-2026 19:55:00",
-          "end_date_time": "12-02-2026 19:56:00",
+          "start_date_time": "13-02-2026 13:30:00",
+          "end_date_time": "13-02-2026 13:31:00",
           "co_author": [
             {
               "name": "S. G. Ganpule",
@@ -738,8 +778,8 @@
           "google_id": "112388441605657512571",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/fWEVqv4iWObwTQDU4IeZ0Yf1o1ZNRxWLjdpWq3lY.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:56:00",
-          "end_date_time": "12-02-2026 19:57:00",
+          "start_date_time": "13-02-2026 13:31:00",
+          "end_date_time": "13-02-2026 13:32:00",
           "co_author": [
             {
               "name": "Prashant Kumar",
@@ -773,8 +813,8 @@
           "google_id": "110388058050248981556",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/Eqf6en0MKP5xRfvK8YEmx7JbnFySuzIWZwG0iTwg.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:57:00",
-          "end_date_time": "12-02-2026 19:58:00",
+          "start_date_time": "13-02-2026 13:32:00",
+          "end_date_time": "13-02-2026 13:33:00",
           "co_author": [
             {
               "name": "P Satyajith Chary",
@@ -813,8 +853,8 @@
           "google_id": "114786220423134695917",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/dDFk6AQK5of01rqqeOk4sWd0gMzb45QEci9sxAxq.png",
           "url": "https://drive.google.com/drive/folders/1dcpxW3wR41KI2aIvvECR2dRbtJxAyNGs?usp=sharing",
-          "start_date_time": "12-02-2026 19:58:00",
-          "end_date_time": "12-02-2026 19:59:00",
+          "start_date_time": "13-02-2026 13:33:00",
+          "end_date_time": "13-02-2026 13:34:00",
           "co_author": [
             {
               "name": "Sudip Modak",
@@ -843,16 +883,16 @@
           "google_id": "110004149074288931443",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/Sz7Afv9ZbcfBRrYF1p7GkGm4f9Jf2mzQXRiEE7xa.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:59:00",
-          "end_date_time": "12-02-2026 20:00:00",
+          "start_date_time": "13-02-2026 13:34:00",
+          "end_date_time": "13-02-2026 13:35:00",
           "co_author": []
         }
       ]
     },
     {
       "screen_number": 5,
-      "screen_start_time": "12-02-2026 19:55:00",
-      "screen_end_time": "12-02-2026 20:03:00",
+      "screen_start_time": "13-02-2026 13:30:00",
+      "screen_end_time": "13-02-2026 13:38:00",
       "no_of_records_in_screen": 8,
       "records": [
         {
@@ -870,8 +910,8 @@
           "google_id": "105693762504877050458",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/AnPPkXU2IwTDAxl8QpmsbOSx829rdSu3fYvFo3BT.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:55:00",
-          "end_date_time": "12-02-2026 19:56:00",
+          "start_date_time": "13-02-2026 13:30:00",
+          "end_date_time": "13-02-2026 13:31:00",
           "co_author": [
             {
               "name": "Soumyo Mukherji",
@@ -905,8 +945,8 @@
           "google_id": "111661192881761350804",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/VJn16A6Nnn8tVtVsozYGO8ab3YsCtt9E2CWKsW7a.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:56:00",
-          "end_date_time": "12-02-2026 19:57:00",
+          "start_date_time": "13-02-2026 13:31:00",
+          "end_date_time": "13-02-2026 13:32:00",
           "co_author": [
             {
               "name": "Shivangi Srivasatava",
@@ -930,8 +970,8 @@
           "google_id": "100415455398530625293",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/dLS9I4sK84bEROCflM2hKjt0pCRDA6zYbtqrL6M9.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:57:00",
-          "end_date_time": "12-02-2026 19:58:00",
+          "start_date_time": "13-02-2026 13:32:00",
+          "end_date_time": "13-02-2026 13:33:00",
           "co_author": [
             {
               "name": "Nagaraju Chintha",
@@ -960,8 +1000,8 @@
           "google_id": "116071458386414255348",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/8lNdqyPjTBDL5oKxJ1acbstMVNw3PnJdHx4ZyVH7.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:58:00",
-          "end_date_time": "12-02-2026 19:59:00",
+          "start_date_time": "13-02-2026 13:33:00",
+          "end_date_time": "13-02-2026 13:34:00",
           "co_author": [
             {
               "name": "Dr. Shyam Sunder Agrawal",
@@ -985,8 +1025,8 @@
           "google_id": "102498866767603129385",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/QdmepioCZZhOEwMY9LY9FdXUqnmwfYgM85RtcWvY.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:59:00",
-          "end_date_time": "12-02-2026 20:00:00",
+          "start_date_time": "13-02-2026 13:34:00",
+          "end_date_time": "13-02-2026 13:35:00",
           "co_author": [
             {
               "name": "Nikila Nair",
@@ -1010,8 +1050,8 @@
           "google_id": "115341529938227533259",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/4ZDdL4bV11uazP1BGHNnumd3uBZd4TD3yZyhuZjq.png",
           "url": null,
-          "start_date_time": "12-02-2026 20:00:00",
-          "end_date_time": "12-02-2026 20:01:00",
+          "start_date_time": "13-02-2026 13:35:00",
+          "end_date_time": "13-02-2026 13:36:00",
           "co_author": [
             {
               "name": "Siri Chandana Amarakonda",
@@ -1045,8 +1085,8 @@
           "google_id": "102242838012924496495",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/2RtWRZ6c6maW49RC5lb5EJnSC7Ef8ikNrYA7Glsd.png",
           "url": null,
-          "start_date_time": "12-02-2026 20:01:00",
-          "end_date_time": "12-02-2026 20:02:00",
+          "start_date_time": "13-02-2026 13:36:00",
+          "end_date_time": "13-02-2026 13:37:00",
           "co_author": []
         },
         {
@@ -1064,8 +1104,8 @@
           "google_id": "106698603515718449030",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/3jus8iG03liZaxICdzthDLuiJOBHUx3Exg0KHl6Y.jpg",
           "url": null,
-          "start_date_time": "12-02-2026 20:02:00",
-          "end_date_time": "12-02-2026 20:03:00",
+          "start_date_time": "13-02-2026 13:37:00",
+          "end_date_time": "13-02-2026 13:38:00",
           "co_author": [
             {
               "name": "Meghana A. Hasamnis",
@@ -1078,9 +1118,9 @@
     },
     {
       "screen_number": 6,
-      "screen_start_time": "12-02-2026 19:55:00",
-      "screen_end_time": "12-02-2026 20:00:00",
-      "no_of_records_in_screen": 5,
+      "screen_start_time": "13-02-2026 13:30:00",
+      "screen_end_time": "13-02-2026 13:34:00",
+      "no_of_records_in_screen": 4,
       "records": [
         {
           "id": 132,
@@ -1097,8 +1137,8 @@
           "google_id": "112210610828838698921",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/lcCyBHzFqaT0J5VcjCBYdpeBwhRjrL7mbfOI2Ayc.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:55:00",
-          "end_date_time": "12-02-2026 19:56:00",
+          "start_date_time": "13-02-2026 13:30:00",
+          "end_date_time": "13-02-2026 13:31:00",
           "co_author": [
             {
               "name": "Purnima Hazra",
@@ -1122,8 +1162,8 @@
           "google_id": "108153059252270071133",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/IGgfXsulEbZas2LrQZEyYvu7mfvH8Vm6D9wySBh5.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:56:00",
-          "end_date_time": "12-02-2026 19:57:00",
+          "start_date_time": "13-02-2026 13:31:00",
+          "end_date_time": "13-02-2026 13:32:00",
           "co_author": [
             {
               "name": "Arnav Sharma",
@@ -1148,46 +1188,6 @@
           ]
         },
         {
-          "id": 100,
-          "paper_id": "6256",
-          "paper_title": "A Robust IoT Architecture for Real-Time Battery and Environmental Monitoring in Coal-Mine Infrastructure",
-          "abstract": "This paper presents the design and validation of an intelligent IoT-enabled architecture for integrated battery and\r\nenvironmental health monitoring in coal-mine Wi-Fi towers. The proposed system combines voltage and environmental sensing\r\nwith both cloud and local interfaces to ensure data visibility and resilience under connectivity disruptions. Three hardware prototypes were iteratively developed to balance cost, sustainability, and industrial durability, using modular sensor integration and robust enclosures. Experimental evaluation on a lab-grade battery confirmed stable voltage tracking and reliable temperature, humidity, pressure, and air-quality measurements. A real-time web dashboard enables visualization, alerting, and geolocation-based monitoring of distributed units. The results demonstrate a dependable, low-cost platform suitable for deployment in harsh field environments. Future extensions will focus on large-scale field validation, predictive analytics for battery health estimation, and enhanced communication redundancy for industrial-scale energy monitoring.",
-          "track": "Infrastructure & Sustainability II",
-          "other_track": null,
-          "corresponding_author": "Sujay Kadam",
-          "corresponding_author_email": "sujay_kadam@dau.ac.in",
-          "email": "202101251@dau.ac.in",
-          "mobile": null,
-          "affiliation": "Dhirubhai Ambani University",
-          "google_id": "110926957036004336828",
-          "eposter_file": "https://myeposter.com/storage/eposter-pdf/7SPxamS686gCIZ9f0S4tMws7vO5ngjsiPxHwx3P1.png",
-          "url": "https://youtu.be/Saa9_uIBWT4",
-          "start_date_time": "12-02-2026 19:57:00",
-          "end_date_time": "12-02-2026 19:58:00",
-          "co_author": [
-            {
-              "name": "David Tandel",
-              "email": "202101251@dau.ac.in",
-              "affiliation": "Dhirubhai Ambani University"
-            },
-            {
-              "name": "Musab Bin Khaleeq",
-              "email": "musab_khaleeq@dau.ac.in",
-              "affiliation": "Dhirubhai Ambani University"
-            },
-            {
-              "name": "Rahul Mishra",
-              "email": "rahul_mishra@iitp.ac.in",
-              "affiliation": "IIT Patna"
-            },
-            {
-              "name": "Tapas Kumar Maiti",
-              "email": "tapas_kumar@dau.ac.in",
-              "affiliation": "Dhirubhai Ambani University"
-            }
-          ]
-        },
-        {
           "id": 125,
           "paper_id": "6396",
           "paper_title": "Design and Fabrication of Anthracite Coal-Derived Graphene Oxide Humidity Sensor for Moisture Sensing in Transformer Oil",
@@ -1202,8 +1202,8 @@
           "google_id": "108528402652050314310",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/EbfI4rUc2GryTbEI3IbQPLSngBxao2MWXYp03Tv0.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:58:00",
-          "end_date_time": "12-02-2026 19:59:00",
+          "start_date_time": "13-02-2026 13:32:00",
+          "end_date_time": "13-02-2026 13:33:00",
           "co_author": [
             {
               "name": "Vikash Ranjan",
@@ -1232,8 +1232,8 @@
           "google_id": "107587770798635717591",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/EpMmQ5GUsIOg6F1jBaHvIJKkHc4ZAkjI7NhXAUZs.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:59:00",
-          "end_date_time": "12-02-2026 20:00:00",
+          "start_date_time": "13-02-2026 13:33:00",
+          "end_date_time": "13-02-2026 13:34:00",
           "co_author": [
             {
               "name": "Rahul Gond",
@@ -1261,8 +1261,8 @@
     },
     {
       "screen_number": 7,
-      "screen_start_time": "12-02-2026 19:55:00",
-      "screen_end_time": "12-02-2026 20:05:00",
+      "screen_start_time": "13-02-2026 13:30:00",
+      "screen_end_time": "13-02-2026 13:40:00",
       "no_of_records_in_screen": 10,
       "records": [
         {
@@ -1280,8 +1280,8 @@
           "google_id": "110294653351975614880",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/J5BYnAaSyyUJlvW9tAaDcfry2hGPVZGDLvGwIdet.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:55:00",
-          "end_date_time": "12-02-2026 19:56:00",
+          "start_date_time": "13-02-2026 13:30:00",
+          "end_date_time": "13-02-2026 13:31:00",
           "co_author": [
             {
               "name": "Zainab Riaz",
@@ -1305,8 +1305,8 @@
           "google_id": "106892135906265625631",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/r8m8yaXtuGpgCIm41SlK2Nn4xEEybS3jqpt0LTf6.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:56:00",
-          "end_date_time": "12-02-2026 19:57:00",
+          "start_date_time": "13-02-2026 13:31:00",
+          "end_date_time": "13-02-2026 13:32:00",
           "co_author": [
             {
               "name": "Parijat Deshpande",
@@ -1330,8 +1330,8 @@
           "google_id": "109706009390787426284",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/avzxqUuZl2YWamPDLU37jkBSiuLexus45emf9sez.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:57:00",
-          "end_date_time": "12-02-2026 19:58:00",
+          "start_date_time": "13-02-2026 13:32:00",
+          "end_date_time": "13-02-2026 13:33:00",
           "co_author": [
             {
               "name": "Simarjeet Singh Saini",
@@ -1355,8 +1355,8 @@
           "google_id": "115035704064984698275",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/TiKZHvUYXPysjgoMPP3FiiN4j73NdmbxlLut1r76.png",
           "url": null,
-          "start_date_time": "12-02-2026 19:58:00",
-          "end_date_time": "12-02-2026 19:59:00",
+          "start_date_time": "13-02-2026 13:33:00",
+          "end_date_time": "13-02-2026 13:34:00",
           "co_author": [
             {
               "name": "Karanjeet Singh",
@@ -1385,8 +1385,8 @@
           "google_id": "112528409388443248600",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/s6TqxukStz0JDTtpOtchXsduUohiKxPM7M8byrY9.png",
           "url": "https://drive.google.com/drive/folders/1NfgzHJHLvlkprcd7aTMLARb-FglZcama?usp=drive_link",
-          "start_date_time": "12-02-2026 19:59:00",
-          "end_date_time": "12-02-2026 20:00:00",
+          "start_date_time": "13-02-2026 13:34:00",
+          "end_date_time": "13-02-2026 13:35:00",
           "co_author": [
             {
               "name": "Jamal Bahari",
@@ -1440,8 +1440,8 @@
           "google_id": "106169326522390029454",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/IWBB5o4VHS0jmOkRIiAExtGZwmcCmtOr28RXe7ML.png",
           "url": null,
-          "start_date_time": "12-02-2026 20:00:00",
-          "end_date_time": "12-02-2026 20:01:00",
+          "start_date_time": "13-02-2026 13:35:00",
+          "end_date_time": "13-02-2026 13:36:00",
           "co_author": [
             {
               "name": "Remya Kunjuveettil G",
@@ -1475,8 +1475,8 @@
           "google_id": "104137942299340099741",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/s5765kE03LThF7lLNxW381t4BacKJmVMIDqxFZVw.png",
           "url": null,
-          "start_date_time": "12-02-2026 20:01:00",
-          "end_date_time": "12-02-2026 20:02:00",
+          "start_date_time": "13-02-2026 13:36:00",
+          "end_date_time": "13-02-2026 13:37:00",
           "co_author": [
             {
               "name": "Prasanna P",
@@ -1500,8 +1500,8 @@
           "google_id": "115841832442350081758",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/XulMJXMLoznb88jqfVxohPs5Pr4Z7dL5OcMTjG6O.png",
           "url": null,
-          "start_date_time": "12-02-2026 20:02:00",
-          "end_date_time": "12-02-2026 20:03:00",
+          "start_date_time": "13-02-2026 13:37:00",
+          "end_date_time": "13-02-2026 13:38:00",
           "co_author": [
             {
               "name": "Teja Jetti",
@@ -1540,8 +1540,8 @@
           "google_id": "108141318391722466710",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/OzA6D0DCa7NvYAueGTnR85IogmrxVHtdzO9tBe12.png",
           "url": null,
-          "start_date_time": "12-02-2026 20:03:00",
-          "end_date_time": "12-02-2026 20:04:00",
+          "start_date_time": "13-02-2026 13:38:00",
+          "end_date_time": "13-02-2026 13:39:00",
           "co_author": [
             {
               "name": "Shubham Gupta",
@@ -1585,8 +1585,8 @@
           "google_id": "105774907495902500082",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/JD2oBPYOSUmUxsH7IPmSwLqvpoDvqODju82VMqnw.jpg",
           "url": null,
-          "start_date_time": "12-02-2026 20:04:00",
-          "end_date_time": "12-02-2026 20:05:00",
+          "start_date_time": "13-02-2026 13:39:00",
+          "end_date_time": "13-02-2026 13:40:00",
           "co_author": [
             {
               "name": "Syam Narayanan S",
@@ -1616,12 +1616,53 @@
   "booking_slot": [
     {
       "screen_number": 1,
-      "screen_start_time": "12-02-2026 14:00:00",
-      "screen_end_time": "12-02-2026 14:15:00",
-      "no_of_records_in_screen": 1,
+      "screen_start_time": "13-02-2026 13:00:00",
+      "screen_end_time": "13-02-2026 13:00:00",
+      "no_of_records_in_screen": 11,
       "records": [
         {
+          "id": 174,
+          "booking_id": 41,
+          "paper_id": "1920",
+          "paper_title": "test xxx",
+          "abstract": "test",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "corresponding_author": "Nishant Raval",
+          "corresponding_author_email": "nishantraval746@gmail.com",
+          "email": "nishantrraval@gmail.com",
+          "mobile": null,
+          "affiliation": "test",
+          "google_id": "104239766397740411369",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/Q59UrqDuqZTAD33Ii2bn2cBUCQ9lXB0deOM46iub.jpg",
+          "url": null,
+          "start_date_time": "13-02-2026 13:00:00",
+          "end_date_time": "13-02-2026 13:15:00",
+          "co_author": []
+        },
+        {
+          "id": 170,
+          "booking_id": 43,
+          "paper_id": "E1234",
+          "paper_title": "Test (1)",
+          "abstract": "this is the paper related to the topic it is the best part of the paper",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Jai Mehtani",
+          "corresponding_author_email": "22dcs047@charusat.edu.in",
+          "email": "22dcs112@charusat.edu.in",
+          "mobile": null,
+          "affiliation": "Charusat",
+          "google_id": "116295305720012738247",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/TApK1ES6TiTwk73Bx3nsHviGom3733Ufb6Z9YOuI.png",
+          "url": null,
+          "start_date_time": "13-02-2026 13:45:00",
+          "end_date_time": "13-02-2026 14:00:00",
+          "co_author": []
+        },
+        {
           "id": 168,
+          "booking_id": 45,
           "paper_id": "123",
           "paper_title": "Testing",
           "abstract": "Testing for eposter-screening",
@@ -1635,8 +1676,8 @@
           "google_id": "112098188252455477266",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/5jdpmP3j1Hczsjc20tVe3mE4ry5DOfUWkep29JtV.jpg",
           "url": null,
-          "start_date_time": "12-02-2026 14:00:00",
-          "end_date_time": "12-02-2026 14:15:00",
+          "start_date_time": "13-02-2026 14:00:00",
+          "end_date_time": "13-02-2026 14:15:00",
           "co_author": [
             {
               "name": "malani",
@@ -1644,17 +1685,10 @@
               "affiliation": "testing"
             }
           ]
-        }
-      ]
-    },
-    {
-      "screen_number": 2,
-      "screen_start_time": "12-02-2026 14:00:00",
-      "screen_end_time": "12-02-2026 14:15:00",
-      "no_of_records_in_screen": 1,
-      "records": [
+        },
         {
           "id": 169,
+          "booking_id": 46,
           "paper_id": "1",
           "paper_title": "Testing",
           "abstract": "Eposter testing",
@@ -1668,14 +1702,260 @@
           "google_id": "100878942786067193507",
           "eposter_file": "https://myeposter.com/storage/eposter-pdf/CKyFhhi98PAXVibvj10uTVkBLCbKXKpKD7eByjLL.jpg",
           "url": null,
-          "start_date_time": "12-02-2026 14:00:00",
-          "end_date_time": "12-02-2026 14:15:00",
+          "start_date_time": "13-02-2026 14:15:00",
+          "end_date_time": "13-02-2026 14:30:00",
+          "co_author": []
+        },
+        {
+          "id": 174,
+          "booking_id": 47,
+          "paper_id": "1920",
+          "paper_title": "test xxx",
+          "abstract": "test",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "corresponding_author": "Nishant Raval",
+          "corresponding_author_email": "nishantraval746@gmail.com",
+          "email": "nishantrraval@gmail.com",
+          "mobile": null,
+          "affiliation": "test",
+          "google_id": "104239766397740411369",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/Q59UrqDuqZTAD33Ii2bn2cBUCQ9lXB0deOM46iub.jpg",
+          "url": null,
+          "start_date_time": "13-02-2026 14:45:00",
+          "end_date_time": "13-02-2026 15:00:00",
+          "co_author": []
+        },
+        {
+          "id": 168,
+          "booking_id": 48,
+          "paper_id": "123",
+          "paper_title": "Testing",
+          "abstract": "Testing for eposter-screening",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Jai",
+          "corresponding_author_email": "joymehtani1512@gmail.com",
+          "email": "joymehtani1512@gmail.com",
+          "mobile": null,
+          "affiliation": "Pegasus Automation",
+          "google_id": "112098188252455477266",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/5jdpmP3j1Hczsjc20tVe3mE4ry5DOfUWkep29JtV.jpg",
+          "url": null,
+          "start_date_time": "13-02-2026 15:30:00",
+          "end_date_time": "13-02-2026 15:45:00",
+          "co_author": [
+            {
+              "name": "malani",
+              "email": "malani3851@gmail.com",
+              "affiliation": "testing"
+            }
+          ]
+        },
+        {
+          "id": 170,
+          "booking_id": 54,
+          "paper_id": "E1234",
+          "paper_title": "Test (1)",
+          "abstract": "this is the paper related to the topic it is the best part of the paper",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Jai Mehtani",
+          "corresponding_author_email": "22dcs047@charusat.edu.in",
+          "email": "22dcs112@charusat.edu.in",
+          "mobile": null,
+          "affiliation": "Charusat",
+          "google_id": "116295305720012738247",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/TApK1ES6TiTwk73Bx3nsHviGom3733Ufb6Z9YOuI.png",
+          "url": null,
+          "start_date_time": "13-02-2026 15:45:00",
+          "end_date_time": "13-02-2026 16:00:00",
+          "co_author": []
+        },
+        {
+          "id": 168,
+          "booking_id": 51,
+          "paper_id": "123",
+          "paper_title": "Testing",
+          "abstract": "Testing for eposter-screening",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Jai",
+          "corresponding_author_email": "joymehtani1512@gmail.com",
+          "email": "joymehtani1512@gmail.com",
+          "mobile": null,
+          "affiliation": "Pegasus Automation",
+          "google_id": "112098188252455477266",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/5jdpmP3j1Hczsjc20tVe3mE4ry5DOfUWkep29JtV.jpg",
+          "url": null,
+          "start_date_time": "13-02-2026 16:30:00",
+          "end_date_time": "13-02-2026 16:45:00",
+          "co_author": [
+            {
+              "name": "malani",
+              "email": "malani3851@gmail.com",
+              "affiliation": "testing"
+            }
+          ]
+        },
+        {
+          "id": 170,
+          "booking_id": 49,
+          "paper_id": "E1234",
+          "paper_title": "Test (1)",
+          "abstract": "this is the paper related to the topic it is the best part of the paper",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Jai Mehtani",
+          "corresponding_author_email": "22dcs047@charusat.edu.in",
+          "email": "22dcs112@charusat.edu.in",
+          "mobile": null,
+          "affiliation": "Charusat",
+          "google_id": "116295305720012738247",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/TApK1ES6TiTwk73Bx3nsHviGom3733Ufb6Z9YOuI.png",
+          "url": null,
+          "start_date_time": "13-02-2026 16:45:00",
+          "end_date_time": "13-02-2026 17:00:00",
+          "co_author": []
+        },
+        {
+          "id": 170,
+          "booking_id": 50,
+          "paper_id": "E1234",
+          "paper_title": "Test (1)",
+          "abstract": "this is the paper related to the topic it is the best part of the paper",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Jai Mehtani",
+          "corresponding_author_email": "22dcs047@charusat.edu.in",
+          "email": "22dcs112@charusat.edu.in",
+          "mobile": null,
+          "affiliation": "Charusat",
+          "google_id": "116295305720012738247",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/TApK1ES6TiTwk73Bx3nsHviGom3733Ufb6Z9YOuI.png",
+          "url": null,
+          "start_date_time": "13-02-2026 17:30:00",
+          "end_date_time": "13-02-2026 17:45:00",
+          "co_author": []
+        },
+        {
+          "id": 174,
+          "booking_id": 40,
+          "paper_id": "1920",
+          "paper_title": "test xxx",
+          "abstract": "test",
+          "track": "Agriculture & Food Technology III",
+          "other_track": null,
+          "corresponding_author": "Nishant Raval",
+          "corresponding_author_email": "nishantraval746@gmail.com",
+          "email": "nishantrraval@gmail.com",
+          "mobile": null,
+          "affiliation": "test",
+          "google_id": "104239766397740411369",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/Q59UrqDuqZTAD33Ii2bn2cBUCQ9lXB0deOM46iub.jpg",
+          "url": null,
+          "start_date_time": "13-02-2026 12:45:00",
+          "end_date_time": "13-02-2026 13:00:00",
+          "co_author": []
+        }
+      ]
+    },
+    {
+      "screen_number": 2,
+      "screen_start_time": "13-02-2026 13:00:00",
+      "screen_end_time": "13-02-2026 15:45:00",
+      "no_of_records_in_screen": 4,
+      "records": [
+        {
+          "id": 170,
+          "booking_id": 42,
+          "paper_id": "E1234",
+          "paper_title": "Test (1)",
+          "abstract": "this is the paper related to the topic it is the best part of the paper",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Jai Mehtani",
+          "corresponding_author_email": "22dcs047@charusat.edu.in",
+          "email": "22dcs112@charusat.edu.in",
+          "mobile": null,
+          "affiliation": "Charusat",
+          "google_id": "116295305720012738247",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/TApK1ES6TiTwk73Bx3nsHviGom3733Ufb6Z9YOuI.png",
+          "url": null,
+          "start_date_time": "13-02-2026 13:00:00",
+          "end_date_time": "13-02-2026 13:15:00",
+          "co_author": []
+        },
+        {
+          "id": 169,
+          "booking_id": 44,
+          "paper_id": "1",
+          "paper_title": "Testing",
+          "abstract": "Eposter testing",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Kalpan",
+          "corresponding_author_email": "solankikalpan05@gmail.com",
+          "email": "kalpansolanki5@gmail.com",
+          "mobile": null,
+          "affiliation": "Pegasus Automation",
+          "google_id": "100878942786067193507",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/CKyFhhi98PAXVibvj10uTVkBLCbKXKpKD7eByjLL.jpg",
+          "url": null,
+          "start_date_time": "13-02-2026 13:45:00",
+          "end_date_time": "13-02-2026 14:00:00",
+          "co_author": []
+        },
+        {
+          "id": 168,
+          "booking_id": 52,
+          "paper_id": "123",
+          "paper_title": "Testing",
+          "abstract": "Testing for eposter-screening",
+          "track": "Analytical Instrumentation",
+          "other_track": null,
+          "corresponding_author": "Jai",
+          "corresponding_author_email": "joymehtani1512@gmail.com",
+          "email": "joymehtani1512@gmail.com",
+          "mobile": null,
+          "affiliation": "Pegasus Automation",
+          "google_id": "112098188252455477266",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/5jdpmP3j1Hczsjc20tVe3mE4ry5DOfUWkep29JtV.jpg",
+          "url": null,
+          "start_date_time": "13-02-2026 14:15:00",
+          "end_date_time": "13-02-2026 14:30:00",
+          "co_author": [
+            {
+              "name": "malani",
+              "email": "malani3851@gmail.com",
+              "affiliation": "testing"
+            }
+          ]
+        },
+        {
+          "id": 170,
+          "booking_id": 53,
+          "paper_id": "E1234",
+          "paper_title": "Test (1)",
+          "abstract": "this is the paper related to the topic it is the best part of the paper",
+          "track": "Transportation Systems & AI for Sensing",
+          "other_track": null,
+          "corresponding_author": "Jai Mehtani",
+          "corresponding_author_email": "22dcs047@charusat.edu.in",
+          "email": "22dcs112@charusat.edu.in",
+          "mobile": null,
+          "affiliation": "Charusat",
+          "google_id": "116295305720012738247",
+          "eposter_file": "https://myeposter.com/storage/eposter-pdf/TApK1ES6TiTwk73Bx3nsHviGom3733Ufb6Z9YOuI.png",
+          "url": null,
+          "start_date_time": "13-02-2026 15:30:00",
+          "end_date_time": "13-02-2026 15:45:00",
           "co_author": []
         }
       ]
     }
   ],
-  "fetched_at": "12-02-2026-19:59:39",
-  "fetched_date": "12-02-2026",
-  "fetched_time": "19:59:39"
+  "fetched_at": "13-02-2026-15:49:02",
+  "fetched_date": "13-02-2026",
+  "fetched_time": "15:49:02"
 }
