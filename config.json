@@ -1,11 +1,11 @@
 {
   "ID": 1,
   "wifi": {
-    "ssid1": "BHAVY",
-    "password1": "Bms@1266",
-    "ssid2": "BHAVY2",
-    "password2": "Bms@1266",
-    "connect_timeout": 15
+    "ssid1": "Pegasus",
+    "password1": "12345678",
+    "ssid2": "Pegasus 5G",
+    "password2": "Pxx@123098.",
+    "connect_timeout": 5
   },
   "password": "hello",
   "username": "admin",
@@ -14,7 +14,7 @@
     "poster_api_url": "https://myeposter.com/api/v1/eposter-list",
     "event_api_url": "https://posterbridge.incandescentsolution.com/api/v1/event-data",
     "event_api_token": "",
-    "request_timeout": 10
+    "request_timeout": 5
   },
   "display": {
     "cache_refresh": 60,
