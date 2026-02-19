@@ -176,6 +176,7 @@ def run_time_mode(screen, clock):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_q: sys.exit()
 
         if not records:
+            print("<TIME>Records Empty Showing ScreenSaver")
             display_handler.show_screensaver_message(screen, scr_w, scr_h, "", rotation)
             pygame.display.flip()
             time.sleep(1)
@@ -193,16 +194,19 @@ def run_time_mode(screen, clock):
                 paper_id = active.get("paper_id")
                 path = cache_handler.get_image_path(pid)
                 if path and path.exists():
+                    print("<TIME>displaying Image pid")
                     display_handler.display_image(screen, path, scr_w, scr_h, rotation)
                     display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=paper_id)
                     pygame.display.flip()
                     poster_end_time = current_time + max(5, min(duration, (active["end_dt"] - now).total_seconds()))
                 else:
+                    print("<TIME>NO Schedualted Showing ScreenSaver")
                     display_handler.show_screensaver_message(screen, scr_w, scr_h, f"Downloading ID: {pid}...", rotation)
                     pygame.display.flip()
                     cache_handler.sync_cache([active]) 
                     poster_end_time = current_time + 2
             else:
+                print("<TIME>Activate False  / Did Not Find Any Image  , Showing ScreenSaver")
                 display_handler.show_screensaver_message(screen, scr_w, scr_h, "", rotation)
                 pygame.display.flip()
                 poster_end_time = current_time + 5
