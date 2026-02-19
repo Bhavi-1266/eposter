@@ -57,35 +57,60 @@ def parse_datetime(date_str, fmt="%d-%m-%Y %H:%M:%S"):
 # DATA & SYNC HELPER
 # ---------------------------------------------------------
 def get_device_records(device_id):
-    if not API_DATA_JSON.exists(): return [], 5
+    if not API_DATA_JSON.exists():
+        return [], 5
+
     try:
-        with open(API_DATA_JSON, 'r') as f: data = json.load(f)
+        with open(API_DATA_JSON, 'r') as f:
+            data = json.load(f)
+
+        records = []
+        minutes_per_record = 5  # default
+
+        # Try screens first (currently empty in API, but keep for future)
         screens = data.get("screens", [])
         my_screen = next((s for s in screens if str(s.get("screen_number")) == str(device_id)), None)
-        if not my_screen: return [], 5
-        records = []
-        for r in my_screen.get("records", []):
-            s = parse_datetime(r.get("start_date_time"))
-            e = parse_datetime(r.get("end_date_time"))
-            if s and e:
-                r["start_dt"] = s
-                r["end_dt"] = e
-                records.append(r)
 
+        if my_screen:
+            minutes_per_record = my_screen.get("minutes_per_record", 5)
+            for r in my_screen.get("records", []):
+                s = parse_datetime(r.get("start_date_time"))
+                e = parse_datetime(r.get("end_date_time"))
+                if s and e:
+                    r["start_dt"] = s
+                    r["end_dt"] = e
+                    records.append(r)
+
+        # Always also check booking_slot for this screen
         bookings = data.get("booking_slot", [])
         for b in bookings:
             if str(b.get("screen_number")) != str(device_id):
                 continue
-            details = b.get("records") or {}
-            if details:
-                for r in details:
-                    s = parse_datetime(r.get("start_date_time"))
-                    e = parse_datetime(r.get("end_date_time"))
-                    if s and e:
-                        r["start_dt"] = s
-                        r["end_dt"] = e
-                        records.append(r)
-        return records, my_screen.get("minutes_per_record", 5)
+
+            # booking_slot entries have records as a list directly
+            slot_records = b.get("records", [])
+            if not isinstance(slot_records, list):
+                continue
+
+            for r in slot_records:
+                s = parse_datetime(r.get("start_date_time"))
+                e = parse_datetime(r.get("end_date_time"))
+                if s and e:
+                    r["start_dt"] = s
+                    r["end_dt"] = e
+                    records.append(r)
+
+        # Deduplicate by booking_id (keep last seen)
+        seen = {}
+        for r in records:
+            seen[r.get("booking_id")] = r
+        records = list(seen.values())
+
+        # Sort by start time
+        records.sort(key=lambda x: x["start_dt"])
+
+        return records, minutes_per_record
+
     except Exception as e:
         log(f"Error parsing records: {e}", "ERROR")
         return [], 5
