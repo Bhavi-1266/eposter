@@ -194,7 +194,7 @@ def run_time_mode(screen, clock):
                 paper_id = active.get("paper_id")
                 path = cache_handler.get_image_path(pid)
                 if path and path.exists():
-                    print("<TIME>displaying Image pid")
+                    print("<TIME>displaying Image pid : " , pid)
                     display_handler.display_image(screen, path, scr_w, scr_h, rotation)
                     display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=paper_id)
                     pygame.display.flip()
