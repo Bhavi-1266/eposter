@@ -100,11 +100,7 @@ def get_device_records(device_id):
                     r["end_dt"] = e
                     records.append(r)
 
-        # Deduplicate by booking_id (keep last seen)
-        seen = {}
-        for r in records:
-            seen[r.get("booking_id")] = r
-        records = list(seen.values())
+        # Deduplicate by booking_id (keep last seen
 
         # Sort by start time
         records.sort(key=lambda x: x["start_dt"])
