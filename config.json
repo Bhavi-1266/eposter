@@ -14,7 +14,7 @@
     "poster_api_url": "https://myeposter.com/api/v1/eposter-list",
     "event_api_url": "https://posterbridge.incandescentsolution.com/api/v1/event-data",
     "event_api_token": "",
-    "request_timeout": 5
+    "request_timeout": 10
   },
   "display": {
     "cache_refresh": 60,
