@@ -100,11 +100,6 @@ def get_device_records(device_id):
                     r["end_dt"] = e
                     records.append(r)
 
-        # Deduplicate by booking_id (keep last seen
-
-        # Sort by start time
-        records.sort(key=lambda x: x["start_dt"])
-
         return records, minutes_per_record
 
     except Exception as e:
