@@ -127,6 +127,12 @@ def sync_cache(records, timeout=REQUEST_TIMEOUT):
                 print(f"[cache] ID {poster_id}: Downloaded file is not a valid image. {img_err}")
                 if tmp_path.exists(): os.remove(tmp_path)
 
+        except requests.exceptions.Timeout:
+            print(f"[cache] ID {poster_id}: Network/Write Error: Slow internet / request timed out after {timeout}s")
+            if tmp_path.exists():
+                try: os.remove(tmp_path)
+                except: pass
+                    
         except Exception as e:
             print(f"[cache] ID {poster_id}: Network/Write Error: {e}")
             if tmp_path.exists():
