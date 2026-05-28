@@ -15,7 +15,8 @@ This project runs a dual-service digital signage system on RakshaOS.
 
 ## Installation
 1. Copy all project files to `/home/rock/Desktop/eposter_latest/eposter-main`.
-2. Ensure `requirements.txt` and `setup_eposter.py` are in that folder.
+2. Ensure `requirements.txt` and `installer.py` are in that folder.
 3. Run the setup:
    ```bash
-   sudo python3 setup_eposter.py
+   sudo python3 installer.py
+   ```

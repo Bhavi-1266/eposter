@@ -1,3 +1,9 @@
 config.json
 venv/
-eposter_cache/ 
+eposter_cache/
+__pycache__/
+*.py[cod]
+logs/
+output.png
+api_data.json
+event_data.json

@@ -36,9 +36,9 @@ A Raspberry Pi-based digital poster display system that automatically fetches an
 
 3. Configure your settings in `config.json` (see Configuration section below)
 
-4. Make launcher executable:
+4. Run the display controller:
    ```bash
-   chmod +x launcher.sh
+   python3 RunThis.py
    ```
 
 ## Configuration
@@ -102,19 +102,19 @@ All configuration is done through `config.json`. Here's what each setting does:
 
 ### Starting the Display
 
-Simply run the launcher script:
+Run the display controller:
 
 ```bash
-./launcher.sh
+python3 RunThis.py
 ```
 
 Or with full path:
 
 ```bash
-/path/to/eposter/launcher.sh
+python3 /path/to/eposter/RunThis.py
 ```
 
-The script will:
+The controller will:
 1. Load configuration from `config.json`
 2. Connect to WiFi (if configured)
 3. Fetch posters from API
@@ -126,23 +126,28 @@ Press `ESC` or `Q` to exit the display.
 
 ### Running as a Service (systemd)
 
-To run automatically on boot, you can create a systemd service. See `eposter-launch.service_CREATOR` for an example.
+To run automatically on boot, run `installer.py` to generate and install the systemd services.
 
 ## File Structure
 
 ```
 eposter/
-├── launcher.sh              # Main launcher script (reads config.json)
-├── config.json              # Configuration file (edit this!)
-├── show_eposters.py         # Main Python script
+├── RunThis.py               # Main display controller
+├── config_portal.py         # Captive portal and device configuration
+├── installer.py             # System setup and service installer
+├── config.json              # Configuration file
 ├── wifi_connect.py          # WiFi connection module
 ├── api_handler.py           # API calls and data handling
 ├── cache_handler.py         # Image caching and processing
 ├── display_handler.py       # Pygame display management
 ├── fetch_event_data.py      # Event data fetching
-├── eposter_cache/           # Cached poster images (auto-created)
+├── wifi_powersave.sh        # WiFi power-save helper script
+├── ScreenSaver.png          # Screensaver image asset
+├── docs/                    # Setup and operations notes
+├── eposter_cache/           # Cached poster images (auto-created, ignored)
 ├── api_data.json            # Saved API response (auto-created)
 ├── event_data.json          # Event information (auto-created)
+├── requirements.txt         # Python dependencies
 └── README.md                # This file
 ```
 
@@ -193,7 +198,7 @@ eposter/
 
 ## Environment Variables
 
-The launcher script exports these environment variables from `config.json`:
+The runtime loads these values from `config.json`:
 
 - `WIFI_SSID`, `WIFI_PSK` - Primary WiFi
 - `WIFI_SSID_2`, `WIFI_PSK_2` - Fallback WiFi
