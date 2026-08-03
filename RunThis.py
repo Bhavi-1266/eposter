@@ -195,10 +195,20 @@ def run_time_mode(screen, clock):
                 path = cache_handler.get_image_path(pid)
                 if path and path.exists():
                     print("<TIME>displaying Image pid : " , pid)
-                    display_handler.display_image(screen, path, scr_w, scr_h, rotation)
-                    display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=paper_id)
-                    pygame.display.flip()
-                    poster_end_time = current_time + max(5, min(duration, (active["end_dt"] - now).total_seconds()))
+                    slot_duration = max(5, min(duration, (active["end_dt"] - now).total_seconds()))
+                    if display_handler.is_animated_gif(path):
+                        display_handler.display_animated_gif(
+                            screen, path, scr_w, scr_h, rotation,
+                            max_duration=slot_duration,
+                            clock=clock,
+                            poster_id=paper_id,
+                        )
+                        poster_end_time = time.time()
+                    else:
+                        display_handler.display_image(screen, path, scr_w, scr_h, rotation)
+                        display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=paper_id)
+                        pygame.display.flip()
+                        poster_end_time = current_time + slot_duration
                 else:
                     print("<TIME>NO Schedualted Showing ScreenSaver")
                     display_handler.show_screensaver_message(screen, scr_w, scr_h, f"Downloading ID: {pid}...", rotation)
@@ -229,7 +239,7 @@ def run_scroll_mode(screen, clock):
             ids = [str(r.get("id") or r.get("PosterId")) for r in recs]
             imgs = [p for i in ids if (p := cache_handler.get_image_path(i))]
             return imgs
-        return sorted([f for f in CACHE_DIR.glob('*') if f.suffix.lower() in ['.png', '.jpg', '.jpeg']])
+        return sorted([f for f in CACHE_DIR.glob('*') if f.suffix.lower() in ['.png', '.jpg', '.jpeg', '.gif']])
 
     records, _ = get_device_records(device_id)
 
@@ -276,13 +286,23 @@ def run_scroll_mode(screen, clock):
         if current_time >= next_switch:
             if index >= len(images): index = 0
             if images[index].exists():
-                display_handler.display_image(screen, images[index], scr_w, scr_h, rotation)
+                image_path = images[index]
                 img_id = images[index].stem
-                paper_id = next((r.get("paper_id") for r in records if str(r.get("id")) == str(img_id)), img_id)
-                display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=paper_id)
-                pygame.display.flip()
+                paper_id = next((r.get("paper_id") for r in records if str(r.get("id") or r.get("PosterId")) == str(img_id)), img_id)
+                if display_handler.is_animated_gif(image_path):
+                    display_handler.display_animated_gif(
+                        screen, image_path, scr_w, scr_h, rotation,
+                        max_duration=max(1, scroll_delay),
+                        clock=clock,
+                        poster_id=paper_id,
+                    )
+                    next_switch = time.time()
+                else:
+                    display_handler.display_image(screen, image_path, scr_w, scr_h, rotation)
+                    display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=paper_id)
+                    pygame.display.flip()
+                    next_switch = current_time + scroll_delay
             index = (index + 1) % len(images)
-            next_switch = current_time + scroll_delay
         clock.tick(30)
 
 # ---------------------------------------------------------
@@ -319,7 +339,7 @@ def run_menu_mode(screen, clock):
 
     def load_menu_images():
         loaded_items = []
-        files = sorted([f for f in CACHE_DIR.glob('*') if f.suffix.lower() in ['.png', '.jpg', '.jpeg']])
+        files = sorted([f for f in CACHE_DIR.glob('*') if f.suffix.lower() in ['.png', '.jpg', '.jpeg', '.gif']])
         for path in files:
             try:
                 img = pygame.image.load(path).convert_alpha()
@@ -363,21 +383,29 @@ def run_menu_mode(screen, clock):
                     for item in items:
                         if y_offset + item['height'] > 0 and y_offset < UI_H:
                             if pygame.Rect(40, y_offset, UI_W-80, item['height']).collidepoint(mx, my):
-                                display_handler.display_image(screen, item['path'], PHY_W, PHY_H, rotation)
-                                # URL on top of preview
                                 menu_img_id = item['path'].stem
                                 menu_records, _ = get_device_records(device_id)
                                 
-                                menu_paper_id = next((r.get("paper_id") for r in menu_records if str(r.get("id")) == str(menu_img_id)), menu_img_id)
-                                display_handler.display_url(screen, PHY_W, PHY_H, rotation, poster_id=menu_paper_id)
-                                pygame.display.flip()
-                                waiting = True
-                                t_start = time.time()
-                                while waiting:
-                                    for e in pygame.event.get():
-                                        if e.type in [pygame.MOUSEBUTTONDOWN, pygame.KEYDOWN]: waiting = False
-                                    if time.time() - t_start > 60: waiting = False
-                                    clock.tick(30)
+                                menu_paper_id = next((r.get("paper_id") for r in menu_records if str(r.get("id") or r.get("PosterId")) == str(menu_img_id)), menu_img_id)
+                                if display_handler.is_animated_gif(item['path']):
+                                    display_handler.display_animated_gif(
+                                        screen, item['path'], PHY_W, PHY_H, rotation,
+                                        max_duration=60,
+                                        clock=clock,
+                                        poster_id=menu_paper_id,
+                                        interrupt_on_input=True,
+                                    )
+                                else:
+                                    display_handler.display_image(screen, item['path'], PHY_W, PHY_H, rotation)
+                                    display_handler.display_url(screen, PHY_W, PHY_H, rotation, poster_id=menu_paper_id)
+                                    pygame.display.flip()
+                                    waiting = True
+                                    t_start = time.time()
+                                    while waiting:
+                                        for e in pygame.event.get():
+                                            if e.type in [pygame.MOUSEBUTTONDOWN, pygame.KEYDOWN]: waiting = False
+                                        if time.time() - t_start > 60: waiting = False
+                                        clock.tick(30)
                                 break
                         y_offset += item['height'] + 25
                 elif event.button == 4: scroll_y += SCROLL_SPEED

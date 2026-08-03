@@ -8,9 +8,12 @@ from pathlib import Path
 import os
 import time
 import json
-from PIL import Image
+from PIL import Image, ImageSequence
 import pygame
 import socket
+
+def is_animated_gif(path):
+    return Path(path).suffix.lower() == ".gif"
 
 def get_local_ip():
     """Dynamically find the local IP address."""
@@ -114,6 +117,49 @@ def make_landscape_and_fit(img: Image.Image, target_w: int, target_h: int, rotat
 def pil_to_surface(pil_img: Image.Image):
     """Converts PIL Image to pygame Surface."""
     return pygame.image.fromstring(pil_img.tobytes(), pil_img.size, pil_img.mode)
+
+def _handle_playback_events(interrupt_on_input=False):
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            raise SystemExit
+
+        if event.type == pygame.KEYDOWN:
+            if event.key in (pygame.K_q, pygame.K_ESCAPE):
+                raise SystemExit
+            if interrupt_on_input:
+                return False
+
+        if interrupt_on_input and event.type == pygame.MOUSEBUTTONDOWN:
+            return False
+
+    return True
+
+def _wait_for_playback(seconds, clock=None, interrupt_on_input=False):
+    end_time = time.time() + max(0, seconds)
+    while time.time() < end_time:
+        if not _handle_playback_events(interrupt_on_input):
+            return False
+        if clock:
+            clock.tick(60)
+        else:
+            pygame.time.wait(10)
+    return True
+
+def _draw_gif_frame(screen, pil_img, scr_w, scr_h, rotation=0, poster_id=None):
+    img = pil_img.convert("RGBA")
+    canvas = make_landscape_and_fit(img, scr_w, scr_h, rotation=-rotation)
+
+    bg = Image.new("RGBA", canvas.size, (0, 0, 0, 255))
+    bg.paste(canvas, (0, 0), canvas)
+
+    surf = pil_to_surface(bg)
+    screen.blit(surf, (0, 0))
+
+    if poster_id is not None:
+        display_url(screen, scr_w, scr_h, rotation, poster_id=poster_id)
+
+    pygame.display.flip()
+    return True
 
 def init_display():
     """Initializes pygame display in fullscreen mode."""
@@ -267,6 +313,46 @@ def display_image(screen, image_path, scr_w, scr_h, rotation=0):
         print(f"[display] Failed to display image {image_path}: {e}")
         return False
 
+def display_animated_gif(screen, gif_path, scr_w, scr_h, rotation=0, max_duration=None,
+                         clock=None, poster_id=None, interrupt_on_input=False):
+    try:
+        frames = []
+        durations = []
+
+        with Image.open(gif_path) as gif:
+            for frame in ImageSequence.Iterator(gif):
+                frames.append(frame.convert("RGBA").copy())
+                durations.append(max(20, int(frame.info.get("duration") or 100)))
+
+        if not frames:
+            return display_image(screen, gif_path, scr_w, scr_h, rotation)
+
+        start_time = time.time()
+
+        while True:
+            for frame, duration_ms in zip(frames, durations):
+                if max_duration is not None and time.time() - start_time >= max_duration:
+                    return True
+
+                if not _handle_playback_events(interrupt_on_input):
+                    return True
+
+                _draw_gif_frame(screen, frame, scr_w, scr_h, rotation, poster_id=poster_id)
+
+                wait_seconds = duration_ms / 1000
+                if max_duration is not None:
+                    remaining = max_duration - (time.time() - start_time)
+                    wait_seconds = min(wait_seconds, max(0, remaining))
+
+                if not _wait_for_playback(wait_seconds, clock, interrupt_on_input):
+                    return True
+
+            if max_duration is None:
+                return True
+
+    except Exception as e:
+        print(f"[display] Failed to display animated GIF {gif_path}: {e}")
+        return False
 
 def display_connecting_wifi(screen, scr_w, scr_h, rotation=0):
     """Wrapper to show wifi message with rotation."""
