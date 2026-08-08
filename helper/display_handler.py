@@ -163,6 +163,28 @@ def _draw_gif_frame(screen, pil_img, scr_w, scr_h, rotation=0, poster_id=None):
     pygame.display.flip()
     return True
 
+def _draw_screensaver_frame(screen, pil_img, scr_w, scr_h, message="", rotation=0):
+    img = pil_img.convert("RGBA")
+    canvas = make_landscape_and_fit(img, scr_w, scr_h, rotation=-rotation)
+    surf = pil_to_surface(canvas)
+
+    screen.blit(surf, (0, 0))
+    _draw_status_bar(screen, scr_w, scr_h, message, rotation)
+    display_url(screen, scr_w, scr_h, rotation)
+    pygame.display.flip()
+    return True
+
+def _load_gif_frames(gif_path):
+    frames = []
+    durations = []
+
+    with Image.open(gif_path) as gif:
+        for frame in ImageSequence.Iterator(gif):
+            frames.append(frame.convert("RGBA").copy())
+            durations.append(max(20, int(frame.info.get("duration") or 100)))
+
+    return frames, durations
+
 def init_display():
     """Initializes pygame display in fullscreen mode."""
     try:
@@ -269,17 +291,39 @@ def _draw_status_bar(screen, scr_w, scr_h, message, rotation=0):
         else:
             screen.blit(rotated_bar, (0, scr_h - bar_height))
 
-def show_screensaver_message(screen, scr_w, scr_h, message="Waiting...", rotation=0, image_path=None):
+def show_screensaver_message(screen, scr_w, scr_h, message="Waiting...", rotation=0, image_path=None,
+                             animation_seconds=0, clock=None):
     screen.fill((0, 0, 0))
     try:
         if image_path is None:
-            image_path = ROOT_DIR / "ScreenSaver.png"
+            gif_path = ROOT_DIR / "ScreenSaver.gif"
+            image_path = gif_path if gif_path.exists() else ROOT_DIR / "ScreenSaver.png"
 
         if Path(image_path).exists():
-            img = Image.open(image_path).convert("RGBA")
-            canvas = make_landscape_and_fit(img, scr_w, scr_h, rotation=-rotation)
-            surf = pil_to_surface(canvas)
-            screen.blit(surf, (0, 0))
+            if is_animated_gif(image_path):
+                frames, durations = _load_gif_frames(image_path)
+
+                if frames and animation_seconds > 0:
+                    start_time = time.time()
+                    while time.time() - start_time < animation_seconds:
+                        for frame, duration_ms in zip(frames, durations):
+                            if time.time() - start_time >= animation_seconds:
+                                break
+                            _draw_screensaver_frame(screen, frame, scr_w, scr_h, message, rotation)
+                            wait_seconds = min(duration_ms / 1000, animation_seconds - (time.time() - start_time))
+                            _wait_for_playback(wait_seconds, clock)
+                    return
+
+                if frames:
+                    _draw_screensaver_frame(screen, frames[0], scr_w, scr_h, message, rotation)
+                    return
+            else:
+                img = Image.open(image_path).convert("RGBA")
+                _draw_screensaver_frame(screen, img, scr_w, scr_h, message, rotation)
+
+                if animation_seconds > 0:
+                    _wait_for_playback(animation_seconds, clock)
+                return
 
         _draw_status_bar(screen, scr_w, scr_h, message, rotation)
         display_url(screen, scr_w, scr_h, rotation)
@@ -318,13 +362,7 @@ def display_image(screen, image_path, scr_w, scr_h, rotation=0):
 def display_animated_gif(screen, gif_path, scr_w, scr_h, rotation=0, max_duration=None,
                          clock=None, poster_id=None, interrupt_on_input=False):
     try:
-        frames = []
-        durations = []
-
-        with Image.open(gif_path) as gif:
-            for frame in ImageSequence.Iterator(gif):
-                frames.append(frame.convert("RGBA").copy())
-                durations.append(max(20, int(frame.info.get("duration") or 100)))
+        frames, durations = _load_gif_frames(gif_path)
 
         if not frames:
             return display_image(screen, gif_path, scr_w, scr_h, rotation)

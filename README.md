@@ -136,7 +136,7 @@ eposter/
 ├── config_portal.py         # Captive portal and device configuration
 ├── installer.py             # System setup and service installer
 ├── config.json              # Configuration file
-├── ScreenSaver.png          # Screensaver image asset
+├── ScreenSaver.png/.gif     # Screensaver asset; GIF animates when present
 ├── helper/                  # Runtime helper modules
 │   ├── api_handler.py       # API calls and data handling
 │   ├── cache_handler.py     # Image caching and processing

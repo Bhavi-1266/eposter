@@ -177,9 +177,11 @@ def run_time_mode(screen, clock):
 
         if not records:
             print("<TIME>Records Empty Showing ScreenSaver")
-            display_handler.show_screensaver_message(screen, scr_w, scr_h, "", rotation)
-            pygame.display.flip()
-            time.sleep(1)
+            display_handler.show_screensaver_message(
+                screen, scr_w, scr_h, "", rotation,
+                animation_seconds=1,
+                clock=clock,
+            )
             continue
             
         if current_time >= poster_end_time:
@@ -217,9 +219,12 @@ def run_time_mode(screen, clock):
                     poster_end_time = current_time + 2
             else:
                 print("<TIME>Activate False  / Did Not Find Any Image  , Showing ScreenSaver")
-                display_handler.show_screensaver_message(screen, scr_w, scr_h, "", rotation)
-                pygame.display.flip()
-                poster_end_time = current_time + 5
+                display_handler.show_screensaver_message(
+                    screen, scr_w, scr_h, "", rotation,
+                    animation_seconds=5,
+                    clock=clock,
+                )
+                poster_end_time = time.time()
         clock.tick(30)
 
 # ---------------------------------------------------------
@@ -277,9 +282,11 @@ def run_scroll_mode(screen, clock):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_q: sys.exit()
 
         if not images:
-            display_handler.show_screensaver_message(screen, scr_w, scr_h, "", rotation)
-            pygame.display.flip()
-            time.sleep(2)
+            display_handler.show_screensaver_message(
+                screen, scr_w, scr_h, "", rotation,
+                animation_seconds=2,
+                clock=clock,
+            )
             images = get_valid_images(records)
             continue
 
