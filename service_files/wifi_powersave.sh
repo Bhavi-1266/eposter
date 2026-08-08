@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Use absolute path to ensure Python can find the config regardless of where it's called
-BASE_DIR=$(dirname "$(readlink -f "$0")")
+# Use absolute paths so this works no matter where it is called from.
+SERVICE_DIR=$(dirname "$(readlink -f "$0")")
+BASE_DIR=$(dirname "$SERVICE_DIR")
 CONFIG_FILE="$BASE_DIR/config.json"
 COMMAND="${1:-status}"
 

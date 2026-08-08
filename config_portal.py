@@ -8,9 +8,9 @@ from pathlib import Path
 from flask import Flask, request, redirect, render_template_string, jsonify, session, url_for
 
 # --- Config ---
-PROJECT_DIR = Path(__file__).parent
+PROJECT_DIR = Path(__file__).resolve().parent
 CONFIG_FILE = PROJECT_DIR / 'config.json'
-POWERSAVE_SCRIPT = PROJECT_DIR / 'wifi_powersave.sh'
+POWERSAVE_SCRIPT = PROJECT_DIR / 'service_files' / 'wifi_powersave.sh'
 PORT = 80
 
 app = Flask(__name__)

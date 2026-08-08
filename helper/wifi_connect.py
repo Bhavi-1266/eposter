@@ -15,7 +15,9 @@ import json
 import socket
 
 # Configuration
-with open(Path(__file__).parent / 'config.json', 'r') as f:
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+with open(ROOT_DIR / 'config.json', 'r') as f:
     config = json.load(f)
 
 API_BASE = config.get('api', {}).get('poster_api_url', 'https://posterbridge.incandescentsolution.com/api/v1/eposter-list')
@@ -193,4 +195,3 @@ if __name__ == "__main__":
     else:
         print("[wifi] WiFi connection failed")
         sys.exit(1)
-

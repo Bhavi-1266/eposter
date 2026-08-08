@@ -136,13 +136,17 @@ eposter/
 ├── config_portal.py         # Captive portal and device configuration
 ├── installer.py             # System setup and service installer
 ├── config.json              # Configuration file
-├── wifi_connect.py          # WiFi connection module
-├── api_handler.py           # API calls and data handling
-├── cache_handler.py         # Image caching and processing
-├── display_handler.py       # Pygame display management
-├── fetch_event_data.py      # Event data fetching
-├── wifi_powersave.sh        # WiFi power-save helper script
 ├── ScreenSaver.png          # Screensaver image asset
+├── helper/                  # Runtime helper modules
+│   ├── api_handler.py       # API calls and data handling
+│   ├── cache_handler.py     # Image caching and processing
+│   ├── display_handler.py   # Pygame display management
+│   ├── fetch_event_data.py  # Event data fetching
+│   └── wifi_connect.py      # WiFi connection module
+├── service_files/           # Bash scripts and systemd service templates
+│   ├── eposter-admin.service.template
+│   ├── eposter-display.service.template
+│   └── wifi_powersave.sh    # WiFi power-save helper script
 ├── docs/                    # Setup and operations notes
 ├── eposter_cache/           # Cached poster images (auto-created, ignored)
 ├── api_data.json            # Saved API response (auto-created)
@@ -153,13 +157,13 @@ eposter/
 
 ## How It Works
 
-1. **WiFi Connection**: `wifi_connect.py` attempts to connect to configured WiFi networks
-2. **API Fetching**: `api_handler.py` fetches poster data from the API
-3. **Image Caching**: `cache_handler.py` downloads and processes images:
+1. **WiFi Connection**: `helper/wifi_connect.py` attempts to connect to configured WiFi networks
+2. **API Fetching**: `helper/api_handler.py` fetches poster data from the API
+3. **Image Caching**: `helper/cache_handler.py` downloads and processes images:
    - Images are named by their poster ID (e.g., `6.png`, `7.png`)
    - Images are converted to landscape orientation
    - Old/unused images are automatically deleted
-4. **Display**: `display_handler.py` shows images in a fullscreen slideshow
+4. **Display**: `helper/display_handler.py` shows images in a fullscreen slideshow
 5. **Auto-refresh**: The system periodically checks for new posters
 
 ## Troubleshooting

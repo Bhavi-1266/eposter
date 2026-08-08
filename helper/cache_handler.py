@@ -10,15 +10,17 @@ from PIL import Image
 import shutil
 
 # Configuration
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
 try:
-    with open(Path(__file__).parent / 'config.json', 'r') as f:
+    with open(ROOT_DIR / 'config.json', 'r') as f:
         config = json.load(f)
 except Exception as e:
     print(f"!! CRITICAL: Could not load config.json: {e}")
     config = {}
 
 REQUEST_TIMEOUT = config.get("api", {}).get("request_timeout", 20)
-SCRIPT_DIR = Path(__file__).parent
+SCRIPT_DIR = ROOT_DIR
 CACHE_DIR = SCRIPT_DIR / "eposter_cache"    
 
 def ensure_cache():

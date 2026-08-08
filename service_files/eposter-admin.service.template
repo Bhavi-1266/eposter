@@ -1,0 +1,18 @@
+[Unit]
+Description={description}
+After={after}
+Wants=network-online.target
+
+[Service]
+User={user}
+WorkingDirectory={base_dir}
+ExecStartPre=/bin/sleep 10
+ExecStart={exec_start}
+Restart=always
+RestartSec=10
+{environment}
+StandardOutput=append:{base_dir}/logs/output.log
+StandardError=append:{base_dir}/logs/error.log
+
+[Install]
+WantedBy=graphical.target

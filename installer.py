@@ -10,6 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent
 VENV_PATH = BASE_DIR / "venv"
 PYTHON_BIN = VENV_PATH / "bin" / "python3"
 REQ_FILE = BASE_DIR / "requirements.txt"
+SERVICE_FILES_DIR = BASE_DIR / "service_files"
 
 # Detect the actual user
 REAL_USER = os.getenv("SUDO_USER") or os.getlogin() or "rock"
@@ -19,12 +20,14 @@ SERVICES = {
     "eposter-admin": {
         "description": "ePoster Admin Web Interface & DNS",
         "exec": f"{PYTHON_BIN} {BASE_DIR}/config_portal.py",
+        "template": SERVICE_FILES_DIR / "eposter-admin.service.template",
         "user": "root", 
         "after": "network.target"
     },
     "eposter-display": {
         "description": "ePoster Pygame Display Controller",
         "exec": f"{PYTHON_BIN} {BASE_DIR}/RunThis.py",
+        "template": SERVICE_FILES_DIR / "eposter-display.service.template",
         "user": REAL_USER,
         "after": "graphical.target display-manager.service network-online.target",
         "env": [
@@ -67,6 +70,9 @@ def setup():
         run([str(pip_bin), "install", "-r", str(REQ_FILE)])
     else:
         run([str(pip_bin), "install", "flask", "dnslib", "pygame", "requests", "Pillow"])
+
+    for script in SERVICE_FILES_DIR.glob("*.sh"):
+        run(["chmod", "755", str(script)])
 
     # --- 3. WIFI & PERMISSIONS (RAKSA OS FIX) ---
     print(f"Configuring Wi-Fi permissions for {REAL_USER}...")
@@ -120,31 +126,23 @@ polkit.addRule(function(action, subject) {{
     for name, info in SERVICES.items():
         print(f"Creating systemd service: {name}")
         env_lines = "\n".join([f"Environment={e}" for e in info.get("env", [])])
+        template_path = info["template"]
         
         # Ensure log directory exists
         log_dir = BASE_DIR / "logs"
         log_dir.mkdir(exist_ok=True)
         run(["chown", f"{REAL_USER}:{REAL_USER}", str(log_dir)])
 
-        service_content = f"""[Unit]
-Description={info['description']}
-After={info['after']}
-Wants=network-online.target
+        with open(template_path, "r") as f:
+            service_content = f.read().format(
+                description=info["description"],
+                after=info["after"],
+                user=info["user"],
+                base_dir=BASE_DIR,
+                exec_start=info["exec"],
+                environment=env_lines,
+            )
 
-[Service]
-User={info['user']}
-WorkingDirectory={BASE_DIR}
-ExecStartPre=/bin/sleep 10
-ExecStart={info['exec']}
-Restart=always
-RestartSec=10
-{env_lines}
-StandardOutput=append:{BASE_DIR}/logs/output.log
-StandardError=append:{BASE_DIR}/logs/error.log
-
-[Install]
-WantedBy=graphical.target
-"""
         with open(f"/etc/systemd/system/{name}.service", "w") as f:
             f.write(service_content)
 

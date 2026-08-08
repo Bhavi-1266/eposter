@@ -12,6 +12,8 @@ from PIL import Image, ImageSequence
 import pygame
 import socket
 
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
 def is_animated_gif(path):
     return Path(path).suffix.lower() == ".gif"
 
@@ -86,7 +88,7 @@ def get_rotation_degree():
     Reloads config each time to ensure fresh value.
     """
     try:
-        config_path = Path(__file__).parent / 'config.json'
+        config_path = ROOT_DIR / 'config.json'
         with open(config_path, 'r') as f:
             config = json.load(f)
         rotation = int(config.get('display', {}).get('rotation_degree', 0))
@@ -271,7 +273,7 @@ def show_screensaver_message(screen, scr_w, scr_h, message="Waiting...", rotatio
     screen.fill((0, 0, 0))
     try:
         if image_path is None:
-            image_path = Path(__file__).parent / "ScreenSaver.png"
+            image_path = ROOT_DIR / "ScreenSaver.png"
 
         if Path(image_path).exists():
             img = Image.open(image_path).convert("RGBA")

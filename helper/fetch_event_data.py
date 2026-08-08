@@ -13,12 +13,14 @@ import requests
 from datetime import datetime
 
 # Configuration
-with open(Path(__file__).parent / 'config.json', 'r') as f:
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+with open(ROOT_DIR / 'config.json', 'r') as f:
     config = json.load(f)
 
 EVENT_API_URL = config.get("api", {}).get("event_api_url", "https://posterbridge.incandescentsolution.com/api/v1/event-data")
 REQUEST_TIMEOUT = config.get("api", {}).get("request_timeout", 10)
-SCRIPT_DIR = Path(__file__).parent
+SCRIPT_DIR = ROOT_DIR
 EVENT_DATA_JSON = SCRIPT_DIR / "event_data.json"
 
 
@@ -129,4 +131,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

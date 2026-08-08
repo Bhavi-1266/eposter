@@ -13,10 +13,10 @@ from datetime import datetime
 import socket
 
 # --- Custom Modules ---
-import wifi_connect
-import api_handler
-import cache_handler
-import display_handler
+from helper import wifi_connect
+from helper import api_handler
+from helper import cache_handler
+from helper import display_handler
 
 # -------------------------
 # Configuration & Constants
@@ -353,6 +353,45 @@ def run_menu_mode(screen, clock):
     display_handler.show_screensaver_message(screen, PHY_W, PHY_H, "Loading Menu...", rotation)
     items = load_menu_images()
     scroll_y, next_sync_time, last_config_check = 0, time.time() + 30, time.time()
+    drag_active = False
+    drag_moved = False
+    drag_start_x, drag_start_y = 0, 0
+    drag_start_scroll_y = 0
+    DRAG_THRESHOLD = 8
+
+    def open_menu_item(item):
+        menu_img_id = item['path'].stem
+        menu_records, _ = get_device_records(device_id)
+        menu_paper_id = next((r.get("paper_id") for r in menu_records if str(r.get("id") or r.get("PosterId")) == str(menu_img_id)), menu_img_id)
+
+        if display_handler.is_animated_gif(item['path']):
+            display_handler.display_animated_gif(
+                screen, item['path'], PHY_W, PHY_H, rotation,
+                max_duration=60,
+                clock=clock,
+                poster_id=menu_paper_id,
+                interrupt_on_input=True,
+            )
+        else:
+            display_handler.display_image(screen, item['path'], PHY_W, PHY_H, rotation)
+            display_handler.display_url(screen, PHY_W, PHY_H, rotation, poster_id=menu_paper_id)
+            pygame.display.flip()
+            waiting = True
+            t_start = time.time()
+            while waiting:
+                for e in pygame.event.get():
+                    if e.type in [pygame.MOUSEBUTTONDOWN, pygame.KEYDOWN]: waiting = False
+                if time.time() - t_start > 60: waiting = False
+                clock.tick(30)
+
+    def item_at_position(x, y):
+        y_offset = scroll_y + TOPBAR_HEIGHT + 20
+        for item in items:
+            if y_offset + item['height'] > 0 and y_offset < UI_H:
+                if pygame.Rect(40, y_offset, UI_W-80, item['height']).collidepoint(x, y):
+                    return item
+            y_offset += item['height'] + 25
+        return None
 
     running = True
     while running:
@@ -374,42 +413,36 @@ def run_menu_mode(screen, clock):
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_q: sys.exit()
+            if event.type == pygame.MOUSEWHEEL:
+                scroll_y += event.y * SCROLL_SPEED
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    if button_rect.collidepoint(mx, my):
-                        update_config_mode("Time")
-                        return
-                    y_offset = scroll_y + TOPBAR_HEIGHT + 20
-                    for item in items:
-                        if y_offset + item['height'] > 0 and y_offset < UI_H:
-                            if pygame.Rect(40, y_offset, UI_W-80, item['height']).collidepoint(mx, my):
-                                menu_img_id = item['path'].stem
-                                menu_records, _ = get_device_records(device_id)
-                                
-                                menu_paper_id = next((r.get("paper_id") for r in menu_records if str(r.get("id") or r.get("PosterId")) == str(menu_img_id)), menu_img_id)
-                                if display_handler.is_animated_gif(item['path']):
-                                    display_handler.display_animated_gif(
-                                        screen, item['path'], PHY_W, PHY_H, rotation,
-                                        max_duration=60,
-                                        clock=clock,
-                                        poster_id=menu_paper_id,
-                                        interrupt_on_input=True,
-                                    )
-                                else:
-                                    display_handler.display_image(screen, item['path'], PHY_W, PHY_H, rotation)
-                                    display_handler.display_url(screen, PHY_W, PHY_H, rotation, poster_id=menu_paper_id)
-                                    pygame.display.flip()
-                                    waiting = True
-                                    t_start = time.time()
-                                    while waiting:
-                                        for e in pygame.event.get():
-                                            if e.type in [pygame.MOUSEBUTTONDOWN, pygame.KEYDOWN]: waiting = False
-                                        if time.time() - t_start > 60: waiting = False
-                                        clock.tick(30)
-                                break
-                        y_offset += item['height'] + 25
+                    drag_start_x, drag_start_y = map_mouse(*event.pos)
+                    drag_start_scroll_y = scroll_y
+                    drag_active = True
+                    drag_moved = False
                 elif event.button == 4: scroll_y += SCROLL_SPEED
                 elif event.button == 5: scroll_y -= SCROLL_SPEED
+            elif event.type == pygame.MOUSEMOTION and drag_active:
+                drag_x, drag_y = map_mouse(*event.pos)
+                total_dx = drag_x - drag_start_x
+                total_dy = drag_y - drag_start_y
+                if drag_moved or abs(total_dx) > DRAG_THRESHOLD or abs(total_dy) > DRAG_THRESHOLD:
+                    drag_moved = True
+                    scroll_y = drag_start_scroll_y + total_dy
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                release_x, release_y = map_mouse(*event.pos)
+                was_click = drag_active and not drag_moved
+                drag_active = False
+
+                if was_click:
+                    if button_rect.collidepoint(release_x, release_y):
+                        update_config_mode("Time")
+                        return
+
+                    clicked_item = item_at_position(release_x, release_y)
+                    if clicked_item:
+                        open_menu_item(clicked_item)
 
         total_h = sum(i["height"] + 25 for i in items)
         if total_h > 0:

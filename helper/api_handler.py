@@ -11,14 +11,16 @@ import requests
 from datetime import datetime
 
 # Configuration
-with open(Path(__file__).parent / 'config.json', 'r') as f:
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+with open(ROOT_DIR / 'config.json', 'r') as f:
     config = json.load(f)
 
 API_BASE = config.get("api", {}).get("poster_api_url")
 REQUEST_TIMEOUT = config.get("api", {}).get("request_timeout", 10)
 
 
-SCRIPT_DIR = Path(__file__).parent
+SCRIPT_DIR = ROOT_DIR
 API_DATA_JSON = SCRIPT_DIR / "api_data.json"
 
 
@@ -133,4 +135,3 @@ def load_api_data():
     except Exception as e:
         print(f"[load_api_data] Error loading API data: {e}")
         return None
-
