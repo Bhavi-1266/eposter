@@ -2,7 +2,7 @@
 import os
 import subprocess
 import sys
-import shutil
+import getpass
 from pathlib import Path
 
 # --- DYNAMIC CONFIGURATION ---
@@ -13,7 +13,10 @@ REQ_FILE = BASE_DIR / "requirements.txt"
 SERVICE_FILES_DIR = BASE_DIR / "service_files"
 
 # Detect the actual user
-REAL_USER = os.getenv("SUDO_USER") or os.getlogin() or "rock"
+try:
+    REAL_USER = os.getenv("SUDO_USER") or os.getlogin() or getpass.getuser()
+except OSError:
+    REAL_USER = os.getenv("SUDO_USER") or getpass.getuser() or "rock"
 
 # Service Definitions
 SERVICES = {
@@ -31,6 +34,7 @@ SERVICES = {
         "user": REAL_USER,
         "after": "graphical.target display-manager.service network-online.target",
         "env": [
+            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
             "DISPLAY=:0",
             f"XAUTHORITY=/home/{REAL_USER}/.Xauthority",
             "XDG_RUNTIME_DIR=/run/user/1000" # Common ID for first user
@@ -54,12 +58,18 @@ def setup():
     try:
         user_info = pwd.getpwnam(REAL_USER)
         user_id = user_info.pw_uid
+        user_home = user_info.pw_dir
     except KeyError:
         user_id = 1000
+        user_home = f"/home/{REAL_USER}"
 
     # 1. Ensure system dependencies
     run(["apt-get", "update", "-y"])
-    run(["apt-get", "install", "-y", "python3-venv", "python3-pip", "x11-xserver-utils", "network-manager", "polkitd"])
+    run([
+        "apt-get", "install", "-y", "python3-venv", "python3-pip",
+        "x11-xserver-utils", "network-manager", "polkitd", "ffmpeg", "jq",
+        "fonts-dejavu-core",
+    ])
 
     # 2. Virtual Env & Requirements
     if not os.path.exists(VENV_PATH):
@@ -117,8 +127,9 @@ polkit.addRule(function(action, subject) {{
     # --- 4. Systemd Services ---
     # Update the environment with the detected UID
     SERVICES["eposter-display"]["env"] = [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
         "DISPLAY=:0",
-        f"XAUTHORITY=/home/{REAL_USER}/.Xauthority",
+        f"XAUTHORITY={user_home}/.Xauthority",
         f"XDG_RUNTIME_DIR=/run/user/{user_id}"
     ]
 
@@ -141,6 +152,7 @@ polkit.addRule(function(action, subject) {{
                 base_dir=BASE_DIR,
                 exec_start=info["exec"],
                 environment=env_lines,
+                service_name=name,
             )
 
         with open(f"/etc/systemd/system/{name}.service", "w") as f:

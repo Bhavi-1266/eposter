@@ -21,6 +21,12 @@ A Raspberry Pi-based digital poster display system that automatically fetches an
   ```bash
   pip3 install requests pillow pygame
   ```
+- Required for `.mov`/video playback on minimal systems:
+  - `ffmpeg` provides `ffplay`; `mpv`, `omxplayer`, and VLC are supported fallbacks.
+  - DietPi install example:
+    ```bash
+    sudo apt update && sudo apt install ffmpeg mpv -y
+    ```
 
 ## Installation
 
@@ -34,7 +40,10 @@ A Raspberry Pi-based digital poster display system that automatically fetches an
    pip3 install requests pillow pygame
    ```
 
-3. Configure your settings in `config.json` (see Configuration section below)
+3. Create the device-local configuration and edit it:
+   ```bash
+   cp config.example.json config.json
+   ```
 
 4. Run the display controller:
    ```bash
@@ -135,7 +144,8 @@ eposter/
 ├── RunThis.py               # Main display controller
 ├── config_portal.py         # Captive portal and device configuration
 ├── installer.py             # System setup and service installer
-├── config.json              # Configuration file
+├── config.example.json      # Source-controlled configuration schema
+├── config.json              # Device-local configuration (ignored by Git)
 ├── ScreenSaver.png/.gif     # Screensaver asset; GIF animates when present
 ├── helper/                  # Runtime helper modules
 │   ├── api_handler.py       # API calls and data handling
@@ -149,7 +159,7 @@ eposter/
 │   └── wifi_powersave.sh    # WiFi power-save helper script
 ├── docs/                    # Setup and operations notes
 ├── eposter_cache/           # Cached poster images (auto-created, ignored)
-├── api_data.json            # Saved API response (auto-created)
+├── api_data.json            # Saved API response (auto-created, ignored)
 ├── event_data.json          # Event information (auto-created)
 ├── requirements.txt         # Python dependencies
 └── README.md                # This file
@@ -159,11 +169,14 @@ eposter/
 
 1. **WiFi Connection**: `helper/wifi_connect.py` attempts to connect to configured WiFi networks
 2. **API Fetching**: `helper/api_handler.py` fetches poster data from the API
-3. **Image Caching**: `helper/cache_handler.py` downloads and processes images:
-   - Images are named by their poster ID (e.g., `6.png`, `7.png`)
-   - Images are converted to landscape orientation
-   - Old/unused images are automatically deleted
-4. **Display**: `helper/display_handler.py` shows images in a fullscreen slideshow
+3. **Media Caching**: `helper/cache_handler.py` downloads and processes images/videos:
+   - Media files are deduplicated by their source URL (`eposter_file`/`file`)
+   - One URL is stored as a single cache file and shared across duplicate records
+   - Old/unused media files are automatically deleted
+   - Repeated schedule rows are reduced to one download/check per unique URL
+4. **Display**: `helper/display_handler.py` shows images/GIFs in Pygame and hands videos to a fullscreen external player
+   - Menu mode displays a generated video tile; tapping it starts playback
+   - Pygame is minimized during video playback and restored afterward
 5. **Auto-refresh**: The system periodically checks for new posters
 
 ## Troubleshooting

@@ -2,6 +2,7 @@
 Description={description}
 After={after}
 Wants=network-online.target
+StartLimitIntervalSec=0
 
 [Service]
 User={user}
@@ -10,9 +11,13 @@ ExecStartPre=/bin/sleep 10
 ExecStart={exec_start}
 Restart=always
 RestartSec=10
+KillMode=control-group
+TimeoutStopSec=10
+Environment=PYTHONUNBUFFERED=1
 {environment}
-StandardOutput=append:{base_dir}/logs/output.log
-StandardError=append:{base_dir}/logs/error.log
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={service_name}
 
 [Install]
-WantedBy=graphical.target
+WantedBy=multi-user.target

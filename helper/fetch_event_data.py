@@ -8,20 +8,29 @@ The API URL is configurable via environment variable EVENT_API_URL.
 from pathlib import Path
 import os
 import sys
-import json
 import requests
 from datetime import datetime
+from helper.json_utils import atomic_write_json, load_json_file
 
 # Configuration
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
-with open(ROOT_DIR / 'config.json', 'r') as f:
-    config = json.load(f)
-
-EVENT_API_URL = config.get("api", {}).get("event_api_url", "https://posterbridge.incandescentsolution.com/api/v1/event-data")
-REQUEST_TIMEOUT = config.get("api", {}).get("request_timeout", 10)
 SCRIPT_DIR = ROOT_DIR
 EVENT_DATA_JSON = SCRIPT_DIR / "event_data.json"
+
+
+def _event_api_settings():
+    config = load_json_file(ROOT_DIR / "config.json", {}) or {}
+    api_config = config.get("api", {})
+    api_url = api_config.get(
+        "event_api_url",
+        "https://posterbridge.incandescentsolution.com/api/v1/event-data",
+    )
+    try:
+        timeout = max(3, int(api_config.get("request_timeout", 10)))
+    except (TypeError, ValueError):
+        timeout = 10
+    return api_url, timeout
 
 
 def fetch_event_data(api_url=None, token=None):
@@ -35,8 +44,9 @@ def fetch_event_data(api_url=None, token=None):
     Returns:
         dict: Event data or None on failure
     """
+    configured_url, timeout = _event_api_settings()
     if api_url is None:
-        api_url = EVENT_API_URL
+        api_url = configured_url
     
     try:
         params = {}
@@ -44,7 +54,7 @@ def fetch_event_data(api_url=None, token=None):
             params["key"] = token
         
         print(f"[fetch_event_data] Fetching from: {api_url}")
-        r = requests.get(api_url, params=params, timeout=REQUEST_TIMEOUT)
+        r = requests.get(api_url, params=params, timeout=timeout)
         
         if r.status_code != 200:
             print(f"[fetch_event_data] API returned status {r.status_code}")
@@ -77,8 +87,7 @@ def save_event_data(event_data, file_path=None):
         # Ensure parent directory exists
         file_path.parent.mkdir(parents=True, exist_ok=True)
         
-        with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(event_data, f, indent=2, ensure_ascii=False)
+        atomic_write_json(file_path, event_data)
         
         print(f"[save_event_data] Saved event data to {file_path}")
         return True

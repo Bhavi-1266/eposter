@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-import json
-import os
 import socket
 import time
 import subprocess
+import secrets
 from pathlib import Path
 from flask import Flask, request, redirect, render_template_string, jsonify, session, url_for
+from helper.json_utils import load_json_file, update_json_file
 
 # --- Config ---
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -14,8 +14,17 @@ POWERSAVE_SCRIPT = PROJECT_DIR / 'service_files' / 'wifi_powersave.sh'
 PORT = 80
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)  # Secret key for session management
-app.secret_key = os.urandom(24)  # Secret key for session management
+SECRET_FILE = PROJECT_DIR / '.portal_secret'
+try:
+    if SECRET_FILE.exists():
+        app.secret_key = SECRET_FILE.read_text(encoding='utf-8').strip()
+    else:
+        app.secret_key = secrets.token_hex(32)
+        SECRET_FILE.write_text(app.secret_key, encoding='utf-8')
+        SECRET_FILE.chmod(0o600)
+except OSError:
+    app.secret_key = secrets.token_hex(32)
+app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax')
 
 # --- Login Template ---
 LOGIN_TEMPLATE = """
@@ -396,18 +405,17 @@ def load_config():
         }
     }
     
-    if not CONFIG_FILE.exists():
-        return default_config
-    
-    try:
-        with open(CONFIG_FILE, 'r') as f:
-            data = json.load(f)
-        for key in default_config:
-            if key not in data:
-                data[key] = default_config[key]
-        return data
-    except Exception:
-        return default_config
+    data = load_json_file(CONFIG_FILE, {}) or {}
+
+    def merge_defaults(target, defaults):
+        for key, value in defaults.items():
+            if key not in target:
+                target[key] = value
+            elif isinstance(value, dict) and isinstance(target[key], dict):
+                merge_defaults(target[key], value)
+
+    merge_defaults(data, default_config)
+    return data
 
 # --- Web Routes ---
 @app.route('/login', methods=['GET', 'POST'])
@@ -452,19 +460,31 @@ def save():
         return jsonify({'success': False, 'message': 'Incorrect Admin Password'})
     
     try:
-        # Update configuration
-        conf['display']['device_id'] = int(request.form.get('device_id'))
-        conf['display']['rotation_degree'] = int(request.form.get('rotation'))
-        conf['display']['Mode'] = request.form.get('mode')
-        conf['display']['Auto_Scroll'] = int(request.form.get('auto_scroll'))
-        conf['wifi']['ssid1'] = request.form.get('ssid1')
-        conf['wifi']['password1'] = request.form.get('pass1')
-        conf['wifi']['ssid2'] = request.form.get('ssid2')
-        conf['wifi']['password2'] = request.form.get('pass2')
-        conf['api']['poster_api_url'] = request.form.get('poster_api_url')
-        
-        with open(CONFIG_FILE, 'w') as f:
-            json.dump(conf, f, indent=2)
+        device_id = max(0, int(request.form.get('device_id')))
+        rotation = int(request.form.get('rotation'))
+        mode = request.form.get('mode')
+        auto_scroll = max(1, int(request.form.get('auto_scroll')))
+        if rotation not in (0, 90, 180, 270) or mode not in ('Time', 'Menu', 'Scroll'):
+            raise ValueError('Invalid display mode or rotation')
+
+        def apply_form(latest):
+            latest = latest or conf
+            latest.setdefault('display', {}).update({
+                'device_id': device_id,
+                'rotation_degree': rotation,
+                'Mode': mode,
+                'Auto_Scroll': auto_scroll,
+            })
+            latest.setdefault('wifi', {}).update({
+                'ssid1': request.form.get('ssid1', ''),
+                'password1': request.form.get('pass1', ''),
+                'ssid2': request.form.get('ssid2', ''),
+                'password2': request.form.get('pass2', ''),
+            })
+            latest.setdefault('api', {})['poster_api_url'] = request.form.get('poster_api_url', '')
+            return latest
+
+        update_json_file(CONFIG_FILE, apply_form, conf)
         
         return jsonify({'success': True, 'message': 'Settings saved successfully!'})
     except Exception as e:
@@ -529,13 +549,6 @@ def toggle_powersave():
 
 # --- Main Entry ---
 if __name__ == '__main__':
-    # 1. Wait for Wi-Fi (Passive Mode)
-    current_ip = wait_for_wifi()
-    
-    # 2. Load Config
-    conf = load_config()
-    
+    current_ip = get_ip()
     print(f"[*] Starting Web Admin on http://{current_ip}:{PORT}")
-    
-    # 3. Start Flask (DNS logic removed)
     app.run(host='0.0.0.0', port=PORT, debug=False)

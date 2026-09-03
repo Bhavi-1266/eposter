@@ -5,23 +5,25 @@ api_handler.py
 Handles API calls to fetch poster data and saves it to JSON file.
 """
 from pathlib import Path
-import os
-import json
 import requests
 from datetime import datetime
+from helper.json_utils import atomic_write_json, load_json_file
 
 # Configuration
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
-with open(ROOT_DIR / 'config.json', 'r') as f:
-    config = json.load(f)
-
-API_BASE = config.get("api", {}).get("poster_api_url")
-REQUEST_TIMEOUT = config.get("api", {}).get("request_timeout", 10)
-
-
 SCRIPT_DIR = ROOT_DIR
 API_DATA_JSON = SCRIPT_DIR / "api_data.json"
+
+
+def _api_settings():
+    config = load_json_file(ROOT_DIR / "config.json", {}) or {}
+    api_config = config.get("api", {})
+    try:
+        timeout = max(3, int(api_config.get("request_timeout", 10)))
+    except (TypeError, ValueError):
+        timeout = 10
+    return api_config.get("poster_api_url"), timeout
 
 
 def ensure_api_json():
@@ -34,8 +36,7 @@ def ensure_api_json():
             API_DATA_JSON.parent.mkdir(parents=True, exist_ok=True)
             # Create empty JSON structure
             empty_data = {}
-            with open(API_DATA_JSON, 'w', encoding='utf-8') as f:
-                json.dump(empty_data, f, indent=2, ensure_ascii=False)
+            atomic_write_json(API_DATA_JSON, empty_data)
             print(f"[ensure_api_json] Created empty API data file: {API_DATA_JSON}")
         else :
             print(f"[ensure_api_json] API data file already exists: {API_DATA_JSON}")
@@ -58,7 +59,16 @@ def get_current_datetime():
     }
 
 
-def fetch_posters(token , api = API_BASE , timeout = REQUEST_TIMEOUT):
+def _without_fetch_metadata(data):
+    if not isinstance(data, dict):
+        return data
+    return {
+        key: value for key, value in data.items()
+        if key not in {"fetched_at", "fetched_date", "fetched_time"}
+    }
+
+
+def fetch_posters(token, api=None, timeout=None):
     """
     Fetches poster data from API and saves it to api_data.json.
     Handles the new API response structure with status, message, and data array.
@@ -69,15 +79,24 @@ def fetch_posters(token , api = API_BASE , timeout = REQUEST_TIMEOUT):
     Returns:
         list: List of poster dicts or None on failure
     """
+    configured_api, configured_timeout = _api_settings()
+    api = api or configured_api
+    timeout = configured_timeout if timeout is None else timeout
+    if not api:
+        print("[fetch_posters] Poster API URL is not configured")
+        return None
+
     try:
-        r = requests.get(api, params={"key": token}, timeout=timeout)
-        if r.status_code != 200:
-            print(f"[fetch_posters] API returned status {r.status_code}")
-            return None
-        
-        data = r.json()
+        params = {"key": token} if token else {}
+        with requests.get(api, params=params, timeout=timeout) as response:
+            response.raise_for_status()
+            data = response.json()
         print( f"[fetch_posters] Successfully fetched posters from API")
-        # Get current system date/time
+        previous_data = load_json_file(API_DATA_JSON, None)
+        content_changed = _without_fetch_metadata(previous_data) != _without_fetch_metadata(data)
+
+        # Add timestamps only when persisting changed content. This avoids
+        # rewriting a large, unchanged schedule to flash every refresh cycle.
         current_dt = get_current_datetime()
         
         # Add timestamp to response
@@ -86,14 +105,14 @@ def fetch_posters(token , api = API_BASE , timeout = REQUEST_TIMEOUT):
             data["fetched_date"] = current_dt["date"]
             data["fetched_time"] = current_dt["time"]
         
-        # Save the raw API response to JSON file
-        try:
-            ensure_api_json()  # Ensure file exists
-            with open(API_DATA_JSON, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-            print(f"[fetch_posters] Saved API response to {API_DATA_JSON}")
-        except Exception as e:
-            print(f"[fetch_posters] Failed to save API data to JSON: {e}")
+        if content_changed:
+            try:
+                atomic_write_json(API_DATA_JSON, data)
+                print(f"[fetch_posters] Saved changed API response to {API_DATA_JSON}")
+            except Exception as e:
+                print(f"[fetch_posters] Failed to save API data to JSON: {e}")
+        else:
+            print("[fetch_posters] API content unchanged; keeping existing file")
         
         # Handle new API response structure: {status, message, data: [...]}
         # if isinstance(data, dict):
@@ -108,12 +127,9 @@ def fetch_posters(token , api = API_BASE , timeout = REQUEST_TIMEOUT):
             # if isinstance(arr, list):
             #     return arr
         
-        if isinstance(data, list):
-            return data
+        return data
         
-        return []
-        
-    except Exception as e:
+    except (requests.RequestException, ValueError, OSError) as e:
         print(f"[fetch_posters] error: {e}")
         return None
 
@@ -129,9 +145,7 @@ def load_api_data():
         if not API_DATA_JSON.exists():
             return None
         
-        with open(API_DATA_JSON, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            return data
+        return load_json_file(API_DATA_JSON, None)
     except Exception as e:
         print(f"[load_api_data] Error loading API data: {e}")
         return None

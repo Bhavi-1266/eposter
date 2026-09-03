@@ -1,8 +1,13 @@
 config.json
+.portal_secret
+.*.lock
+.*.tmp
 venv/
 eposter_cache/
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.ruff_cache/
 logs/
 output.png
 api_data.json
