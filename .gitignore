@@ -12,3 +12,4 @@ logs/
 output.png
 api_data.json
 event_data.json
+/local_test/

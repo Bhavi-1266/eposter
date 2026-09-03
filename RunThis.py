@@ -183,6 +183,21 @@ def _display_duration_seconds(record, fallback):
         pass
     return fallback
 
+
+def _next_static_media(records, current_record):
+    """Return the next scheduled static image and its paper ID."""
+    ordered = sorted(records or [], key=lambda item: item.get("start_dt") or datetime.max)
+    try:
+        current_index = next(i for i, item in enumerate(ordered) if item is current_record)
+    except StopIteration:
+        return None, None
+
+    for candidate in ordered[current_index + 1:]:
+        path = cache_handler.get_media_path(_record_media_url(candidate))
+        if path and path.exists() and not display_handler.is_video_file(path) and not display_handler.is_animated_gif(path):
+            return path, candidate.get("paper_id")
+    return None, None
+
   
 def refresh_data_and_cache(poster_token, device_id):
     
@@ -281,11 +296,14 @@ def run_time_mode(screen, clock):
                         (active["end_dt"] - now).total_seconds(),
                     ))
                     if _is_video_record(active, path):
+                        next_image, next_paper_id = _next_static_media(records, active)
                         played = display_handler.display_video(
                             screen, path, scr_w, scr_h, rotation,
                             max_duration=slot_duration,
                             clock=clock,
                             poster_id=paper_id,
+                            next_image_path=next_image,
+                            next_poster_id=next_paper_id,
                         )
                         poster_end_time = time.time() + (0 if played else 5)
                     elif display_handler.is_animated_gif(path):
@@ -409,11 +427,15 @@ def run_scroll_mode(screen, clock):
                     next_switch = time.time()
                 elif display_handler.is_video_file(image_path):
                     max_wait = _display_duration_seconds(current_record, scroll_delay)
+                    next_image = images[(index + 1) % len(images)] if len(images) > 1 else None
+                    next_record = _url_for_path(records, next_image) if next_image else None
                     display_handler.display_video(
                         screen, image_path, scr_w, scr_h, rotation,
                         max_duration=max_wait,
                         clock=clock,
                         poster_id=paper_id,
+                        next_image_path=next_image,
+                        next_poster_id=next_record.get("paper_id") if next_record else None,
                     )
                     next_switch = time.time()
                 else:

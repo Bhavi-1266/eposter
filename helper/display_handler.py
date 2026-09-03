@@ -124,6 +124,20 @@ def pil_to_surface(pil_img: Image.Image):
     """Converts PIL Image to pygame Surface."""
     return pygame.image.fromstring(pil_img.tobytes(), pil_img.size, pil_img.mode)
 
+
+def prepare_image_surface(image_path, scr_w, scr_h, rotation=0):
+    """Decode and resize an image without changing the visible display."""
+    try:
+        with Image.open(image_path) as source:
+            img = source.convert("RGBA")
+        canvas = make_landscape_and_fit(img, scr_w, scr_h, rotation=-rotation)
+        background = Image.new("RGBA", canvas.size, (0, 0, 0, 255))
+        background.paste(canvas, (0, 0), canvas)
+        return pil_to_surface(background)
+    except Exception as e:
+        print(f"[display] Failed to prepare image {image_path}: {e}")
+        return None
+
 def _handle_playback_events(interrupt_on_input=False):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -182,8 +196,8 @@ def _resolve_video_player(path):
     candidates = [
         ["ffplay", "-x", "{w}", "-y", "{h}", "-fs", "-alwaysontop", "-autoexit", "-loglevel", "error", "{path}"],
         ["omxplayer", "--no-osd", "--orientation", "0", "{path}"],
-        ["mpv", "--fullscreen", "--no-terminal", "--keep-open=no", "{path}"],
-        ["cvlc", "--fullscreen", "--play-and-exit", "--no-osd", "{path}"],
+        ["mpv", "--fullscreen", "--ontop", "--no-terminal", "--keep-open=no", "{path}"],
+        ["cvlc", "--fullscreen", "--video-on-top", "--play-and-exit", "--no-osd", "{path}"],
     ]
 
     for cmd_tmpl in candidates:
@@ -224,37 +238,9 @@ def _apply_video_rotation(cmd, rotation):
     return cmd
 
 
-def _suspend_pygame_display():
-    """Minimize Pygame so an external fullscreen video player can take focus."""
-    if not pygame.display.get_init() or pygame.display.get_surface() is None:
-        return False
-
-    try:
-        pygame.event.pump()
-        minimized = pygame.display.iconify()
-        pygame.event.pump()
-        time.sleep(0.15)
-        return bool(minimized)
-    except pygame.error as e:
-        print(f"[display] Could not minimize Pygame before video playback: {e}")
-        return False
-
-
-def _restore_pygame_display(screen, scr_w, scr_h, mouse_was_visible=False):
-    """Bring the existing Pygame display surface back after video playback."""
-    try:
-        flags = pygame.FULLSCREEN if screen.get_flags() & pygame.FULLSCREEN else 0
-        pygame.display.set_mode((scr_w, scr_h), flags)
-        pygame.mouse.set_visible(mouse_was_visible)
-        pygame.event.clear()
-        screen.fill((0, 0, 0))
-        pygame.display.flip()
-    except pygame.error as e:
-        print(f"[display] Could not restore Pygame after video playback: {e}")
-
-
 def display_video(screen, video_path, scr_w, scr_h, rotation=0, max_duration=None,
-                  clock=None, poster_id=None, interrupt_on_input=False):
+                  clock=None, poster_id=None, interrupt_on_input=False,
+                  next_image_path=None, next_poster_id=None):
     if not is_video_file(video_path):
         return False
 
@@ -270,26 +256,33 @@ def display_video(screen, video_path, scr_w, scr_h, rotation=0, max_duration=Non
     if Path(cmd[0]).name == "ffplay" and interrupt_on_input:
         cmd[-1:-1] = ["-exitonkeydown", "-exitonmousedown"]
     proc = None
-    display_suspended = False
-    mouse_was_visible = pygame.mouse.get_visible()
-    try:
-        # Clear and minimize Pygame so the external player is not hidden behind it.
-        screen.fill((0, 0, 0))
-        if poster_id is not None:
-            display_url(screen, scr_w, scr_h, rotation, poster_id=poster_id)
-        pygame.display.flip()
-        display_suspended = _suspend_pygame_display()
+    next_surface = None
+    if next_image_path and not is_video_file(next_image_path) and not is_animated_gif(next_image_path):
+        next_surface = prepare_image_surface(next_image_path, scr_w, scr_h, rotation)
 
+    try:
+        # Keep Pygame alive behind the always-on-top player. Recreating the
+        # fullscreen display here causes a visible black flash after videos.
+        pygame.event.pump()
         proc = _spawn_video_player(cmd)
         if proc is None:
             return False
 
         start = time.monotonic()
+        next_image_drawn = False
         while True:
             if proc.poll() is not None:
                 break
 
-            if max_duration is not None and time.monotonic() - start >= max_duration:
+            elapsed = time.monotonic() - start
+            if next_surface is not None and not next_image_drawn and elapsed >= 0.35:
+                screen.blit(next_surface, (0, 0))
+                if next_poster_id is not None:
+                    display_url(screen, scr_w, scr_h, rotation, poster_id=next_poster_id)
+                pygame.display.flip()
+                next_image_drawn = True
+
+            if max_duration is not None and elapsed >= max_duration:
                 _stop_video_player(proc)
                 return True
 
@@ -311,8 +304,6 @@ def display_video(screen, video_path, scr_w, scr_h, rotation=0, max_duration=Non
         return False
     finally:
         _stop_video_player(proc)
-        if display_suspended:
-            _restore_pygame_display(screen, scr_w, scr_h, mouse_was_visible)
 
 def _draw_gif_frame(screen, pil_img, scr_w, scr_h, rotation=0, poster_id=None):
     img = pil_img.convert("RGBA")
@@ -503,20 +494,9 @@ def show_screensaver_message(screen, scr_w, scr_h, message="Waiting...", rotatio
 def display_image(screen, image_path, scr_w, scr_h, rotation=0):
     """Displays an image on the screen with a black background."""
     try:
-        with Image.open(image_path) as source:
-            img = source.convert("RGBA")
-
-        canvas = make_landscape_and_fit(
-            img, scr_w, scr_h, rotation=-rotation
-        )
-
-        # Create black background
-        bg = Image.new("RGBA", canvas.size, (0, 0, 0, 255))
-        bg.paste(canvas, (0, 0), canvas)
-
-        # Convert to pygame surface
-        surf = pil_to_surface(bg)
-
+        surf = prepare_image_surface(image_path, scr_w, scr_h, rotation)
+        if surf is None:
+            return False
         screen.blit(surf, (0, 0))
         pygame.display.flip()
 

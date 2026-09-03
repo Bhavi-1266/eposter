@@ -109,6 +109,26 @@ All configuration is done through `config.json`. Here's what each setting does:
 
 ## Usage
 
+### Local Test API
+
+The development server reads its JSON source on every request, so timing and media changes do not require a restart. It can also serve local images and videos.
+
+```bash
+mkdir -p local_test/media
+cp tools/local_api_data.example.json local_test/api_data.json
+cp /path/to/poster.png local_test/media/poster.png
+cp /path/to/video.mov local_test/media/video.mov
+python3 tools/local_api.py
+```
+
+Point the display configuration at:
+
+```json
+"poster_api_url": "http://127.0.0.1:8080/api/posters"
+```
+
+Edit `local_test/api_data.json` to change records or `duration_seconds`. Saving the file resets the generated schedule cycle. The entire `local_test/` directory is ignored by Git. To test from another device, start the server with `--host 0.0.0.0` and use the server computer's LAN IP in both the display configuration and generated media URLs.
+
 ### Starting the Display
 
 Run the display controller:
