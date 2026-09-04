@@ -2,21 +2,16 @@
 import os
 import subprocess
 import sys
-import getpass
 from pathlib import Path
 
-# --- DYNAMIC CONFIGURATION ---
-BASE_DIR = Path(__file__).resolve().parent
+# --- BOARD DEPLOYMENT CONFIGURATION ---
+BASE_DIR = Path("/home/rock/eposter")
 VENV_PATH = BASE_DIR / "venv"
 PYTHON_BIN = VENV_PATH / "bin" / "python3"
 REQ_FILE = BASE_DIR / "requirements.txt"
 SERVICE_FILES_DIR = BASE_DIR / "service_files"
 
-# Detect the actual user
-try:
-    REAL_USER = os.getenv("SUDO_USER") or os.getlogin() or getpass.getuser()
-except OSError:
-    REAL_USER = os.getenv("SUDO_USER") or getpass.getuser() or "rock"
+REAL_USER = "rock"
 
 # Service Definitions
 SERVICES = {
@@ -49,19 +44,62 @@ def run(cmd, ignore_fail=False):
     except Exception as e:
         print(f"Non-critical error: {e}")
 
+
+def install_service_units(restart=True):
+    """Render and install both systemd units for the current repo location."""
+    import pwd
+
+    if not PYTHON_BIN.exists():
+        print(f"Error: virtualenv Python not found at {PYTHON_BIN}")
+        print("Run 'sudo python3 installer.py' once for the full installation.")
+        return False
+
+    try:
+        user_info = pwd.getpwnam(REAL_USER)
+    except KeyError:
+        print(f"Error: display user '{REAL_USER}' does not exist")
+        return False
+
+    user_id = user_info.pw_uid
+    user_home = user_info.pw_dir
+    SERVICES["eposter-display"]["env"] = [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        f"HOME={user_home}",
+        "DISPLAY=:0",
+        f"XAUTHORITY={user_home}/.Xauthority",
+        f"XDG_RUNTIME_DIR=/run/user/{user_id}",
+        f"DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{user_id}/bus",
+        "SDL_VIDEODRIVER=x11",
+        "SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS=0",
+        "PYGAME_HIDE_SUPPORT_PROMPT=1",
+    ]
+
+    for name, info in SERVICES.items():
+        print(f"Installing systemd service: {name}")
+        env_lines = "\n".join(f"Environment={value}" for value in info.get("env", []))
+        with open(info["template"], "r", encoding="utf-8") as handle:
+            service_content = handle.read().format(
+                description=info["description"],
+                after=info["after"],
+                user=info["user"],
+                base_dir=BASE_DIR,
+                exec_start=info["exec"],
+                python_bin=PYTHON_BIN,
+                environment=env_lines,
+                service_name=name,
+            )
+        service_path = Path("/etc/systemd/system") / f"{name}.service"
+        service_path.write_text(service_content, encoding="utf-8")
+
+    run(["systemctl", "daemon-reload"])
+    run(["systemctl", "enable", "eposter-admin.service", "eposter-display.service"])
+    if restart:
+        run(["systemctl", "restart", "eposter-admin.service", "eposter-display.service"])
+    return True
+
 def setup():
     print(f"Installing ePoster from: {BASE_DIR}")
     os.chdir(BASE_DIR)
-
-    # Detect UID for XDG_RUNTIME_DIR
-    import pwd
-    try:
-        user_info = pwd.getpwnam(REAL_USER)
-        user_id = user_info.pw_uid
-        user_home = user_info.pw_dir
-    except KeyError:
-        user_id = 1000
-        user_home = f"/home/{REAL_USER}"
 
     # 1. Ensure system dependencies
     run(["apt-get", "update", "-y"])
@@ -125,43 +163,7 @@ polkit.addRule(function(action, subject) {{
     run("nmcli connection modify Hotspot connection.autoconnect no", ignore_fail=True)
     
     # --- 4. Systemd Services ---
-    # Update the environment with the detected UID
-    SERVICES["eposter-display"]["env"] = [
-        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-        "DISPLAY=:0",
-        f"XAUTHORITY={user_home}/.Xauthority",
-        f"XDG_RUNTIME_DIR=/run/user/{user_id}"
-    ]
-
-    # --- 4. Systemd Services ---
-    for name, info in SERVICES.items():
-        print(f"Creating systemd service: {name}")
-        env_lines = "\n".join([f"Environment={e}" for e in info.get("env", [])])
-        template_path = info["template"]
-        
-        # Ensure log directory exists
-        log_dir = BASE_DIR / "logs"
-        log_dir.mkdir(exist_ok=True)
-        run(["chown", f"{REAL_USER}:{REAL_USER}", str(log_dir)])
-
-        with open(template_path, "r") as f:
-            service_content = f.read().format(
-                description=info["description"],
-                after=info["after"],
-                user=info["user"],
-                base_dir=BASE_DIR,
-                exec_start=info["exec"],
-                environment=env_lines,
-                service_name=name,
-            )
-
-        with open(f"/etc/systemd/system/{name}.service", "w") as f:
-            f.write(service_content)
-
-    # 5. X11 & Refresh
-    run(["systemctl", "daemon-reload"])
-    run(["systemctl", "enable", "eposter-admin.service"])
-    run(["systemctl", "enable", "eposter-display.service"])
+    install_service_units(restart=True)
     
     print(f"\n[SUCCESS] Setup finished. Wi-Fi permissions granted to '{REAL_USER}'.")
     print("Hotspot autostart disabled. Please reboot.")
@@ -170,4 +172,8 @@ if __name__ == "__main__":
     if os.geteuid() != 0:
         print("Error: Run with sudo.")
         sys.exit(1)
-    setup()
+    if "--services-only" in sys.argv:
+        if not install_service_units(restart=True):
+            sys.exit(1)
+    else:
+        setup()

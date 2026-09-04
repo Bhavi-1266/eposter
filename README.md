@@ -157,6 +157,14 @@ Press `ESC` or `Q` to exit the display.
 
 To run automatically on boot, run `installer.py` to generate and install the systemd services.
 
+After pulling a code update, reinstall only the service definitions and restart both services:
+
+```bash
+sudo python3 installer.py --services-only
+```
+
+The board deployment is fixed at `/home/rock/eposter`, with the display entrypoint at `/home/rock/eposter/RunThis.py`. The display service waits for X11, uses the `rock` user's runtime directories, and prevents SDL from minimizing Pygame when the external video player takes focus.
+
 ## File Structure
 
 ```
