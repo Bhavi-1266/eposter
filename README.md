@@ -179,6 +179,24 @@ The controller will:
 3. Fetch posters from API
 4. Display them in a fullscreen slideshow
 
+### Playback countdown
+
+A compact, translucent cream badge at the top-left of the oriented display shows
+only `MM:SS` in dark digits for images, GIFs, and videos, with no progress bar. It stays
+discreetly visible without flashing or changing color. Time mode follows the remaining slot, Scroll follows the
+item's playback interval, and menu images/GIFs count down their 60-second view.
+Video timers use the shorter of the clip duration and configured time limit;
+if duration probing fails, they use the configured limit.
+
+Run the full installer after updating to install `python3-tk`, which supplies the
+small X11 overlay above the external video player. `ffprobe` comes with the
+existing `ffmpeg` dependency. The countdown does not appear on the menu list or
+screensaver.
+
+The timer styling adds no dependencies. Images and GIFs use native Pygame alpha
+blending; video overlay translucency requires an existing desktop compositor
+and falls back to a solid background when compositing is unavailable.
+
 ### Stopping the Display
 
 Press `ESC` or `Q` to exit the display.

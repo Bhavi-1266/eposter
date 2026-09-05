@@ -237,6 +237,7 @@ def run_time_mode(screen, clock):
     records, duration = get_device_records(device_id)
     
     poster_end_time = 0
+    countdown = None
     sync_interval = _cache_refresh_seconds(cfg)
     next_sync_time = time.time() + sync_interval
     last_config_check = time.time()
@@ -279,6 +280,7 @@ def run_time_mode(screen, clock):
             continue
             
         if current_time >= poster_end_time:
+            countdown = None
             now = datetime.now()
             active = None
             for r in sorted(records, key=lambda item: item.get("start_dt") or now):
@@ -318,7 +320,9 @@ def run_time_mode(screen, clock):
                         display_handler.display_image(screen, path, scr_w, scr_h, rotation)
                         display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=paper_id)
                         pygame.display.flip()
-                        poster_end_time = current_time + slot_duration
+                        poster_end_time = min(time.time() + slot_duration, active["end_dt"].timestamp())
+                        countdown = display_handler.PlaybackTimer(max(0, poster_end_time - time.time()), (scr_w, scr_h), rotation)
+                        countdown.capture(screen)
                 else:
                     print("<TIME>NO Schedualted Showing ScreenSaver")
                     display_handler.show_screensaver_message(screen, scr_w, scr_h, f"Downloading ID: {pid}...", rotation)
@@ -333,6 +337,8 @@ def run_time_mode(screen, clock):
                     clock=clock,
                 )
                 poster_end_time = time.time()
+        if countdown is not None:
+            countdown.paint(screen)
         clock.tick(30)
 
 # ---------------------------------------------------------
@@ -367,6 +373,7 @@ def run_scroll_mode(screen, clock):
     images = get_valid_media_paths(records)
     index = 0
     next_switch = 0
+    countdown = None
     sync_interval = _cache_refresh_seconds(cfg)
     next_sync_time = time.time() + sync_interval
     last_config_check = time.time()
@@ -388,6 +395,8 @@ def run_scroll_mode(screen, clock):
                 device_id = new_id
                 records, _ = refresh_data_and_cache(token, device_id)
                 images = get_valid_media_paths(records)
+                countdown = None
+                next_switch = 0
                 index = 0
                 next_sync_time = current_time + sync_interval
             last_config_check = current_time
@@ -412,6 +421,7 @@ def run_scroll_mode(screen, clock):
             continue
 
         if current_time >= next_switch:
+            countdown = None
             if index >= len(images): index = 0
             if images[index].exists():
                 image_path = images[index]
@@ -442,8 +452,12 @@ def run_scroll_mode(screen, clock):
                     display_handler.display_image(screen, image_path, scr_w, scr_h, rotation)
                     display_handler.display_url(screen, scr_w, scr_h, rotation, poster_id=paper_id)
                     pygame.display.flip()
-                    next_switch = current_time + scroll_delay
+                    next_switch = time.time() + scroll_delay
+                    countdown = display_handler.PlaybackTimer(scroll_delay, (scr_w, scr_h), rotation)
+                    countdown.capture(screen)
             index = (index + 1) % len(images)
+        if countdown is not None:
+            countdown.paint(screen)
         clock.tick(30)
 
 # ---------------------------------------------------------
@@ -575,14 +589,16 @@ def run_menu_mode(screen, clock):
             display_handler.display_url(screen, PHY_W, PHY_H, rotation, poster_id=menu_paper_id)
             pygame.display.flip()
             waiting = True
-            t_start = time.time()
+            countdown = display_handler.PlaybackTimer(60, (PHY_W, PHY_H), rotation)
+            countdown.capture(screen)
             while waiting:
                 for e in pygame.event.get():
                     if e.type == pygame.QUIT:
                         raise SystemExit
                     if e.type in [pygame.MOUSEBUTTONDOWN, pygame.KEYDOWN]:
                         waiting = False
-                if time.time() - t_start > 60: waiting = False
+                countdown.paint(screen)
+                if countdown.remaining <= 0: waiting = False
                 clock.tick(30)
 
     def item_at_position(x, y):

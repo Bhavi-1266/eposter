@@ -12,6 +12,8 @@ import shutil
 from PIL import Image, ImageSequence
 import pygame
 import socket
+import math
+from helper.playback_timer import PlaybackTimer, VideoTimerWindow
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 _IP_CACHE = {"value": "127.0.0.1", "expires": 0.0}
@@ -154,9 +156,11 @@ def _handle_playback_events(interrupt_on_input=False):
 
     return True
 
-def _wait_for_playback(seconds, clock=None, interrupt_on_input=False):
+def _wait_for_playback(seconds, clock=None, interrupt_on_input=False, on_tick=None):
     end_time = time.monotonic() + max(0, seconds)
     while time.monotonic() < end_time:
+        if on_tick:
+            on_tick()
         if not _handle_playback_events(interrupt_on_input):
             return False
         if clock:
@@ -238,6 +242,24 @@ def _apply_video_rotation(cmd, rotation):
     return cmd
 
 
+def video_countdown_duration(path, max_duration):
+    """Use clip length when it ends before the configured playback limit."""
+    duration = None
+    try:
+        result = subprocess.run([
+            "ffprobe", "-v", "error", "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1", str(path),
+        ], capture_output=True, text=True, check=True, timeout=3)
+        candidate = float(result.stdout.strip())
+        if math.isfinite(candidate) and candidate > 0:
+            duration = candidate
+    except (OSError, ValueError, subprocess.SubprocessError):
+        pass
+    if max_duration is not None:
+        duration = min(duration, max_duration) if duration is not None else max_duration
+    return duration
+
+
 def display_video(screen, video_path, scr_w, scr_h, rotation=0, max_duration=None,
                   clock=None, poster_id=None, interrupt_on_input=False,
                   next_image_path=None, next_poster_id=None):
@@ -255,6 +277,8 @@ def display_video(screen, video_path, scr_w, scr_h, rotation=0, max_duration=Non
     cmd = _apply_video_rotation(cmd, rotation)
     if Path(cmd[0]).name == "ffplay" and interrupt_on_input:
         cmd[-1:-1] = ["-exitonkeydown", "-exitonmousedown"]
+    duration = video_countdown_duration(video_path, max_duration)
+    timer_window = None
     proc = None
     next_surface = None
     if next_image_path and not is_video_file(next_image_path) and not is_animated_gif(next_image_path):
@@ -269,11 +293,25 @@ def display_video(screen, video_path, scr_w, scr_h, rotation=0, max_duration=Non
             return False
 
         start = time.monotonic()
+        if duration is not None:
+            try:
+                timer_window = VideoTimerWindow(PlaybackTimer(duration, (scr_w, scr_h), rotation), interrupt_on_input)
+            except Exception as error:
+                print(f"[display] Video countdown unavailable: {error}. Run the installer to install python3-tk.")
         next_image_drawn = False
         while True:
             if proc.poll() is not None:
                 break
 
+            if timer_window is not None:
+                try:
+                    timer_window.tick()
+                    if timer_window.closed:
+                        return True
+                except Exception as error:
+                    print(f"[display] Video countdown stopped: {error}")
+                    timer_window.close()
+                    timer_window = None
             elapsed = time.monotonic() - start
             if next_surface is not None and not next_image_drawn and elapsed >= 0.35:
                 screen.blit(next_surface, (0, 0))
@@ -304,8 +342,10 @@ def display_video(screen, video_path, scr_w, scr_h, rotation=0, max_duration=Non
         return False
     finally:
         _stop_video_player(proc)
+        if timer_window is not None:
+            timer_window.close()
 
-def _draw_gif_frame(screen, pil_img, scr_w, scr_h, rotation=0, poster_id=None):
+def _draw_gif_frame(screen, pil_img, scr_w, scr_h, rotation=0, poster_id=None, timer=None):
     img = pil_img.convert("RGBA")
     canvas = make_landscape_and_fit(img, scr_w, scr_h, rotation=-rotation)
 
@@ -318,6 +358,9 @@ def _draw_gif_frame(screen, pil_img, scr_w, scr_h, rotation=0, poster_id=None):
     if poster_id is not None:
         display_url(screen, scr_w, scr_h, rotation, poster_id=poster_id)
 
+    if timer is not None:
+        timer.capture(screen)
+        timer.paint(screen)
     pygame.display.flip()
     return True
 
@@ -514,24 +557,26 @@ def display_animated_gif(screen, gif_path, scr_w, scr_h, rotation=0, max_duratio
         if not frames:
             return display_image(screen, gif_path, scr_w, scr_h, rotation)
 
-        start_time = time.time()
+        start_time = time.monotonic()
+        total_duration = max_duration if max_duration is not None else sum(durations) / 1000
+        timer = PlaybackTimer(total_duration, (scr_w, scr_h), rotation)
 
         while True:
             for frame, duration_ms in zip(frames, durations):
-                if max_duration is not None and time.time() - start_time >= max_duration:
+                if max_duration is not None and time.monotonic() - start_time >= max_duration:
                     return True
 
                 if not _handle_playback_events(interrupt_on_input):
                     return True
 
-                _draw_gif_frame(screen, frame, scr_w, scr_h, rotation, poster_id=poster_id)
+                _draw_gif_frame(screen, frame, scr_w, scr_h, rotation, poster_id=poster_id, timer=timer)
 
                 wait_seconds = duration_ms / 1000
                 if max_duration is not None:
-                    remaining = max_duration - (time.time() - start_time)
+                    remaining = max_duration - (time.monotonic() - start_time)
                     wait_seconds = min(wait_seconds, max(0, remaining))
 
-                if not _wait_for_playback(wait_seconds, clock, interrupt_on_input):
+                if not _wait_for_playback(wait_seconds, clock, interrupt_on_input, on_tick=lambda: timer.paint(screen)):
                     return True
 
             if max_duration is None:
