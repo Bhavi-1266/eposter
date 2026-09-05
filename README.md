@@ -163,6 +163,15 @@ After pulling a code update, reinstall only the service definitions and restart 
 sudo python3 installer.py --services-only
 ```
 
+The full installer is safe to rerun on an existing board:
+
+```bash
+cd /home/rock/eposter
+sudo python3 installer.py
+```
+
+It preserves `config.json`, validates the configured poster API, repairs ownership of runtime JSON/cache files, updates dependencies, replaces both old service units, and restarts them. If `config.json` is missing, it creates one from `config.example.json` without inventing credentials or an API URL.
+
 The board deployment is fixed at `/home/rock/eposter`, with the display entrypoint at `/home/rock/eposter/RunThis.py`. The display service waits for X11, uses the `rock` user's runtime directories, and prevents SDL from minimizing Pygame when the external video player takes focus.
 
 ## File Structure

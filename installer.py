@@ -2,6 +2,8 @@
 import os
 import subprocess
 import sys
+import json
+import shutil
 from pathlib import Path
 
 # --- BOARD DEPLOYMENT CONFIGURATION ---
@@ -41,8 +43,62 @@ def run(cmd, ignore_fail=False):
     print(f"--> Executing: {' '.join(cmd) if isinstance(cmd, list) else cmd}")
     try:
         subprocess.run(cmd, check=not ignore_fail, shell=isinstance(cmd, str))
+        return True
     except Exception as e:
-        print(f"Non-critical error: {e}")
+        if ignore_fail:
+            print(f"Non-critical error: {e}")
+            return False
+        raise
+
+
+def prepare_runtime_state(user_info):
+    """Preserve configuration and make runtime state writable by the display."""
+    config_path = BASE_DIR / "config.json"
+    example_path = BASE_DIR / "config.example.json"
+    config_lock_path = BASE_DIR / ".config.json.lock"
+
+    if not config_path.exists():
+        if not example_path.exists():
+            print(f"Error: neither {config_path} nor {example_path} exists")
+            return False
+        shutil.copyfile(example_path, config_path)
+        print(f"Created {config_path} from config.example.json")
+
+    try:
+        with config_path.open("r", encoding="utf-8") as handle:
+            config = json.load(handle)
+    except (OSError, ValueError) as error:
+        print(f"Error: config.json is not valid/readable: {error}")
+        return False
+
+    api_url = config.get("api", {}).get("poster_api_url")
+    if api_url:
+        print(f"Poster API configured: {api_url}")
+    else:
+        print("Warning: api.poster_api_url is empty in config.json")
+
+    config_lock_path.touch(exist_ok=True)
+    shared_files = [config_path, config_lock_path]
+    for optional_name in ("api_data.json", "event_data.json"):
+        optional_path = BASE_DIR / optional_name
+        if optional_path.exists():
+            shared_files.append(optional_path)
+
+    for shared_path in shared_files:
+        os.chown(shared_path, user_info.pw_uid, user_info.pw_gid)
+        shared_path.chmod(0o660 if shared_path == config_lock_path else 0o640)
+
+    for directory_name in ("eposter_cache", "local_test"):
+        directory = BASE_DIR / directory_name
+        directory.mkdir(parents=True, exist_ok=True)
+        for path in [directory] + list(directory.rglob("*")):
+            if path.is_symlink():
+                continue
+            os.chown(path, user_info.pw_uid, user_info.pw_gid)
+            path.chmod(0o750 if path.is_dir() else 0o640)
+
+    print(f"Runtime files are owned by {REAL_USER}:{user_info.pw_gid}")
+    return True
 
 
 def install_service_units(restart=True):
@@ -62,6 +118,10 @@ def install_service_units(restart=True):
 
     user_id = user_info.pw_uid
     user_home = user_info.pw_dir
+
+    if not prepare_runtime_state(user_info):
+        return False
+
     SERVICES["eposter-display"]["env"] = [
         "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
         f"HOME={user_home}",
@@ -112,7 +172,10 @@ def setup():
     # 2. Virtual Env & Requirements
     if not os.path.exists(VENV_PATH):
         run(["python3", "-m", "venv", str(VENV_PATH)])
-    
+
+    # Do not update an environment while the old services are importing it.
+    run(["systemctl", "stop", "eposter-admin.service", "eposter-display.service"], ignore_fail=True)
+
     pip_bin = VENV_PATH / "bin" / "pip"
     if REQ_FILE.exists():
         run([str(pip_bin), "install", "-r", str(REQ_FILE)])
@@ -163,7 +226,8 @@ polkit.addRule(function(action, subject) {{
     run("nmcli connection modify Hotspot connection.autoconnect no", ignore_fail=True)
     
     # --- 4. Systemd Services ---
-    install_service_units(restart=True)
+    if not install_service_units(restart=True):
+        raise RuntimeError("Failed to install ePoster services")
     
     print(f"\n[SUCCESS] Setup finished. Wi-Fi permissions granted to '{REAL_USER}'.")
     print("Hotspot autostart disabled. Please reboot.")
