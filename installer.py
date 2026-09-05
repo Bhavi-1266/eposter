@@ -166,7 +166,7 @@ def setup():
     run([
         "apt-get", "install", "-y", "python3-venv", "python3-pip",
         "x11-xserver-utils", "network-manager", "polkitd", "ffmpeg", "jq",
-        "fonts-dejavu-core",
+        "fonts-dejavu-core", "git",
     ])
 
     # 2. Virtual Env & Requirements

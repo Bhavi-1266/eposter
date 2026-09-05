@@ -71,3 +71,22 @@ The regression checks use temporary configuration and mocked system commands:
     python3 -m unittest discover -s tests -p test_portal.py
 
 Waitress tuning follows https://docs.pylonsproject.org/projects/waitress/en/stable/arguments.html.
+
+## Software updates
+
+The authenticated, CSRF-protected `POST /api/update` also requires the current
+admin password. It launches a separate systemd service, so restarting the portal
+does not interrupt installation. `GET /api/update` reports persistent progress
+and detects an interrupted job. Concurrent starts are rejected.
+
+The worker runs Git as the checkout owner, requires `main` with no tracked edits,
+pulls `origin main` using `--ff-only`, then runs `/usr/bin/python3 installer.py`
+as root. Remote access must work without prompts. Pull failures skip installation;
+installer failures attempt to start both services again. Detailed installer output
+is in `journalctl -u eposter-update.service`; state is in ignored
+`.update-status.json`. A failed install may leave updated code or dependencies;
+there is no automatic rollback.
+
+Device configuration (`config.json`), its backups, portal session secret, feeds,
+cache, generated output, environments, logs, and local agent settings are ignored.
+Keep `config.example.json` and example API data tracked for fresh installations.

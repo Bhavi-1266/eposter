@@ -22,6 +22,7 @@ from flask import Flask, g, jsonify, redirect, render_template, request, session
 from werkzeug.exceptions import HTTPException
 
 from helper.json_utils import atomic_write_json
+from device_update import UNIT, update_status, write_status
 
 PROJECT_DIR = Path(__file__).resolve().parent
 CONFIG_LIMIT = 256 * 1024
@@ -293,10 +294,10 @@ def create_app(project_dir=None):
     snapshot = {"expires": 0, "data": None}
     status_lock, mutation_lock, login_lock = threading.Lock(), threading.Lock(), threading.Lock()
     failures = OrderedDict()
-    protected = {"home", "save", "status", "powersave_status", "toggle_powersave"}
+    protected = {"home", "save", "status", "powersave_status", "toggle_powersave", "start_update", "get_update"}
 
     def wants_json():
-        return request.endpoint in {"save", "status", "powersave_status", "toggle_powersave"} or request.headers.get("Accept") == "application/json"
+        return request.endpoint in {"save", "status", "powersave_status", "toggle_powersave", "start_update", "get_update"} or request.headers.get("Accept") == "application/json"
 
     def csrf_token():
         if "csrf_token" not in session:
@@ -424,6 +425,43 @@ def create_app(project_dir=None):
         result["mode"] = g.config["display"].get("Mode")
         result["device_id"] = g.config["display"].get("device_id")
         return jsonify(success=True, device=result)
+
+    @app.get("/api/update")
+    def get_update():
+        result = update_status(project_dir)
+        if result.get("state") in {"queued", "running"}:
+            active = subprocess.run(["systemctl", "is-active", UNIT], capture_output=True, text=True, timeout=3)
+            if active.stdout.strip() not in {"active", "activating", "reloading"}:
+                result = {"state": "failed", "message": "Update job stopped unexpectedly. Check the update service journal on the device."}
+        return jsonify(success=True, update=result)
+
+    @app.post("/api/update")
+    def start_update():
+        data = request.get_json(silent=True) or {}
+        if not isinstance(data, dict) or not same_text(data.get("admin_password"), g.config["password"]):
+            raise PortalError("Enter your admin password in the Save settings bar first.", 403)
+        if os.geteuid() != 0 or not shutil.which("systemd-run"):
+            raise PortalError("Updates require the installed root admin service and systemd.", 503)
+        with (project_dir / ".update-launch.lock").open("a+") as lock:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                raise PortalError("An update is already being started.", 409) from None
+            active = subprocess.run(["systemctl", "is-active", UNIT], capture_output=True, text=True, timeout=3)
+            if active.stdout.strip() in {"active", "activating", "reloading", "deactivating"}:
+                raise PortalError("An update is already running.", 409)
+            write_status(project_dir, "queued", "Starting software update. The portal may temporarily disconnect.")
+            try:
+                subprocess.run([
+                    "systemd-run", "--unit=" + UNIT, "--collect",
+                    "--property=Type=exec", "--property=RuntimeMaxSec=40min",
+                    "--property=UMask=0027", "--working-directory=" + str(project_dir),
+                    "/usr/bin/python3", str(project_dir / "device_update.py"),
+                ], check=True, capture_output=True, text=True, timeout=5)
+            except (OSError, subprocess.SubprocessError):
+                write_status(project_dir, "failed", "Could not start the update job. Check the admin service journal.")
+                raise PortalError("Could not start the update job. Check the admin service journal.", 503) from None
+        return jsonify(success=True, update=update_status(project_dir)), 202
 
     @app.get("/powersave_status")
     def powersave_status():

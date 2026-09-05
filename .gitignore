@@ -13,3 +13,14 @@ output.png
 api_data.json
 event_data.json
 /local_test/
+
+# Device-local update state, environments, and configuration backups
+.update-status.json
+.venv/
+.env
+.env.*
+!.env.example
+/config.json.*
+*.log
+/.agents/
+/.codex/

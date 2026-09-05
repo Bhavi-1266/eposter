@@ -52,6 +52,40 @@ class PortalTests(unittest.TestCase):
             ssid1="Conference", ssid2="", pass1="", pass2="", poster_token="",
         )
 
+    def test_update_requires_login_csrf_and_password(self):
+        self.assertEqual(self.client.get("/api/update").status_code, 401)
+        self.assertEqual(self.client.post("/api/update").status_code, 401)
+        self.login()
+        self.assertEqual(self.client.post("/api/update", json={}).status_code, 403)
+        with patch("config_portal.subprocess.run") as run:
+            response = self.client.post("/api/update", json={"admin_password": "wrong"},
+                                        headers={"X-CSRF-Token": self.token()})
+        self.assertEqual(response.status_code, 403)
+        run.assert_not_called()
+
+    def test_update_launch_and_duplicate(self):
+        self.login()
+        headers = {"X-CSRF-Token": self.token()}
+        with patch("config_portal.os.geteuid", return_value=0), patch("config_portal.shutil.which", return_value="/usr/bin/systemd-run"), patch("config_portal.subprocess.run") as run:
+            run.return_value = subprocess.CompletedProcess([], 0, stdout="inactive\n")
+            response = self.client.post("/api/update", json={"admin_password": self.config["password"]}, headers=headers)
+            self.assertEqual(response.status_code, 202)
+            command = run.call_args.args[0]
+            self.assertEqual(command[0], "systemd-run")
+            self.assertIn("--unit=eposter-update.service", command)
+            run.reset_mock()
+            run.return_value = subprocess.CompletedProcess([], 0, stdout="active\n")
+            response = self.client.post("/api/update", json={"admin_password": self.config["password"]}, headers=headers)
+            self.assertEqual(response.status_code, 409)
+            self.assertEqual(run.call_count, 1)
+
+    def test_update_detects_interrupted_job(self):
+        self.login()
+        portal.write_status(self.root, "running", "Installing")
+        with patch("config_portal.subprocess.run", return_value=subprocess.CompletedProcess([], 3, stdout="inactive\n")):
+            response = self.client.get("/api/update")
+        self.assertEqual(response.json["update"]["state"], "failed")
+
     def test_authentication_and_csrf_are_required(self):
         self.assertEqual(self.client.get("/api/status").status_code, 401)
         self.client.get("/login")

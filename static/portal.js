@@ -64,6 +64,7 @@
     byId("edit-state").textContent = state.busy ? "Working..." : (state.dirty ? "Unsaved changes" : "No unsaved changes");
     byId("save-button").disabled = state.busy || !state.dirty;
     byId("discard").disabled = state.busy || !state.dirty;
+    byId("update-button").disabled = state.busy || state.dirty || state.updating;
   }
 
   function announce(message, kind, focus = false) {
@@ -322,6 +323,53 @@
       updateDirty();
     }
   }
+
+  function renderUpdate(data) {
+    state.updating = ["queued", "running"].includes(data.state);
+    byId("update-feedback").textContent = data.message;
+    byId("update-button").textContent = state.updating ? "Updating…" : "Update software";
+    updateDirty();
+  }
+
+  async function refreshUpdate() {
+    if (document.hidden) return;
+    try {
+      const result = await api("/api/update");
+      renderUpdate(result.update);
+    } catch (error) {
+      byId("update-feedback").textContent = state.updating
+        ? "Waiting for the portal to reconnect. The update may still be running."
+        : error.message;
+    }
+  }
+
+  byId("update-button").addEventListener("click", async () => {
+    if (state.busy || state.dirty || state.updating) return;
+    const password = byId("admin_password");
+    if (!password.value) {
+      byId("update-feedback").textContent = "Enter your admin password in the save bar first.";
+      revealField(password);
+      return;
+    }
+    state.busy = true;
+    updateDirty();
+    try {
+      const result = await api("/api/update", {method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({admin_password: password.value})});
+      password.value = "";
+      renderUpdate(result.update);
+    } catch (error) {
+      byId("update-feedback").textContent = error.message + " Checking whether the update started…";
+      await refreshUpdate();
+      if (!state.updating) byId("update-feedback").textContent = error.message;
+    } finally {
+      state.busy = false;
+      updateDirty();
+    }
+  });
+  refreshUpdate();
+  setInterval(refreshUpdate, 10000);
 
   byId("check-power").addEventListener("click", () => powerAction());
   byId("power-off").addEventListener("click", () => powerAction(false));

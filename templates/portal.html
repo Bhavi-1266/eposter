@@ -129,6 +129,13 @@
       <div class="save-actions"><button type="button" class="button quiet" id="discard">Discard edits</button><button type="submit" class="button primary" id="save-button">Save settings</button></div>
     </section>
   </form>
+  <section class="card settings-card" aria-labelledby="update-heading">
+    <h2 id="update-heading">Software update</h2>
+    <p>Install the latest version. Your saved device settings are kept. The display and portal will restart during installation.</p>
+    <p class="help">Save or discard your edits, then enter the admin password in the save bar.</p>
+    <button type="button" class="button secondary" id="update-button">Update software</button>
+    <p id="update-feedback" role="status">Checking update status…</p>
+  </section>
   <footer class="page-footer"><span>ePoster Manager &middot; Local device control</span><span>Status checks every 30 seconds while this tab is visible.</span></footer>
 </main>
 {% endblock %}

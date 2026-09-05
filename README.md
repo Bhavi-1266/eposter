@@ -116,16 +116,28 @@ status, field-level validation, save-conflict detection, and visible connection
 errors. It uses local assets and pauses status polling when the browser tab is
 hidden. See [Portal operations](docs/PORTAL.md) for resource limits and diagnostics.
 
-For this portal update, run the full installer after pulling the updated code:
+Use **Software update → Update software** in the portal to pull `origin main`
+and run the full installer. Save or discard pending edits and enter the admin
+password first. Progress survives the portal restart; reload after completion.
+The device must have a clean checkout on `main` and noninteractive access to its
+Git remote. Updates use `git pull --ff-only origin main` and preserve ignored
+configuration and runtime files.
+
+To enable this button on an older device, pull this release and run once:
 
 ```bash
 cd /home/rock/eposter
 sudo python3 installer.py
 ```
 
-This installs the new Waitress dependency and restarts the admin service. The
-`--services-only` option does not install new dependencies. Sign in again after
-the update; existing sessions need the new security token.
+Update jobs run independently as `eposter-update.service`. For diagnostics:
+
+```bash
+sudo journalctl -u eposter-update.service --no-pager
+```
+
+If installation fails after pulling, code may already be updated. Resolve the
+reported issue and retry the full installer; updates do not automatically roll back.
 
 ### Local Test API
 
