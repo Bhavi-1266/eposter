@@ -1,0 +1,22 @@
+{
+  "device_id": 1,
+  "repeat_for_minutes": 120,
+  "records": [
+    {
+      "id": 1,
+      "paper_id": "LOCAL-IMAGE",
+      "paper_title": "Local test image",
+      "eposter_file": "/media/poster.png",
+      "media_type": "image",
+      "duration_seconds": 10
+    },
+    {
+      "id": 2,
+      "paper_id": "LOCAL-VIDEO",
+      "paper_title": "Local test video",
+      "eposter_file": "/media/video.mov",
+      "media_type": "video",
+      "duration_seconds": 20
+    }
+  ]
+}

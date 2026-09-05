@@ -1,554 +1,461 @@
 #!/usr/bin/env python3
-import socket
-import time
-import subprocess
+"""Local management portal with bounded requests and no display imports."""
+import copy
+import errno
+import fcntl
+import hashlib
+import hmac
+import json
+import os
 import secrets
+import shutil
+import socket
+import subprocess
+import threading
+import time
+from collections import OrderedDict
+from datetime import datetime, timedelta
 from pathlib import Path
-from flask import Flask, request, redirect, render_template_string, jsonify, session, url_for
-from helper.json_utils import load_json_file, update_json_file
+from urllib.parse import urlsplit
 
-# --- Config ---
+from flask import Flask, g, jsonify, redirect, render_template, request, session, url_for
+from werkzeug.exceptions import HTTPException
+
+from helper.json_utils import atomic_write_json
+
 PROJECT_DIR = Path(__file__).resolve().parent
-CONFIG_FILE = PROJECT_DIR / 'config.json'
-POWERSAVE_SCRIPT = PROJECT_DIR / 'service_files' / 'wifi_powersave.sh'
-PORT = 80
+CONFIG_LIMIT = 256 * 1024
+DEFAULTS = {
+    "ID": 0,
+    "wifi": {"ssid1": "", "password1": "", "ssid2": "", "password2": "", "connect_timeout": 20},
+    "api": {"poster_api_url": "", "poster_token": "", "request_timeout": 15, "max_media_size_mb": 512},
+    "display": {"device_id": 1, "rotation_degree": 0, "Mode": "Menu", "Auto_Scroll": 5, "cache_refresh": 60},
+}
 
-app = Flask(__name__)
-SECRET_FILE = PROJECT_DIR / '.portal_secret'
-try:
-    if SECRET_FILE.exists():
-        app.secret_key = SECRET_FILE.read_text(encoding='utf-8').strip()
-    else:
-        app.secret_key = secrets.token_hex(32)
-        SECRET_FILE.write_text(app.secret_key, encoding='utf-8')
-        SECRET_FILE.chmod(0o600)
-except OSError:
-    app.secret_key = secrets.token_hex(32)
-app.config.update(SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='Lax')
 
-# --- Login Template ---
-LOGIN_TEMPLATE = """
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ePoster Manager - Login</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-container { max-width: 400px; width: 100%; background: white; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
-        .header h1 { font-size: 28px; margin-bottom: 5px; }
-        .header p { font-size: 14px; opacity: 0.9; }
-        .content { padding: 30px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 5px; color: #333; font-weight: bold; font-size: 14px; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
-        input:focus { outline: none; border-color: #667eea; }
-        .btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 10px; }
-        .btn:hover { opacity: 0.9; }
-        .error { background: #fee; color: #c33; padding: 10px; border-radius: 5px; margin-bottom: 15px; border-left: 4px solid #c33; font-size: 14px; }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <div class="header">
-            <h1>ePoster Manager</h1>
-            <p>Admin Login</p>
-        </div>
-        <div class="content">
-            {% if error %}
-            <div class="error">{{ error }}</div>
-            {% endif %}
-            <form method="POST" action="/login">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" name="username" required autofocus>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" required>
-                </div>
-                <button type="submit" class="btn">Login</button>
-            </form>
-        </div>
-    </div>
-</body>
-</html>
-"""
+class PortalError(Exception):
+    def __init__(self, message, status=400, fields=None):
+        super().__init__(message)
+        self.status = status
+        self.fields = fields or {}
 
-# --- HTML Template ---
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ePoster Manager</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
-        .header h1 { font-size: 28px; margin-bottom: 10px; }
-        .status { background: rgba(255,255,255,0.2); padding: 10px; border-radius: 5px; margin-top: 15px; font-size: 14px; }
-        .content { padding: 30px; }
-        .section { margin-bottom: 30px; }
-        .section h2 { color: #667eea; margin-bottom: 15px; font-size: 18px; border-bottom: 2px solid #667eea; padding-bottom: 5px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: #333; font-weight: bold; font-size: 14px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
-        input:focus, select:focus { outline: none; border-color: #667eea; }
-        input[readonly] { background: #f5f5f5; cursor: not-allowed; }
-        .btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 20px; }
-        .btn:hover { opacity: 0.9; }
-        .error { background: #fee; color: #c33; padding: 10px; border-radius: 5px; margin-bottom: 15px; border-left: 4px solid #c33; }
-        .note { font-size: 12px; color: #666; margin-top: 5px; }
-        
-        /* Toast Notification Styles */
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 1000;
-            animation: slideIn 0.3s ease-out;
-            display: none;
-        }
-        .toast.success { background: #4caf50; }
-        .toast.error { background: #f44336; }
-        .toast.show { display: block; }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div id="toast" class="toast"></div>
-    
-    <div class="container">
-        <div class="header">
-            <h1>ePoster Manager</h1>
-            <div class="status">
-                <strong>Current Status</strong><br>
-                Connected to: {{ hostname }}<br>
-                Device ID: {{ config.ID }}
-            </div>
-        </div>
-        <div class="content">
-            <form method="POST" action="/save" id="configForm">
-                <div class="section">
-                    <h2>Authorization</h2>
-                    <div class="form-group">
-                        <label>Admin Password (Required to Save)</label>
-                        <input type="password" name="admin_password" id="admin_password" required>
-                        <div class="note">Enter your admin password to save changes</div>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h2>Power Management</h2>
-                    <div class="form-group">
-                        <label>WiFi Power Saving</label>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <button type="button" id="powerSaveBtn" class="btn" style="width: auto; padding: 10px 20px; margin: 0;">Turn On</button>
-                            <span id="powerSaveStatus" style="color: #666; font-size: 14px;">Currently: OFF</span>
-                        </div>
-                        <div class="note">Enable WiFi power saving to reduce power consumption</div>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h2>Identity</h2>
-                    <div class="form-group">
-                        <label>Unit ID (Read Only)</label>
-                        <input type="number" name="unit_id" value="{{ config.ID }}" readonly>
-                    </div>
-                </div>
 
-                <div class="section">
-                    <h2>Operation Mode</h2>
-                    <div class="form-group">
-                        <label>Current Mode</label>
-                        <select name="mode">
-                            <option value="Time" {% if config.display.Mode == "Time" %}selected{% endif %}>Time Schedule</option>
-                            <option value="Menu" {% if config.display.Mode == "Menu" %}selected{% endif %}>Menu (Interactive)</option>
-                            <option value="Scroll" {% if config.display.Mode == "Scroll" %}selected{% endif %}>Auto Scroll</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Auto Scroll Duration (Seconds)</label>
-                        <input type="number" name="auto_scroll" value="{{ config.display.Auto_Scroll }}" min="1">
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>Display Config</h2>
-                    <div class="form-group">
-                        <label>Content ID (Screen Number)</label>
-                        <input type="number" name="device_id" value="{{ config.display.device_id }}" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>Rotation (0, 90, 180, 270)</label>
-                        <select name="rotation">
-                            <option value="0" {% if config.display.rotation_degree == 0 %}selected{% endif %}>0°</option>
-                            <option value="90" {% if config.display.rotation_degree == 90 %}selected{% endif %}>90°</option>
-                            <option value="180" {% if config.display.rotation_degree == 180 %}selected{% endif %}>180°</option>
-                            <option value="270" {% if config.display.rotation_degree == 270 %}selected{% endif %}>270°</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>Wi-Fi Settings</h2>
-                    <div class="form-group">
-                        <label>Primary SSID</label>
-                        <input type="text" name="ssid1" value="{{ config.wifi.ssid1 }}">
-                    </div>
-                    <div class="form-group">
-                        <label>Primary Password</label>
-                        <input type="password" name="pass1" value="{{ config.wifi.password1 }}">
-                    </div>
-                    <div class="form-group">
-                        <label>Backup SSID</label>
-                        <input type="text" name="ssid2" value="{{ config.wifi.ssid2 }}">
-                    </div>
-                    <div class="form-group">
-                        <label>Backup Password</label>
-                        <input type="password" name="pass2" value="{{ config.wifi.password2 }}">
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>API Configuration</h2>
-                    <div class="form-group">
-                        <label>Poster API URL</label>
-                        <input type="text" name="poster_api_url" value="{{ config.api.poster_api_url }}">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn">Save Changes</button>
-            </form>
-        </div>
-    </div>
-    
-    <script>
-        const form = document.getElementById('configForm');
-        const toast = document.getElementById('toast');
-        const powerSaveBtn = document.getElementById('powerSaveBtn');
-        const powerSaveStatus = document.getElementById('powerSaveStatus');
-        let isPowerSaveOn = false;
-        
-        function showToast(message, type) {
-            toast.textContent = message;
-            toast.className = 'toast ' + type + ' show';
-            
-            setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s ease-out';
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    toast.style.animation = '';
-                }, 300);
-            }, 3000);
-        }
-        
-        // Fetch current power save status on page load
-        async function fetchPowerSaveStatus() {
-            try {
-                const response = await fetch('/powersave_status');
-                const result = await response.json();
-                
-                if (result.success) {
-                    isPowerSaveOn = result.status === 'ON';
-                    updatePowerSaveUI();
-                }
-            } catch (error) {
-                console.error('Error fetching power save status:', error);
-            }
-        }
-        
-        function updatePowerSaveUI() {
-            powerSaveBtn.textContent = isPowerSaveOn ? 'Turn Off' : 'Turn On';
-            powerSaveStatus.textContent = 'Currently: ' + (isPowerSaveOn ? 'ON' : 'OFF');
-            powerSaveStatus.style.color = isPowerSaveOn ? '#4caf50' : '#666';
-        }
-        
-        // Fetch status on page load
-        fetchPowerSaveStatus();
-        
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(form);
-            
-            try {
-                const response = await fetch('/save', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast(result.message, 'success');
-                    // Clear password field after successful save
-                    document.getElementById('admin_password').value = '';
-                } else {
-                    showToast(result.message, 'error');
-                }
-            } catch (error) {
-                showToast('Error saving settings', 'error');
-            }
-        });
-        
-        powerSaveBtn.addEventListener('click', async () => {
-            try {
-                powerSaveBtn.disabled = true;
-                powerSaveBtn.textContent = 'Processing...';
-                
-                const response = await fetch('/toggle_powersave', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ enable: !isPowerSaveOn })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    isPowerSaveOn = !isPowerSaveOn;
-                    powerSaveBtn.textContent = isPowerSaveOn ? 'Turn Off' : 'Turn On';
-                    powerSaveStatus.textContent = 'Currently: ' + (isPowerSaveOn ? 'ON' : 'OFF');
-                    powerSaveStatus.style.color = isPowerSaveOn ? '#4caf50' : '#666';
-                    showToast(result.message, 'success');
-                } else {
-                    showToast(result.message, 'error');
-                }
-            } catch (error) {
-                showToast('Error toggling power save', 'error');
-            } finally {
-                powerSaveBtn.disabled = false;
-            }
-        });
-    </script>
-</body>
-</html>
-"""
-
-# --- Helper: Get IP Address ---
-def get_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+def read_config(project_dir):
+    """Fail visibly rather than substituting credentials for unreadable state."""
     try:
-        # Doesn't actually connect, just used to find local IP
-        s.connect(('8.8.8.8', 1))
-        IP = s.getsockname()[0]
-    except Exception:
-        IP = '127.0.0.1'
-    finally:
-        s.close()
-    return IP
-
-# --- Passive Wi-Fi Check ---
-def wait_for_wifi(timeout_interval=5):
-    """
-    Waits until the device has a valid network IP 
-    and can reach the outside world.
-    """
-    print("[*] Entering Passive Mode: Waiting for Wi-Fi connection...")
-    while True:
-        ip = get_ip()
-        if ip != '127.0.0.1':
-            print(f"[*] Wi-Fi Connected! Local IP: {ip}")
-            return ip
+        with (project_dir / "config.json").open("rb") as handle:
+            raw = handle.read(CONFIG_LIMIT + 1)
+        if len(raw) > CONFIG_LIMIT:
+            raise PortalError("config.json exceeds the 256 KB limit.", 503)
+        data = json.loads(raw)
+    except FileNotFoundError:
+        raise PortalError("config.json is missing. Run the installer on the board to create it.", 503) from None
+    except PermissionError:
+        raise PortalError("Cannot read config.json. Run the installer to repair its permissions.", 503) from None
+    except (ValueError, UnicodeError):
+        raise PortalError("config.json contains invalid JSON. Correct the file on the board; no settings were overwritten.", 503) from None
+    except OSError:
+        raise PortalError("Cannot read config.json. Check the board's storage and permissions.", 503) from None
+    if not isinstance(data, dict):
+        raise PortalError("config.json must contain a JSON object.", 503)
+    for key, default in DEFAULTS.items():
+        if isinstance(default, dict):
+            if key in data and not isinstance(data[key], dict):
+                raise PortalError("The '{}' section of config.json must be an object.".format(key), 503)
+            section = copy.deepcopy(default)
+            section.update(data.get(key, {}))
+            data[key] = section
         else:
-            print(f"[-] No connection found. Retrying in {timeout_interval}s...")
-            time.sleep(timeout_interval)
+            data.setdefault(key, default)
+    if not all(isinstance(data.get(key), str) and data[key] for key in ("username", "password")):
+        raise PortalError("Admin credentials are missing from config.json. Set username and password on the board.", 503)
+    return data, hashlib.sha256(raw).hexdigest()
 
-# --- Config Management ---
-def load_config():
-    default_config = {
-        "ID": 0,
-        "username": "admin",
-        "password": "admin",
-        "wifi": {"ssid1": "", "password1": "", "ssid2": "", "password2": ""},
-        "api": {"poster_api_url": ""},
-        "display": {
-            "device_id": 0,
-            "rotation_degree": 0,
-            "Mode": "Menu",
-            "Auto_Scroll": 5
-        }
-    }
-    
-    data = load_json_file(CONFIG_FILE, {}) or {}
 
-    def merge_defaults(target, defaults):
-        for key, value in defaults.items():
-            if key not in target:
-                target[key] = value
-            elif isinstance(value, dict) and isinstance(target[key], dict):
-                merge_defaults(target[key], value)
+def same_text(first, second):
+    return isinstance(first, str) and isinstance(second, str) and hmac.compare_digest(first.encode(), second.encode())
 
-    merge_defaults(data, default_config)
-    return data
 
-# --- Web Routes ---
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'GET':
-        return render_template_string(LOGIN_TEMPLATE, error=None)
-    
-    # POST: Handle login
-    username = request.form.get('username')
-    password = request.form.get('password')
-    conf = load_config()
-    
-    # Check credentials (both from config)
-    if username == conf.get('username') and password == conf.get('password'):
-        session['logged_in'] = True
-        return redirect(url_for('home'))
-    else:
-        return render_template_string(LOGIN_TEMPLATE, error='Invalid username or password')
+def credential_version(config, secret):
+    # Flask cookies are signed, not encrypted. Do not expose an unkeyed
+    # password fingerprint that could be used for offline guessing.
+    value = json.dumps([config["username"], config["password"]]).encode()
+    return hmac.new(secret.encode(), value, hashlib.sha256).hexdigest()
 
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)
-    return redirect(url_for('login'))
 
-@app.route('/')
-def home():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    
-    conf = load_config()
-    return render_template_string(HTML_TEMPLATE, config=conf, hostname=f"ePoster-{conf['ID']}")
-
-@app.route('/save', methods=['POST'])
-def save():
-    if not session.get('logged_in'):
-        return jsonify({'success': False, 'message': 'Not authenticated'})
-    
-    conf = load_config()
-    input_password = request.form.get('admin_password')
-    
-    if input_password != conf.get('password'):
-        return jsonify({'success': False, 'message': 'Incorrect Admin Password'})
-    
+def session_secret(project_dir):
+    path = project_dir / ".portal_secret"
     try:
-        device_id = max(0, int(request.form.get('device_id')))
-        rotation = int(request.form.get('rotation'))
-        mode = request.form.get('mode')
-        auto_scroll = max(1, int(request.form.get('auto_scroll')))
-        if rotation not in (0, 90, 180, 270) or mode not in ('Time', 'Menu', 'Scroll'):
-            raise ValueError('Invalid display mode or rotation')
+        value = path.read_text(encoding="utf-8").strip()
+        if len(value) >= 32:
+            return value
+    except FileNotFoundError:
+        pass
+    value = secrets.token_hex(32)
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+        os.fchmod(handle.fileno(), 0o600)
+        handle.write(value)
+    return value
 
-        def apply_form(latest):
-            latest = latest or conf
-            latest.setdefault('display', {}).update({
-                'device_id': device_id,
-                'rotation_degree': rotation,
-                'Mode': mode,
-                'Auto_Scroll': auto_scroll,
+
+def validate_form(form):
+    errors, values = {}, {}
+    for field, lower, upper in (
+        ("device_id", 0, 999999), ("rotation", 0, 270),
+        ("auto_scroll", 1, 3600), ("cache_refresh", 30, 3600),
+        ("request_timeout", 3, 120), ("connect_timeout", 5, 120),
+        ("max_media_size_mb", 1, 2048),
+    ):
+        try:
+            value = int(form.get(field, ""))
+            if not lower <= value <= upper:
+                raise ValueError
+            values[field] = value
+        except (ValueError, TypeError):
+            errors[field] = "Enter a whole number from {} to {}.".format(lower, upper)
+    if "rotation" not in errors and values["rotation"] not in (0, 90, 180, 270):
+        errors["rotation"] = "Choose 0, 90, 180, or 270 degrees."
+    values["mode"] = form.get("mode")
+    if values["mode"] not in ("Time", "Menu", "Scroll"):
+        errors["mode"] = "Choose a supported display mode."
+    values["poster_api_url"] = form.get("poster_api_url", "").strip()
+    try:
+        url = urlsplit(values["poster_api_url"])
+        if (len(values["poster_api_url"]) > 2048 or url.scheme not in ("http", "https")
+                or not url.hostname or url.username or url.password or url.fragment
+                or any(ch.isspace() for ch in values["poster_api_url"])):
+            raise ValueError
+        if url.port is not None and not 1 <= url.port <= 65535:
+            raise ValueError
+    except ValueError:
+        errors["poster_api_url"] = "Enter a valid http:// or https:// API URL without embedded credentials."
+    for field in ("ssid1", "ssid2"):
+        values[field] = form.get(field, "")
+        if len(values[field].encode()) > 32:
+            errors[field] = "Network names must be no more than 32 bytes."
+    for field in ("pass1", "pass2", "poster_token"):
+        values[field] = form.get(field, "")
+        if len(values[field]) > 512:
+            errors[field] = "This value is too long (maximum 512 characters)."
+        if values[field] and form.get("clear_" + field) == "1":
+            errors[field] = "Choose either a new value or Clear saved value."
+    if errors:
+        raise PortalError("Check the highlighted fields. Your settings have not been saved.", 422, errors)
+    return values
+
+
+def save_config(project_dir, form):
+    values = validate_form(form)
+    lock_path = project_dir / ".config.json.lock"
+    with lock_path.open("a+", encoding="utf-8") as lock:
+        deadline = time.monotonic() + 2
+        while True:
+            try:
+                fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except BlockingIOError:
+                if time.monotonic() >= deadline:
+                    raise PortalError("Settings are busy in another process. Try saving again shortly.", 503)
+                time.sleep(0.05)
+        try:
+            config, revision = read_config(project_dir)
+            if not same_text(form.get("admin_password"), config["password"]):
+                raise PortalError("The admin password is incorrect.", 403, {"admin_password": "Enter the current admin password."})
+            if not same_text(form.get("revision"), revision):
+                raise PortalError("Settings changed on the board or in another tab. Reload before saving; your edits are still shown here.", 409)
+            config["display"].update({
+                "device_id": values["device_id"], "Mode": values["mode"],
+                "rotation_degree": values["rotation"], "Auto_Scroll": values["auto_scroll"],
+                "cache_refresh": values["cache_refresh"],
             })
-            latest.setdefault('wifi', {}).update({
-                'ssid1': request.form.get('ssid1', ''),
-                'password1': request.form.get('pass1', ''),
-                'ssid2': request.form.get('ssid2', ''),
-                'password2': request.form.get('pass2', ''),
-            })
-            latest.setdefault('api', {})['poster_api_url'] = request.form.get('poster_api_url', '')
-            return latest
+            config["api"].update({key: values[key] for key in ("poster_api_url", "request_timeout", "max_media_size_mb")})
+            config["wifi"].update({key: values[key] for key in ("ssid1", "ssid2", "connect_timeout")})
+            for field, section, key in (("pass1", "wifi", "password1"), ("pass2", "wifi", "password2"), ("poster_token", "api", "poster_token")):
+                if form.get("clear_" + field) == "1":
+                    config[section][key] = ""
+                elif values[field]:
+                    config[section][key] = values[field]
+            if os.geteuid() == 0:
+                owner = (project_dir / "config.json").stat()
+                os.fchown(lock.fileno(), owner.st_uid, owner.st_gid)
+                os.fchmod(lock.fileno(), 0o660)
+            atomic_write_json(project_dir / "config.json", config)
+            encoded = json.dumps(config, indent=2, ensure_ascii=False).encode("utf-8")
+            return config, hashlib.sha256(encoded).hexdigest()
+        finally:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
 
-        update_json_file(CONFIG_FILE, apply_form, conf)
-        
-        return jsonify({'success': True, 'message': 'Settings saved successfully!'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': f'Error saving settings: {str(e)}'})
 
-@app.route('/powersave_status', methods=['GET'])
-def powersave_status():
-    if not session.get('logged_in'):
-        return jsonify({'success': False, 'message': 'Not authenticated'})
-    
+def device_snapshot(project_dir):
+    result = {"checked_at": datetime.now().astimezone().isoformat(timespec="seconds"), "ip": "Unavailable"}
+    warnings = []
     try:
-        if not POWERSAVE_SCRIPT.exists():
-            return jsonify({'success': False, 'message': 'Power save script not found'})
-        
-        result = subprocess.run(
-            ['bash', str(POWERSAVE_SCRIPT), 'status'],
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
-        
-        if result.returncode == 0:
-            status = result.stdout.strip()
-            return jsonify({'success': True, 'status': status})
-        else:
-            return jsonify({'success': False, 'message': 'Could not get status'})
-    
-    except Exception as e:
-        return jsonify({'success': False, 'message': f'Error: {str(e)}'})
-
-@app.route('/toggle_powersave', methods=['POST'])
-def toggle_powersave():
-    if not session.get('logged_in'):
-        return jsonify({'success': False, 'message': 'Not authenticated'})
-    
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.connect(("8.8.8.8", 80))
+            result["ip"] = sock.getsockname()[0]
+    except OSError:
+        warnings.append("No routed network address detected. Local access may still work.")
     try:
-        data = request.get_json()
-        enable = data.get('enable', False)
-        
-        if not POWERSAVE_SCRIPT.exists():
-            return jsonify({'success': False, 'message': 'Power save script not found'})
-        
-        command = 'on' if enable else 'off'
-        
-        result = subprocess.run(
-            ['bash', str(POWERSAVE_SCRIPT), command],
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
-        
-        if result.returncode == 0:
-            message = 'WiFi power saving enabled' if enable else 'WiFi power saving disabled'
-            return jsonify({'success': True, 'message': message})
-        else:
-            return jsonify({'success': False, 'message': f'Script error: {result.stderr}'})
-    
-    except subprocess.TimeoutExpired:
-        return jsonify({'success': False, 'message': 'Script execution timeout'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': f'Error: {str(e)}'})
+        memory = {}
+        with open("/proc/meminfo", encoding="ascii") as handle:
+            for line in handle:
+                key, value = line.split(":", 1)
+                if key in ("MemTotal", "MemAvailable"):
+                    memory[key] = int(value.split()[0])
+        result["memory_used_percent"] = round(100 * (1 - memory["MemAvailable"] / memory["MemTotal"]))
+        if result["memory_used_percent"] >= 90:
+            warnings.append("Memory usage is above 90%; video playback may slow down.")
+    except (OSError, ValueError, KeyError, ZeroDivisionError):
+        result["memory_used_percent"] = None
+    try:
+        result["uptime_seconds"] = int(float(Path("/proc/uptime").read_text().split()[0]))
+    except (OSError, ValueError, IndexError):
+        result["uptime_seconds"] = None
+    try:
+        disk = shutil.disk_usage(project_dir)
+        result["disk_free_mb"] = disk.free // (1024 * 1024)
+        if result["disk_free_mb"] < 256:
+            warnings.append("Less than 256 MB of storage is free. New media may not download.")
+    except OSError:
+        result["disk_free_mb"] = None
+    try:
+        feed = (project_dir / "api_data.json").stat()
+        result["feed_updated_at"] = datetime.fromtimestamp(feed.st_mtime).astimezone().isoformat(timespec="seconds")
+    except OSError:
+        result["feed_updated_at"] = None
+        warnings.append("No saved API feed found. Check the API URL and display service logs.")
+    count = 0
+    try:
+        with os.scandir(project_dir / "eposter_cache") as entries:
+            for scanned, entry in enumerate(entries):
+                if scanned >= 2048:
+                    result["cache_capped"] = True
+                    break
+                if entry.is_file(follow_symlinks=False) and Path(entry.name).suffix.lower() in {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".mov", ".mp4", ".m4v", ".webm", ".mkv", ".avi"}:
+                    count += 1
+        result["cache_files"] = count
+        if not count:
+            warnings.append("Media cache is empty. The display may still be downloading its first files.")
+    except OSError:
+        result["cache_files"] = None
+        warnings.append("Media cache is missing or unreadable.")
+    result["video_player"] = next((name for name in ("ffplay", "omxplayer", "mpv", "cvlc") if shutil.which(name)), None)
+    if not result["video_player"]:
+        warnings.append("No video player found. Install ffmpeg on the board to enable video.")
+    result["display_service"] = "unknown"
+    if shutil.which("systemctl"):
+        try:
+            process = subprocess.run(["systemctl", "show", "eposter-display.service", "--property=ActiveState", "--value"], capture_output=True, text=True, timeout=2, check=False)
+            state = process.stdout.strip()
+            if process.returncode == 0 and state in {"active", "inactive", "failed", "activating", "deactivating", "reloading"}:
+                result["display_service"] = state
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+    if result["display_service"] in ("failed", "inactive"):
+        warnings.append("Display service is {}. Check its journal on the board.".format(result["display_service"]))
+    result["warnings"] = warnings
+    return result
 
-# --- Main Entry ---
-if __name__ == '__main__':
-    current_ip = get_ip()
-    print(f"[*] Starting Web Admin on http://{current_ip}:{PORT}")
-    app.run(host='0.0.0.0', port=PORT, debug=False)
+
+def wifi_power(enable=None):
+    binary = shutil.which("nmcli")
+    if not binary:
+        raise PortalError("NetworkManager (nmcli) is unavailable on this device.", 503)
+
+    def command(arguments):
+        try:
+            result = subprocess.run([binary] + arguments, capture_output=True, text=True, timeout=4, check=False)
+        except subprocess.TimeoutExpired:
+            raise PortalError("NetworkManager did not answer within 4 seconds. Try again later.", 504) from None
+        if result.returncode:
+            raise PortalError("NetworkManager could not complete this action. Check the active Wi-Fi profile and service permissions.", 503)
+        return result.stdout.strip()
+
+    profiles = command(["-t", "-f", "UUID,TYPE", "connection", "show", "--active"])
+    profile = next((row.split(":", 1)[0] for row in profiles.splitlines() if row.endswith(":802-11-wireless")), None)
+    if not profile:
+        raise PortalError("There is no active NetworkManager Wi-Fi profile. Ethernet-only devices do not need this setting.", 409)
+    if enable is None:
+        output = command(["-g", "802-11-wireless.powersave", "connection", "show", "uuid", profile])
+        code = output.split()[0] if output else ""
+        return {"0": "DEFAULT", "1": "UNCHANGED", "2": "OFF", "3": "ON"}.get(code, "UNKNOWN")
+    command(["connection", "modify", "uuid", profile, "802-11-wireless.powersave", "3" if enable else "2"])
+    return "ON" if enable else "OFF"
+
+
+def create_app(project_dir=None):
+    project_dir = Path(project_dir or PROJECT_DIR)
+    app = Flask(__name__, template_folder=str(PROJECT_DIR / "templates"), static_folder=str(PROJECT_DIR / "static"))
+    app.secret_key = session_secret(project_dir)
+    app.config.update(MAX_CONTENT_LENGTH=16 * 1024, MAX_FORM_MEMORY_SIZE=16 * 1024, MAX_FORM_PARTS=50,
+                      SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Strict", PERMANENT_SESSION_LIFETIME=timedelta(hours=8))
+    snapshot = {"expires": 0, "data": None}
+    status_lock, mutation_lock, login_lock = threading.Lock(), threading.Lock(), threading.Lock()
+    failures = OrderedDict()
+    protected = {"home", "save", "status", "powersave_status", "toggle_powersave"}
+
+    def wants_json():
+        return request.endpoint in {"save", "status", "powersave_status", "toggle_powersave"} or request.headers.get("Accept") == "application/json"
+
+    def csrf_token():
+        if "csrf_token" not in session:
+            session["csrf_token"] = secrets.token_urlsafe(32)
+        return session["csrf_token"]
+
+    app.jinja_env.globals["csrf_token"] = csrf_token
+
+    @app.before_request
+    def guard():
+        g.request_id = secrets.token_hex(4)
+        if request.endpoint in protected:
+            if not session.get("logged_in"):
+                if wants_json():
+                    raise PortalError("Your session expired. Sign in again; unsaved fields remain on this page.", 401)
+                return redirect(url_for("login"))
+            config, revision = read_config(project_dir)
+            if not same_text(session.get("credential_version"), credential_version(config, app.secret_key)):
+                session.clear()
+                if wants_json():
+                    raise PortalError("Admin credentials changed. Sign in again.", 401)
+                return redirect(url_for("login"))
+            g.config, g.revision = config, revision
+        if request.method == "POST":
+            supplied = request.headers.get("X-CSRF-Token") or request.form.get("csrf_token")
+            if not same_text(supplied, session.get("csrf_token")):
+                raise PortalError("This page's security token expired. Reload the page and try again.", 403)
+
+    @app.after_request
+    def headers(response):
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "same-origin"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'"
+        if request.endpoint != "static":
+            response.headers["Cache-Control"] = "no-store"
+        return response
+
+    @app.errorhandler(Exception)
+    def error_response(error):
+        fields = {}
+        if isinstance(error, PortalError):
+            code, message, fields = error.status, str(error), error.fields
+        elif isinstance(error, HTTPException):
+            code = error.code or 500
+            message = "Request is too large (maximum 16 KB)." if code == 413 else error.name
+        elif isinstance(error, OSError):
+            code = 503
+            message = "The board could not save settings. Check config permissions and free storage."
+            if error.errno == errno.ENOSPC:
+                message = "Storage is full. Free space on the board before saving again."
+            app.logger.error("Storage error %s: %s", g.get("request_id"), type(error).__name__)
+        else:
+            code, message = 500, "The portal encountered an unexpected error. Check the admin service journal."
+            app.logger.exception("Portal error %s", g.get("request_id"))
+        if wants_json():
+            return jsonify(success=False, message=message, fields=fields, request_id=g.get("request_id")), code
+        return render_template("portal_login.html", error=message), code
+
+    @app.route("/login", methods=["GET", "POST"])
+    def login():
+        config, _ = read_config(project_dir)
+        if request.method == "GET":
+            return render_template("portal_login.html", error=None)
+        address, now = request.remote_addr or "local", time.monotonic()
+        with login_lock:
+            count, start = failures.get(address, (0, now))
+            if now - start >= 300:
+                count, start = 0, now
+            if count >= 10:
+                raise PortalError("Too many sign-in attempts. Wait five minutes before trying again.", 429)
+            failures[address] = (count + 1, start)
+            failures.move_to_end(address)
+            if len(failures) > 128:
+                failures.popitem(last=False)
+        if not (same_text(request.form.get("username"), config["username"]) and same_text(request.form.get("password"), config["password"])):
+            return render_template("portal_login.html", error="Incorrect username or password."), 401
+        with login_lock:
+            failures.pop(address, None)
+        session.clear()
+        session.update(logged_in=True, credential_version=credential_version(config, app.secret_key))
+        session.permanent = True
+        return redirect(url_for("home"))
+
+    @app.post("/logout")
+    def logout():
+        session.clear()
+        return redirect(url_for("login"))
+
+    @app.get("/")
+    def home():
+        config = copy.deepcopy(g.config)
+        secret_saved = {"pass1": bool(config["wifi"].get("password1")), "pass2": bool(config["wifi"].get("password2")), "poster_token": bool(config["api"].get("poster_token"))}
+        config.pop("password", None)
+        for section, field in (("wifi", "password1"), ("wifi", "password2"), ("api", "poster_token")):
+            config[section].pop(field, None)
+        return render_template("portal.html", settings=config, revision=g.revision, secret_saved=secret_saved)
+
+    @app.post("/save")
+    def save():
+        if not mutation_lock.acquire(blocking=False):
+            raise PortalError("Another settings action is in progress. Try again shortly.", 409)
+        try:
+            config, revision = save_config(project_dir, request.form)
+            snapshot["expires"] = 0
+            return jsonify(success=True, message="Settings saved. Display updates after its current playback or refresh cycle. Wi-Fi credentials are used on the next connection attempt.", revision=revision,
+                           secret_saved={"pass1": bool(config["wifi"].get("password1")), "pass2": bool(config["wifi"].get("password2")), "poster_token": bool(config["api"].get("poster_token"))})
+        finally:
+            mutation_lock.release()
+
+    @app.get("/api/status")
+    def status():
+        if time.monotonic() >= snapshot["expires"]:
+            if status_lock.acquire(blocking=False):
+                try:
+                    snapshot["data"] = device_snapshot(project_dir)
+                    snapshot["expires"] = time.monotonic() + 30
+                finally:
+                    status_lock.release()
+            elif snapshot["data"] is None:
+                raise PortalError("Device status is being collected. Try again shortly.", 503)
+        result = copy.deepcopy(snapshot["data"])
+        if not g.config["api"].get("poster_api_url"):
+            result["warnings"].append("Poster API URL is not configured.")
+        result["mode"] = g.config["display"].get("Mode")
+        result["device_id"] = g.config["display"].get("device_id")
+        return jsonify(success=True, device=result)
+
+    @app.get("/powersave_status")
+    def powersave_status():
+        if not mutation_lock.acquire(blocking=False):
+            raise PortalError("A device action is already in progress.", 409)
+        try:
+            return jsonify(success=True, status=wifi_power())
+        finally:
+            mutation_lock.release()
+
+    @app.post("/toggle_powersave")
+    def toggle_powersave():
+        data = request.get_json(silent=True)
+        if not isinstance(data, dict) or type(data.get("enable")) is not bool:
+            raise PortalError("Choose whether Wi-Fi power saving should be enabled.", 422)
+        if not same_text(data.get("admin_password"), g.config["password"]):
+            raise PortalError("Enter your admin password in the Save settings bar first.", 403, {"admin_password": "Current admin password required."})
+        if not mutation_lock.acquire(blocking=False):
+            raise PortalError("A device action is already in progress.", 409)
+        try:
+            state = wifi_power(data["enable"])
+            return jsonify(success=True, status=state, message="Wi-Fi profile updated. The power setting takes effect on its next reconnect; the current connection was kept running.")
+        finally:
+            mutation_lock.release()
+
+    return app
+
+
+if __name__ == "__main__":
+    from waitress import serve
+
+    serve(create_app(), host="0.0.0.0", port=80, threads=4, connection_limit=32,
+          backlog=32, channel_timeout=20, cleanup_interval=5,
+          max_request_body_size=16 * 1024, max_request_header_size=16 * 1024,
+          expose_tracebacks=False)

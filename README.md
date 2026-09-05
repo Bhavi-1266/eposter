@@ -109,6 +109,24 @@ All configuration is done through `config.json`. Here's what each setting does:
 
 ## Usage
 
+### Device Management Portal
+
+The portal provides mobile-friendly display, API, and network settings, device
+status, field-level validation, save-conflict detection, and visible connection
+errors. It uses local assets and pauses status polling when the browser tab is
+hidden. See [Portal operations](docs/PORTAL.md) for resource limits and diagnostics.
+
+For this portal update, run the full installer after pulling the updated code:
+
+```bash
+cd /home/rock/eposter
+sudo python3 installer.py
+```
+
+This installs the new Waitress dependency and restarts the admin service. The
+`--services-only` option does not install new dependencies. Sign in again after
+the update; existing sessions need the new security token.
+
 ### Local Test API
 
 The development server reads its JSON source on every request, so timing and media changes do not require a restart. It can also serve local images and videos.

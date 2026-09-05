@@ -1,0 +1,35 @@
+{% extends "portal_base.html" %}
+{% block title %}Sign in | ePoster Manager{% endblock %}
+{% block body %}
+<main id="main" class="login-layout">
+  <section class="login-intro">
+    <span class="brand-mark" aria-hidden="true">eP</span>
+    <p class="eyebrow">YOUR DISPLAY, CONNECTED</p>
+    <h1>A little control.<br>A clearer display.</h1>
+    <p>Manage content, timing, and connectivity from one place.</p>
+    <span class="pill">Local device management</span>
+  </section>
+  <section class="card login-card">
+    <p class="eyebrow">EPOSTER MANAGER</p>
+    <h2>Welcome back.</h2>
+    <p class="muted">Sign in with this board's admin credentials.</p>
+    {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+    <form action="{{ url_for('login') }}" method="post" id="login-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" name="username" autocomplete="username" maxlength="128" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="password-field">
+          <input id="password" type="password" name="password" autocomplete="current-password" maxlength="512" required>
+          <button type="button" class="reveal" data-reveal="password" aria-pressed="false">Show</button>
+        </div>
+      </div>
+      <button class="button primary full-width" type="submit">Sign in</button>
+      <p id="login-hint" class="help" role="status">Connect to the same network as your board.</p>
+    </form>
+  </section>
+</main>
+{% endblock %}
