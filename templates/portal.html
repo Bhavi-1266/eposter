@@ -1,0 +1,141 @@
+{% extends "portal_base.html" %}
+{% macro field(name, label, value='', type='text', help='', min='', max='', required=true) %}
+<div class="field">
+  <label for="{{ name }}">{{ label }}</label>
+  <input id="{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ value if value is not none else '' }}"
+    {% if min != '' %}min="{{ min }}"{% endif %} {% if max != '' %}max="{{ max }}"{% endif %}
+    {% if required %}required{% endif %} aria-describedby="{{ name }}-help {{ name }}-error">
+  <small id="{{ name }}-help" class="help">{{ help }}</small>
+  <small id="{{ name }}-error" class="field-error"></small>
+</div>
+{% endmacro %}
+{% macro secret(name, label) %}
+<div class="field">
+  <label for="{{ name }}">{{ label }}</label>
+  <div class="password-field">
+    <input id="{{ name }}" name="{{ name }}" type="password" autocomplete="new-password" maxlength="512"
+      placeholder="Leave blank to keep saved value" aria-describedby="{{ name }}-help {{ name }}-error">
+    <button class="reveal" type="button" data-reveal="{{ name }}" aria-pressed="false">Show</button>
+  </div>
+  <small id="{{ name }}-help" class="help" data-secret-state="{{ name }}">{{ 'A value is saved on the board.' if secret_saved[name] else 'No value is currently saved.' }}</small>
+  <label class="check-row"><input type="checkbox" name="clear_{{ name }}" value="1"> Clear saved value</label>
+  <small id="{{ name }}-error" class="field-error"></small>
+</div>
+{% endmacro %}
+{% block body %}
+<header class="topbar">
+  <a class="brand" href="{{ url_for('home') }}"><span class="brand-mark" aria-hidden="true">eP</span><span>ePoster <span class="muted">Manager</span></span></a>
+  <div class="header-actions">
+    <span id="connection" class="pill neutral" role="status">Connecting</span>
+    <form action="{{ url_for('logout') }}" method="post" id="logout-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="button quiet" type="submit">Sign out</button>
+    </form>
+  </div>
+</header>
+<main id="main" class="workspace">
+  <section class="page-heading">
+    <div><p class="eyebrow">DEVICE CONTROL</p><h1>Your display, at a glance.</h1><p class="muted">Unit {{ settings.ID }} <span class="separator">/</span> <span id="device-identity">Screen {{ settings.display.device_id }} &middot; {{ settings.display.Mode }} mode</span></p></div>
+    <button type="button" class="button secondary" id="refresh-status">Refresh status</button>
+  </section>
+  <noscript><div class="notice error">Enable JavaScript to use status updates and the settings form. The portal uses only local scripts.</div></noscript>
+  <div id="connection-notice" class="notice warning" role="status" hidden></div>
+  <section aria-label="Device status" class="status-grid">
+    <article class="metric"><span class="metric-label">Display service</span><strong id="service-state">Checking</strong><small>Process state, not a playback heartbeat</small></article>
+    <article class="metric"><span class="metric-label">Memory in use</span><strong id="memory-state">--</strong><small id="uptime-state">Uptime unavailable</small></article>
+    <article class="metric"><span class="metric-label">Storage available</span><strong id="disk-state">--</strong><small>On the device's system disk</small></article>
+    <article class="metric"><span class="metric-label">Cached media</span><strong id="cache-state">--</strong><small id="player-state">Checking video player</small></article>
+  </section>
+  <div class="status-caption"><span id="status-checked">Waiting for device status</span><span id="device-ip">Local address: --</span></div>
+  <details class="card diagnostics" id="diagnostics">
+    <summary>Device notices <span class="count" id="notice-count">--</span></summary>
+    <ul id="device-notices"><li>Checking device status.</li></ul>
+    <p class="help">Feed content last changed: <span id="feed-updated">Unknown</span>. An unchanged feed keeps its previous timestamp.</p>
+    <p class="help">For detailed playback errors, run on the board:</p>
+    <code class="command">sudo journalctl -u eposter-display.service -n 50 --no-pager</code>
+  </details>
+  <div id="feedback" class="notice" role="alert" tabindex="-1" hidden></div>
+  <div id="session-actions" class="notice warning" hidden><a href="{{ url_for('login') }}" target="_blank" rel="noopener">Sign in again in a new tab</a>, then reload this page before saving. Keep a note of your unsaved edits.</div>
+  <form id="settings-form" action="{{ url_for('save') }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="revision" value="{{ revision }}">
+    <fieldset id="settings-fields">
+      <nav class="section-nav" aria-label="Settings sections"><a href="#display-settings">Display</a><a href="#api-settings">Content API</a><a href="#network-settings">Network</a></nav>
+      <section class="card settings-card" id="display-settings">
+        <div class="section-heading"><span class="section-number">01</span><div><h2>Display &amp; playback</h2><p>Choose what this screen shows and how it moves.</p></div></div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="mode">Playback mode</label>
+            <select name="mode" id="mode" aria-describedby="mode-help mode-error">
+              {% for value, label in [('Time', 'Time schedule'), ('Scroll', 'Auto scroll'), ('Menu', 'Interactive menu')] %}<option value="{{ value }}" {% if settings.display.Mode == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+            <small id="mode-help" class="help">Time follows the API schedule; Scroll cycles media; Menu lets viewers select.</small>
+            <small id="mode-error" class="field-error"></small>
+          </div>
+          {{ field('device_id', 'Screen number', settings.display.device_id, 'number', 'Must match the screen number in your API.', 0, 999999) }}
+          <div class="field">
+            <label for="rotation">Display rotation</label>
+            <select id="rotation" name="rotation" aria-describedby="rotation-help rotation-error">
+              {% for value, label in [(0, '0 degrees / normal'), (90, '90 degrees / clockwise'), (180, '180 degrees / inverted'), (270, '270 degrees / counterclockwise')] %}<option value="{{ value }}" {% if settings.display.rotation_degree | int == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+            <small class="help" id="rotation-help">Applies to both poster images and videos.</small>
+            <small class="field-error" id="rotation-error"></small>
+          </div>
+          {{ field('auto_scroll', 'Default scroll duration (seconds)', settings.display.Auto_Scroll, 'number', 'Fallback duration. Videos may use their API duration.', 1, 3600) }}
+        </div>
+      </section>
+      <section class="card settings-card" id="api-settings">
+        <div class="section-heading"><span class="section-number">02</span><div><h2>Content API</h2><p>Connect the feed that supplies your posters and schedule.</p></div></div>
+        {{ field('poster_api_url', 'Poster API URL', settings.api.poster_api_url, 'url', 'Use the full JSON endpoint. For a local test server, use its LAN address.') }}
+        <div class="form-grid">
+          {{ secret('poster_token', 'API token (optional)') }}
+          {{ field('cache_refresh', 'Refresh interval (seconds)', settings.display.cache_refresh, 'number', '60 seconds or more is a useful starting point for this board.', 30, 3600) }}
+        </div>
+        <details class="advanced"><summary>Download limits</summary><div class="form-grid">
+          {{ field('request_timeout', 'Request timeout (seconds)', settings.api.request_timeout, 'number', 'How long the display waits for network responses.', 3, 120) }}
+          {{ field('max_media_size_mb', 'Maximum media file size (MB)', settings.api.max_media_size_mb, 'number', 'Limits each download, not the whole cache.', 1, 2048) }}
+        </div></details>
+      </section>
+      <section class="card settings-card" id="network-settings">
+        <div class="section-heading"><span class="section-number">03</span><div><h2>Network</h2><p>Keep your primary network and a fallback ready.</p></div></div>
+        <p class="inline-note">Saved credentials are used on the next connection attempt. Saving does not disconnect the active network.</p>
+        <div class="form-grid">
+          {{ field('ssid1', 'Primary network name', settings.wifi.ssid1, help='Leave empty to skip automatic Wi-Fi connection.', required=false) }}
+          {{ secret('pass1', 'Primary Wi-Fi password') }}
+          {{ field('ssid2', 'Backup network name', settings.wifi.ssid2, help='Optional fallback network.', required=false) }}
+          {{ secret('pass2', 'Backup Wi-Fi password') }}
+          {{ field('connect_timeout', 'Connection timeout (seconds)', settings.wifi.connect_timeout, 'number', 'Time allowed for a connection attempt.', 5, 120) }}
+        </div>
+        <details class="advanced"><summary>Wi-Fi power saving</summary>
+          <p class="help">Applies to the active NetworkManager Wi-Fi profile on its next reconnect. Keeping power saving off can help an always-on display maintain connectivity.</p>
+          <div class="power-controls">
+            <span id="power-state" class="pill neutral">Not checked</span>
+            <button type="button" id="check-power" class="button secondary">Check setting</button>
+            <button type="button" id="power-off" class="button secondary" disabled>Set off</button>
+            <button type="button" id="power-on" class="button secondary" disabled>Set on</button>
+          </div>
+          <p class="help">Enter your admin password in the save bar before changing this setting.</p>
+          <p id="power-feedback" class="help" role="status"></p>
+        </details>
+      </section>
+    </fieldset>
+    <section class="save-bar" aria-label="Save settings">
+      <div class="save-summary"><strong id="edit-state" role="status">No unsaved changes</strong><small>Changes apply after the display's current cycle.</small></div>
+      <div class="field save-password">
+        <label for="admin_password">Admin password</label>
+        <input id="admin_password" name="admin_password" type="password" autocomplete="current-password" maxlength="512" required aria-describedby="admin_password-error">
+        <small id="admin_password-error" class="field-error"></small>
+      </div>
+      <div class="save-actions"><button type="button" class="button quiet" id="discard">Discard edits</button><button type="submit" class="button primary" id="save-button">Save settings</button></div>
+    </section>
+  </form>
+  <section class="card settings-card" aria-labelledby="update-heading">
+    <h2 id="update-heading">Software update</h2>
+    <p>Install the latest version. Your saved device settings are kept. The display and portal will restart during installation.</p>
+    <p class="help">Save or discard your edits, then enter the admin password in the save bar.</p>
+    <button type="button" class="button secondary" id="update-button">Update software</button>
+    <p id="update-feedback" role="status">Checking update status…</p>
+  </section>
+  <footer class="page-footer"><span>ePoster Manager &middot; Local device control</span><span>Status checks every 30 seconds while this tab is visible.</span></footer>
+</main>
+{% endblock %}

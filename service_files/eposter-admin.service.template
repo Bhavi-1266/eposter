@@ -1,0 +1,26 @@
+[Unit]
+Description={description}
+After={after}
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/rock/eposter
+ExecStartPre=/usr/bin/test -x /home/rock/eposter/venv/bin/python3
+ExecStart=/home/rock/eposter/venv/bin/python3 /home/rock/eposter/config_portal.py
+Restart=always
+RestartSec=5
+KillMode=control-group
+TimeoutStopSec=10
+TimeoutStartSec=30
+UMask=0027
+Environment=PYTHONUNBUFFERED=1
+{environment}
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={service_name}
+
+[Install]
+WantedBy=multi-user.target

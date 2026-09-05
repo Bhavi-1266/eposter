@@ -1,0 +1,27 @@
+[Unit]
+Description={description}
+After={after}
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=rock
+WorkingDirectory=/home/rock/eposter
+ExecStartPre=/usr/bin/test -x /home/rock/eposter/venv/bin/python3
+ExecStartPre=/bin/sh -c 'for attempt in $(seq 1 45); do test -S /tmp/.X11-unix/X0 && exit 0; sleep 1; done; exit 1'
+ExecStart=/home/rock/eposter/venv/bin/python3 /home/rock/eposter/RunThis.py
+Restart=always
+RestartSec=5
+KillMode=control-group
+TimeoutStopSec=10
+TimeoutStartSec=50
+UMask=0027
+Environment=PYTHONUNBUFFERED=1
+{environment}
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={service_name}
+
+[Install]
+WantedBy=graphical.target

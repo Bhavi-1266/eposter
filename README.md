@@ -21,6 +21,12 @@ A Raspberry Pi-based digital poster display system that automatically fetches an
   ```bash
   pip3 install requests pillow pygame
   ```
+- Required for `.mov`/video playback on minimal systems:
+  - `ffmpeg` provides `ffplay`; `mpv`, `omxplayer`, and VLC are supported fallbacks.
+  - DietPi install example:
+    ```bash
+    sudo apt update && sudo apt install ffmpeg mpv -y
+    ```
 
 ## Installation
 
@@ -34,7 +40,10 @@ A Raspberry Pi-based digital poster display system that automatically fetches an
    pip3 install requests pillow pygame
    ```
 
-3. Configure your settings in `config.json` (see Configuration section below)
+3. Create the device-local configuration and edit it:
+   ```bash
+   cp config.example.json config.json
+   ```
 
 4. Run the display controller:
    ```bash
@@ -100,6 +109,56 @@ All configuration is done through `config.json`. Here's what each setting does:
 
 ## Usage
 
+### Device Management Portal
+
+The portal provides mobile-friendly display, API, and network settings, device
+status, field-level validation, save-conflict detection, and visible connection
+errors. It uses local assets and pauses status polling when the browser tab is
+hidden. See [Portal operations](docs/PORTAL.md) for resource limits and diagnostics.
+
+Use **Software update → Update software** in the portal to pull `origin main`
+and run the full installer. Save or discard pending edits and enter the admin
+password first. Progress survives the portal restart; reload after completion.
+The device must have a clean checkout on `main` and noninteractive access to its
+Git remote. Updates use `git pull --ff-only origin main` and preserve ignored
+configuration and runtime files.
+
+To enable this button on an older device, pull this release and run once:
+
+```bash
+cd /home/rock/eposter
+sudo python3 installer.py
+```
+
+Update jobs run independently as `eposter-update.service`. For diagnostics:
+
+```bash
+sudo journalctl -u eposter-update.service --no-pager
+```
+
+If installation fails after pulling, code may already be updated. Resolve the
+reported issue and retry the full installer; updates do not automatically roll back.
+
+### Local Test API
+
+The development server reads its JSON source on every request, so timing and media changes do not require a restart. It can also serve local images and videos.
+
+```bash
+mkdir -p local_test/media
+cp tools/local_api_data.example.json local_test/api_data.json
+cp /path/to/poster.png local_test/media/poster.png
+cp /path/to/video.mov local_test/media/video.mov
+python3 tools/local_api.py
+```
+
+Point the display configuration at:
+
+```json
+"poster_api_url": "http://127.0.0.1:8080/api/posters"
+```
+
+Edit `local_test/api_data.json` to change records or `duration_seconds`. Saving the file resets the generated schedule cycle. The entire `local_test/` directory is ignored by Git. To test from another device, start the server with `--host 0.0.0.0` and use the server computer's LAN IP in both the display configuration and generated media URLs.
+
 ### Starting the Display
 
 Run the display controller:
@@ -128,6 +187,23 @@ Press `ESC` or `Q` to exit the display.
 
 To run automatically on boot, run `installer.py` to generate and install the systemd services.
 
+After pulling a code update, reinstall only the service definitions and restart both services:
+
+```bash
+sudo python3 installer.py --services-only
+```
+
+The full installer is safe to rerun on an existing board:
+
+```bash
+cd /home/rock/eposter
+sudo python3 installer.py
+```
+
+It preserves `config.json`, validates the configured poster API, repairs ownership of runtime JSON/cache files, updates dependencies, replaces both old service units, and restarts them. If `config.json` is missing, it creates one from `config.example.json` without inventing credentials or an API URL.
+
+The board deployment is fixed at `/home/rock/eposter`, with the display entrypoint at `/home/rock/eposter/RunThis.py`. The display service waits for X11, uses the `rock` user's runtime directories, and prevents SDL from minimizing Pygame when the external video player takes focus.
+
 ## File Structure
 
 ```
@@ -135,17 +211,22 @@ eposter/
 ├── RunThis.py               # Main display controller
 ├── config_portal.py         # Captive portal and device configuration
 ├── installer.py             # System setup and service installer
-├── config.json              # Configuration file
-├── wifi_connect.py          # WiFi connection module
-├── api_handler.py           # API calls and data handling
-├── cache_handler.py         # Image caching and processing
-├── display_handler.py       # Pygame display management
-├── fetch_event_data.py      # Event data fetching
-├── wifi_powersave.sh        # WiFi power-save helper script
-├── ScreenSaver.png          # Screensaver image asset
+├── config.example.json      # Source-controlled configuration schema
+├── config.json              # Device-local configuration (ignored by Git)
+├── ScreenSaver.png/.gif     # Screensaver asset; GIF animates when present
+├── helper/                  # Runtime helper modules
+│   ├── api_handler.py       # API calls and data handling
+│   ├── cache_handler.py     # Image caching and processing
+│   ├── display_handler.py   # Pygame display management
+│   ├── fetch_event_data.py  # Event data fetching
+│   └── wifi_connect.py      # WiFi connection module
+├── service_files/           # Bash scripts and systemd service templates
+│   ├── eposter-admin.service.template
+│   ├── eposter-display.service.template
+│   └── wifi_powersave.sh    # WiFi power-save helper script
 ├── docs/                    # Setup and operations notes
 ├── eposter_cache/           # Cached poster images (auto-created, ignored)
-├── api_data.json            # Saved API response (auto-created)
+├── api_data.json            # Saved API response (auto-created, ignored)
 ├── event_data.json          # Event information (auto-created)
 ├── requirements.txt         # Python dependencies
 └── README.md                # This file
@@ -153,13 +234,16 @@ eposter/
 
 ## How It Works
 
-1. **WiFi Connection**: `wifi_connect.py` attempts to connect to configured WiFi networks
-2. **API Fetching**: `api_handler.py` fetches poster data from the API
-3. **Image Caching**: `cache_handler.py` downloads and processes images:
-   - Images are named by their poster ID (e.g., `6.png`, `7.png`)
-   - Images are converted to landscape orientation
-   - Old/unused images are automatically deleted
-4. **Display**: `display_handler.py` shows images in a fullscreen slideshow
+1. **WiFi Connection**: `helper/wifi_connect.py` attempts to connect to configured WiFi networks
+2. **API Fetching**: `helper/api_handler.py` fetches poster data from the API
+3. **Media Caching**: `helper/cache_handler.py` downloads and processes images/videos:
+   - Media files are deduplicated by their source URL (`eposter_file`/`file`)
+   - One URL is stored as a single cache file and shared across duplicate records
+   - Old/unused media files are automatically deleted
+   - Repeated schedule rows are reduced to one download/check per unique URL
+4. **Display**: `helper/display_handler.py` shows images/GIFs in Pygame and hands videos to a fullscreen external player
+   - Menu mode displays a generated video tile; tapping it starts playback
+   - Pygame is minimized during video playback and restored afterward
 5. **Auto-refresh**: The system periodically checks for new posters
 
 ## Troubleshooting
