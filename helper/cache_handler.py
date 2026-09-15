@@ -42,8 +42,12 @@ def get_media_path(url):
     media_key = _media_key_from_url(url)
     for ext in MEDIA_EXTENSIONS:
         path = CACHE_DIR / f"{media_key}.{ext}"
-        if path.is_file() and path.stat().st_size > 0:
-            return path
+        try:
+            if path.is_file() and path.stat().st_size > 0:
+                return path
+        except FileNotFoundError:
+            # The refresh worker can remove stale media between these checks.
+            continue
     return None
 
 

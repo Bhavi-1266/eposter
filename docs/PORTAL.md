@@ -1,6 +1,6 @@
 # Device portal
 
-The management page runs independently of the Pygame display. Templates live in
+The management page runs independently of the mpv display controller. Templates live in
 templates/ and local browser assets in static/. No CDN, web font download,
 frontend framework, or build command is needed.
 
@@ -16,8 +16,9 @@ After pulling these files into /home/rock/eposter, run:
 
     sudo python3 installer.py
 
-Use the full installer for this update so requirements.txt installs Waitress.
-The services-only option does not install new Python dependencies. The service
+Use the full installer for this update to install mpv, fonts, and the Python
+dependencies, including Waitress. The services-only option does not install
+system packages or new Python dependencies. The service
 entrypoint remains config_portal.py on port 80.
 
 Open the board's IP in a browser and sign in again. Old sessions are intentionally
@@ -41,8 +42,10 @@ configuration lock times out after two seconds. Missing, malformed, or unreadabl
 configuration produces an explicit error; default admin credentials are not
 substituted. Detailed unexpected errors are logged to eposter-admin's journal.
 
-Changes are consumed by the display on its existing playback/refresh boundaries.
-The portal does not restart the display or guarantee immediate mid-video changes.
+The controller reloads display settings every second, including during videos.
+Hardware ID and content API changes trigger a background refresh. Downloads can
+take longer; the portal does not restart the display. Wi-Fi credentials apply on
+the next connection attempt.
 
 ## Resource limits
 
@@ -85,7 +88,8 @@ as root. Remote access must work without prompts. Pull failures skip installatio
 installer failures attempt to start both services again. Detailed installer output
 is in `journalctl -u eposter-update.service`; state is in ignored
 `.update-status.json`. A failed install may leave updated code or dependencies;
-there is no automatic rollback.
+the installer restores the previous Python environment and configuration after
+activation failure, but Git changes and system packages are not rolled back.
 
 Device configuration (`config.json`), its backups, portal session secret, feeds,
 cache, generated output, environments, logs, and local agent settings are ignored.

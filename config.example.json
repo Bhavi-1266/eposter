@@ -14,14 +14,16 @@
     "poster_api_url": "",
     "event_api_url": "",
     "event_api_token": "",
+    "timezone": "",
     "request_timeout": 15,
     "max_media_size_mb": 512
   },
   "display": {
     "cache_refresh": 60,
     "rotation_degree": 0,
-    "device_id": 0,
+    "hardware_ID": 0,
     "Auto_Scroll": 5,
-    "Mode": "Menu"
+    "Mode": "Menu",
+    "video_hwdec": "auto"
   }
 }

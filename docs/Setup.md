@@ -8,10 +8,10 @@ This project runs a dual-service digital signage system on DietPi and other Debi
    - Binds to Port 80 (Web).
    - Provides a web portal for WiFi and device configuration.
 2. **Display Controller (`RunThis.py`)**: 
-   - Runs as user **rock**.
-   - Manages the Pygame GUI, API syncing, and content rotation.
+   - Runs as the selected display user (sudo user or checkout owner, with **rock** as the fallback for a root-owned checkout).
+   - Controls one persistent mpv window for images, GIFs, videos, menus, and API countdowns. The original cache routine runs in one background worker.
 3. **Helper Modules (`helper/`)**:
-   - Contains WiFi, API, cache, display, and event-fetch helpers used by the root entrypoints.
+   - Contains configuration, scheduling, WiFi, API, cache, and mpv playback helpers. The event-fetch helper is retained for legacy use.
 4. **Service Files (`service_files/`)**:
    - Contains bash scripts and systemd service templates used by `installer.py`.
 
@@ -24,3 +24,5 @@ This project runs a dual-service digital signage system on DietPi and other Debi
    ```bash
    sudo python3 installer.py
    ```
+
+For this migration, run the full installer. See [installation and upgrade](../README.md#installation-and-upgrade) for configuration migration, environment staging, and recovery.

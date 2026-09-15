@@ -4,16 +4,30 @@ import subprocess
 import sys
 import json
 import shutil
+import pwd
+import grp
+import uuid
+import time
+from helper.configuration import migrate_config
+from helper.json_utils import atomic_write_json
 from pathlib import Path
 
 # --- BOARD DEPLOYMENT CONFIGURATION ---
-BASE_DIR = Path("/home/rock/eposter")
+BASE_DIR = Path(__file__).resolve().parent
 VENV_PATH = BASE_DIR / "venv"
 PYTHON_BIN = VENV_PATH / "bin" / "python3"
 REQ_FILE = BASE_DIR / "requirements.txt"
 SERVICE_FILES_DIR = BASE_DIR / "service_files"
 
-REAL_USER = "rock"
+def display_user():
+    explicit = os.environ.get("EPOSTER_USER") or os.environ.get("SUDO_USER")
+    if explicit and explicit != "root":
+        return explicit
+    owner = pwd.getpwuid(BASE_DIR.stat().st_uid).pw_name
+    return owner if owner != "root" else "rock"
+
+
+REAL_USER = display_user()
 
 # Service Definitions
 SERVICES = {
@@ -25,7 +39,7 @@ SERVICES = {
         "after": "network.target"
     },
     "eposter-display": {
-        "description": "ePoster Pygame Display Controller",
+        "description": "ePoster Persistent Media Display",
         "exec": f"{PYTHON_BIN} {BASE_DIR}/RunThis.py",
         "template": SERVICE_FILES_DIR / "eposter-display.service.template",
         "user": REAL_USER,
@@ -42,8 +56,8 @@ SERVICES = {
 def run(cmd, ignore_fail=False):
     print(f"--> Executing: {' '.join(cmd) if isinstance(cmd, list) else cmd}")
     try:
-        subprocess.run(cmd, check=not ignore_fail, shell=isinstance(cmd, str))
-        return True
+        result = subprocess.run(cmd, check=not ignore_fail, shell=isinstance(cmd, str))
+        return result.returncode == 0
     except Exception as e:
         if ignore_fail:
             print(f"Non-critical error: {e}")
@@ -71,6 +85,16 @@ def prepare_runtime_state(user_info):
         print(f"Error: config.json is not valid/readable: {error}")
         return False
 
+    backup_path = BASE_DIR / "config.json.before-player-update"
+    if not backup_path.exists():
+        shutil.copy2(config_path, backup_path)
+        backup_path.chmod(0o600)
+    try:
+        config = migrate_config(config_path)
+    except (OSError, ValueError) as error:
+        print(f"Configuration migration failed: {error}")
+        return False
+
     api_url = config.get("api", {}).get("poster_api_url")
     if api_url:
         print(f"Poster API configured: {api_url}")
@@ -79,7 +103,7 @@ def prepare_runtime_state(user_info):
 
     config_lock_path.touch(exist_ok=True)
     shared_files = [config_path, config_lock_path]
-    for optional_name in ("api_data.json", "event_data.json"):
+    for optional_name in ("api_data.json", "event_data.json", ".playback-status.json"):
         optional_path = BASE_DIR / optional_name
         if optional_path.exists():
             shared_files.append(optional_path)
@@ -101,7 +125,7 @@ def prepare_runtime_state(user_info):
     return True
 
 
-def install_service_units(restart=True):
+def install_service_units(restart=True, validated=False):
     """Render and install both systemd units for the current repo location."""
     import pwd
 
@@ -116,6 +140,9 @@ def install_service_units(restart=True):
         print(f"Error: display user '{REAL_USER}' does not exist")
         return False
 
+    if not validated:
+        validate_environment(PYTHON_BIN)
+
     user_id = user_info.pw_uid
     user_home = user_info.pw_dir
 
@@ -129,9 +156,6 @@ def install_service_units(restart=True):
         f"XAUTHORITY={user_home}/.Xauthority",
         f"XDG_RUNTIME_DIR=/run/user/{user_id}",
         f"DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{user_id}/bus",
-        "SDL_VIDEODRIVER=x11",
-        "SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS=0",
-        "PYGAME_HIDE_SUPPORT_PROMPT=1",
     ]
 
     for name, info in SERVICES.items():
@@ -157,6 +181,90 @@ def install_service_units(restart=True):
         run(["systemctl", "restart", "eposter-admin.service", "eposter-display.service"])
     return True
 
+def validate_environment(python):
+    prefix = ["runuser", "-u", REAL_USER, "--"] if os.geteuid() == 0 else []
+    run(prefix + [str(python), "-c",
+                  "import config_portal, RunThis; from helper.media_controller import Controller"])
+    run(prefix + [str(python), str(BASE_DIR / "tools/playback_smoke.py"), "--quick"])
+
+
+def stage_environment():
+    """Versioned paths keep pip entry-point shebangs valid after activation."""
+    staged = BASE_DIR / ".venvs" / uuid.uuid4().hex
+    staged.parent.mkdir(exist_ok=True)
+    try:
+        run(["python3", "-m", "venv", str(staged)])
+        run([str(staged / "bin/pip"), "install", "-r", str(REQ_FILE)])
+        user = pwd.getpwnam(REAL_USER)
+        # The webpage updater runs as root with umask 0027. Make the staged
+        # environment traversable by the actual display user before activation.
+        for path in [staged.parent, staged] + list(staged.rglob("*")):
+            os.chown(path, user.pw_uid, user.pw_gid, follow_symlinks=False)
+        validate_environment(staged / "bin/python3")
+        return staged
+    except Exception:
+        if staged.exists():
+            shutil.rmtree(staged)
+        raise
+
+
+def activate_environment(staged):
+    """Switch only after staging succeeds; keep the old environment for recovery."""
+    previous = BASE_DIR / (".venv-previous-" + uuid.uuid4().hex)
+    if VENV_PATH.exists() or VENV_PATH.is_symlink():
+        VENV_PATH.rename(previous)
+    else:
+        previous = False
+    try:
+        VENV_PATH.symlink_to(staged, target_is_directory=True)
+    except Exception:
+        if previous:
+            previous.rename(VENV_PATH)
+        raise
+    return previous
+
+
+def restore_environment(previous):
+    if VENV_PATH.is_symlink():
+        VENV_PATH.unlink()
+    if previous:
+        previous.rename(VENV_PATH)
+
+
+def prune_environments(previous):
+    """Retain the current and previous version; only remove installer-owned paths."""
+    keep = {VENV_PATH.resolve()}
+    if previous:
+        keep.add(previous.resolve())
+    for marker in BASE_DIR.glob(".venv-previous-*"):
+        if marker == previous or len(marker.name.removeprefix(".venv-previous-")) != 32:
+            continue
+        if marker.is_symlink():
+            marker.unlink()
+        elif marker.is_dir():
+            shutil.rmtree(marker)
+    versions = BASE_DIR / ".venvs"
+    if versions.exists():
+        for version in versions.iterdir():
+            if (version.is_dir() and not version.is_symlink() and version.resolve() not in keep
+                    and len(version.name) == 32 and all(c in "0123456789abcdef" for c in version.name)):
+                shutil.rmtree(version)
+
+
+def wait_for_display(restarted_after, timeout=20):
+    """Service 'active' alone doesn't prove the player has initialized."""
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        try:
+            status = json.loads((BASE_DIR / ".playback-status.json").read_text())
+            if status.get("checked_at", 0) >= restarted_after and status.get("pid") and status.get("ready"):
+                return
+        except (OSError, ValueError):
+            pass
+        time.sleep(0.5)
+    raise RuntimeError("Display did not report a fresh player heartbeat. Check journalctl -u eposter-display.service.")
+
+
 def setup():
     print(f"Installing ePoster from: {BASE_DIR}")
     os.chdir(BASE_DIR)
@@ -166,22 +274,45 @@ def setup():
     run([
         "apt-get", "install", "-y", "python3-venv", "python3-pip",
         "x11-xserver-utils", "network-manager", "polkitd", "ffmpeg", "jq",
-        "fonts-dejavu-core", "git", "python3-tk",
+        "fonts-dejavu-core", "git", "mpv", "tzdata",
     ])
 
-    # 2. Virtual Env & Requirements
-    if not os.path.exists(VENV_PATH):
-        run(["python3", "-m", "venv", str(VENV_PATH)])
+    # Stage and smoke-test dependencies before interrupting the running services.
+    staged = stage_environment()
+    previous = None
+    stopped = False
+    original_config = None
+    config_path = BASE_DIR / "config.json"
+    try:
+        stopped = True
+        if not run(["systemctl", "stop", "eposter-admin.service", "eposter-display.service"], ignore_fail=True):
+            # A first install has no units yet; an existing active service must
+            # actually stop before its Python environment can be switched.
+            for service in ("eposter-admin.service", "eposter-display.service"):
+                if run(["systemctl", "is-active", "--quiet", service], ignore_fail=True):
+                    raise RuntimeError(f"Could not stop {service}; update cancelled")
+        # Capture rollback state after the portal can no longer save settings.
+        if config_path.exists():
+            original_config = json.loads(config_path.read_text())
+        previous = activate_environment(staged)
+        finish_install()
+        try:
+            prune_environments(previous)
+        except OSError as error:
+            print(f"Old environment cleanup deferred: {error}")
+    except Exception:
+        if stopped:
+            run(["systemctl", "stop", "eposter-admin.service", "eposter-display.service"], ignore_fail=True)
+        if previous is not None:
+            restore_environment(previous)
+        if original_config is not None and stopped:
+            atomic_write_json(config_path, original_config)
+        if stopped:
+            run(["systemctl", "start", "eposter-admin.service", "eposter-display.service"], ignore_fail=True)
+        raise
 
-    # Do not update an environment while the old services are importing it.
-    run(["systemctl", "stop", "eposter-admin.service", "eposter-display.service"], ignore_fail=True)
 
-    pip_bin = VENV_PATH / "bin" / "pip"
-    if REQ_FILE.exists():
-        run([str(pip_bin), "install", "-r", str(REQ_FILE)])
-    else:
-        run([str(pip_bin), "install", "flask", "dnslib", "pygame", "requests", "Pillow"])
-
+def finish_install():
     for script in SERVICE_FILES_DIR.glob("*.sh"):
         run(["chmod", "755", str(script)])
 
@@ -189,7 +320,13 @@ def setup():
     print(f"Configuring Wi-Fi permissions for {REAL_USER}...")
     
     # Ensure the user is in the correct groups
-    run(["usermod", "-aG", "netdev,audio,video,sudo", REAL_USER])
+    groups = ["netdev", "audio", "video", "sudo"]
+    try:
+        grp.getgrnam("render")
+        groups.append("render")
+    except KeyError:
+        pass
+    run(["usermod", "-aG", ",".join(groups), REAL_USER])
 
     # Path for modern Polkit rules
     polkit_dir = Path("/etc/polkit-1/rules.d")
@@ -226,11 +363,16 @@ polkit.addRule(function(action, subject) {{
     run("nmcli connection modify Hotspot connection.autoconnect no", ignore_fail=True)
     
     # --- 4. Systemd Services ---
-    if not install_service_units(restart=True):
+    restarted_after = time.time()
+    if not install_service_units(restart=True, validated=True):
         raise RuntimeError("Failed to install ePoster services")
     
-    print(f"\n[SUCCESS] Setup finished. Wi-Fi permissions granted to '{REAL_USER}'.")
-    print("Hotspot autostart disabled. Please reboot.")
+    run(["timedatectl", "set-ntp", "true"], ignore_fail=True)
+    for service in ("eposter-admin.service", "eposter-display.service"):
+        run(["systemctl", "is-active", "--quiet", service])
+    wait_for_display(restarted_after)
+    print("[SUCCESS] Services restarted. Configuration and media cache preserved.")
+    print("Inspect journalctl -u eposter-display.service for the active video decoder.")
 
 if __name__ == "__main__":
     if os.geteuid() != 0:

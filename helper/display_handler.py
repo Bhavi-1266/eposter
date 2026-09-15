@@ -1,591 +1,371 @@
-#!/usr/bin/env python3
-"""
-display_handler.py
+"""Persistent media display, bounded image preparation, and menu rendering.
 
-Handles displaying poster images and status messages using pygame.
+The existing on-disk media cache is only read here. Prepared frames and transition
+snapshots are temporary presentation assets, removed when the display exits.
 """
-from pathlib import Path
-import time
-import json
-import subprocess
-import shutil
-from PIL import Image, ImageSequence
-import pygame
+import logging
+import queue
 import socket
-import math
-from helper.playback_timer import PlaybackTimer, VideoTimerWindow
+import tempfile
+import threading
+import time
+from collections import OrderedDict
+from functools import lru_cache
+from pathlib import Path
 
+from PIL import Image, ImageDraw, ImageFont, ImageOps
+from helper.mpv_player import MpvPlayer, PlayerError
+from helper.playback_timer import format_remaining
+
+LOG = logging.getLogger(__name__)
 ROOT_DIR = Path(__file__).resolve().parent.parent
-_IP_CACHE = {"value": "127.0.0.1", "expires": 0.0}
-_OVERLAY_CACHE = {}
-_FONT_CACHE = {}
+VIDEO_EXTENSIONS = {".mov", ".mp4", ".m4v", ".webm", ".mkv", ".avi"}
+
+
+def is_video_file(path):
+    return Path(path).suffix.lower() in VIDEO_EXTENSIONS
+
 
 def is_animated_gif(path):
     return Path(path).suffix.lower() == ".gif"
 
 
-def is_video_file(path):
-    return Path(path).suffix.lower() in {".mov", ".mp4", ".m4v", ".webm", ".mkv", ".avi"}
-
 def get_local_ip():
-    """Dynamically find the local IP address."""
-    now = time.monotonic()
-    if now < _IP_CACHE["expires"]:
-        return _IP_CACHE["value"]
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.connect(("8.8.8.8", 80))
-            ip = sock.getsockname()[0]
+            return sock.getsockname()[0]
     except OSError:
-        ip = "127.0.0.1"
-    _IP_CACHE.update(value=ip, expires=now + 60)
-    return ip
+        return "127.0.0.1"
 
-def display_url(screen, scr_w, scr_h, rotation=0, poster_id=None):
-    """
-    Overlays a bottom bar with poster ID on left and IP on right.
-    Removed .flip() to prevent flickering.
-    """
-    try:
-        ip_addr = get_local_ip()
-        url_text = f"{ip_addr}"
-        poster_text = f"Paper ID: {poster_id}" if poster_id else ""
-        if rotation in [90, 270]:
-            logical_w = scr_h
-        else:
-            logical_w = scr_w
 
-        bar_height = 25
-        cache_key = (logical_w, rotation, poster_text, url_text)
-        bar_surface = _OVERLAY_CACHE.get(cache_key)
-        if bar_surface is None:
-            font = _FONT_CACHE.setdefault(16, pygame.font.SysFont("Arial", 16, bold=True))
-            bar_surface = pygame.Surface((logical_w, bar_height), pygame.SRCALPHA)
-            bar_surface.fill((245, 245, 245, 225))
-            if poster_text:
-                left_surf = font.render(poster_text, True, (45, 45, 45))
-                bar_surface.blit(left_surf, (10, (bar_height - left_surf.get_height()) // 2))
-            right_surf = font.render(url_text, True, (45, 45, 45))
-            bar_surface.blit(right_surf, (logical_w - right_surf.get_width() - 10, (bar_height - right_surf.get_height()) // 2))
-            if len(_OVERLAY_CACHE) >= 64:
-                _OVERLAY_CACHE.clear()
-            _OVERLAY_CACHE[cache_key] = bar_surface
-        
-        if rotation == 0:
-            screen.blit(bar_surface, (0, scr_h - bar_height))
-        else:
-            rotated_bar = pygame.transform.rotate(bar_surface, -rotation)
-            if rotation == 90:
-                screen.blit(rotated_bar, (0, 0))
-            elif rotation == 180:
-                screen.blit(rotated_bar, (0, 0))
-            elif rotation == 270:
-                screen.blit(rotated_bar, (scr_w - rotated_bar.get_width(), 0))
+@lru_cache(maxsize=16)
+def font(size):
+    for name in ("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans.ttf", "DejaVuSans.ttf"):
+        try:
+            return ImageFont.truetype(name, size)
+        except OSError:
+            pass
+    return ImageFont.load_default(size=size)
+
+
+def logical_size(size, rotation):
+    return size[::-1] if rotation % 180 else size
+
+
+def overlay_scale(size):
+    """Pixel scale shared with player.lua: 1080p=1, UHD=2, either orientation."""
+    return max(0.75, min(size)/1080)
+
+
+def footer_height(size):
+    return round(56*overlay_scale(size))
+
+
+def media_size(size, rotation):
+    w, h = logical_size(size, rotation)
+    return w, max(1, h-footer_height(size))
+
+
+def media_margins(size, rotation, menu=False):
+    margins = dict.fromkeys(("left", "right", "top", "bottom"), 0.0)
+    if not menu:
+        side = {0: "bottom", 90: "left", 180: "top", 270: "right"}[rotation % 360]
+        extent = size[0] if rotation % 180 else size[1]
+        margins[side] = footer_height(size)/extent
+    return margins
+
+
+def menu_scale(size):
+    return max(1, min(size)/1080)
+
+
+def logical_point(x, y, size, rotation):
+    w, h = size
+    return {0: (x, y), 90: (y, w-x), 180: (w-x, h-y), 270: (h-y, x)}[rotation % 360]
+
+
+def menu_geometry(size):
+    scale = menu_scale(size)
+    top, row, count = _menu_geometry(tuple(round(value/scale) for value in size))
+    return round(top*scale), round(row*scale), count
+
+
+def _menu_geometry(size):
+    w, h = size
+    top = max(82, int(h * 0.09))
+    row = max(100, min(220, int(h * 0.18)))
+    count = max(1, (h-top-104)//row)
+    return top, row, count
+
+
+def render_menu(items, offset, selected, size):
+    scale = menu_scale(size)
+    base = tuple(round(value/scale) for value in size)
+    image = _render_menu(items, offset, selected, base)
+    return image.resize(size, Image.Resampling.LANCZOS) if base != size else image
+
+
+def _render_menu(items, offset, selected, size):
+    w, h = size
+    image = Image.new("RGB", size, (245, 245, 240))
+    draw = ImageDraw.Draw(image)
+    top, row, count = menu_geometry(size)
+    draw.rectangle((0, 0, w, top), fill=(234, 234, 228))
+    draw.rounded_rectangle((20, 15, min(w-20, 270), top-15), radius=8, fill=(30, 117, 133))
+    draw.text((34, 25), "Start Schedule", font=font(24), fill="white")
+    if not items:
+        draw.text((30, top+40), "No cached media available", font=font(24), fill=(55, 55, 55))
+    for index, item in enumerate(items[offset:offset+count], offset):
+        y = top + (index-offset)*row + 10
+        fill = (219, 239, 239) if selected == index else (255, 255, 255)
+        draw.rounded_rectangle((20, y, w-20, y+row-18), radius=12, fill=fill)
+        thumb_w, thumb_h = min(200, w//3), row-38
+        try:
+            if is_video_file(item["path"]):
+                draw.rectangle((34, y+10, 34+thumb_w, y+10+thumb_h), fill=(27, 80, 93))
+                cx, cy = 34+thumb_w//2, y+10+thumb_h//2
+                draw.polygon([(cx-12, cy-20), (cx-12, cy+20), (cx+20, cy)], fill="white")
             else:
-                screen.blit(rotated_bar, (0, scr_h - bar_height))
-        # NO FLIP HERE
-    except Exception as e:
-        print(f"[display] Error overlaying URL: {e}")
-
-    
-def get_rotation_degree():
-    """
-    Get the current rotation degree from config file.
-    Reloads config each time to ensure fresh value.
-    """
-    try:
-        config_path = ROOT_DIR / 'config.json'
-        with open(config_path, 'r') as f:
-            config = json.load(f)
-        rotation = int(config.get('display', {}).get('rotation_degree', 0))
-        return rotation
-    except Exception as e:
-        print(f"[display] Error reading rotation from config: {e}")
-        return 0
-
-def make_landscape_and_fit(img: Image.Image, target_w: int, target_h: int, rotation: int = 0) -> Image.Image:
-    """Rotates image and fits it to target dimensions."""
-    iw, ih = img.size
-    if rotation != 0:
-        # Expand=True allows the canvas to grow to hold the rotated image
-        img = img.rotate(rotation, expand=True)
-        iw, ih = img.size
-        
-    scale = min(target_w / iw, target_h / ih)
-    nw = max(1, int(iw * scale))
-    nh = max(1, int(ih * scale))
-    
-    resized = img.resize((nw, nh), Image.LANCZOS)
-    canvas = Image.new("RGBA", (target_w, target_h), (0, 0, 0, 255))
-    x = (target_w - nw) // 2
-    y = (target_h - nh) // 2
-    canvas.paste(resized, (x, y))
-    return canvas
-
-def pil_to_surface(pil_img: Image.Image):
-    """Converts PIL Image to pygame Surface."""
-    return pygame.image.fromstring(pil_img.tobytes(), pil_img.size, pil_img.mode)
+                with Image.open(item["path"]) as source:
+                    source.thumbnail((thumb_w, thumb_h))
+                    thumb = ImageOps.exif_transpose(source).convert("RGB")
+                    image.paste(thumb, (34+(thumb_w-thumb.width)//2, y+10+(thumb_h-thumb.height)//2))
+        except (OSError, ValueError):
+            draw.text((34, y+20), "Unavailable", font=font(16), fill=(80, 80, 80))
+        label = f"Paper ID: {item.get('paper_id') or item['path'].stem}"
+        while draw.textlength(label, font=font(22)) > w-thumb_w-90 and len(label) > 4:
+            label = label[:-4] + "..."
+        draw.text((thumb_w+55, y+24), label, font=font(22), fill=(45, 45, 45))
+        kind = "Video" if is_video_file(item["path"]) else "GIF" if is_animated_gif(item["path"]) else "Image"
+        draw.text((thumb_w+55, y+58), kind + "  /  Tap to view", font=font(16), fill=(85, 85, 85))
+    draw.text((24, h-90), f"{min(offset+1, len(items))}-{min(offset+count, len(items))} of {len(items)}   Scroll to browse", font=font(20), fill=(65, 65, 65))
+    return image
 
 
-def prepare_image_surface(image_path, scr_w, scr_h, rotation=0):
-    """Decode and resize an image without changing the visible display."""
-    try:
-        with Image.open(image_path) as source:
-            img = source.convert("RGBA")
-        canvas = make_landscape_and_fit(img, scr_w, scr_h, rotation=-rotation)
-        background = Image.new("RGBA", canvas.size, (0, 0, 0, 255))
-        background.paste(canvas, (0, 0), canvas)
-        return pil_to_surface(background)
-    except Exception as e:
-        print(f"[display] Failed to prepare image {image_path}: {e}")
-        return None
+class PreparedImages:
+    """At most three decoded/resized stills on temporary storage; no frame arrays."""
+    def __init__(self, directory, limit=3):
+        self.directory = Path(directory)
+        self.limit = limit
+        self.entries = OrderedDict()
+        self.sequence = 0
 
-def _handle_playback_events(interrupt_on_input=False):
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            raise SystemExit
+    def prepare(self, path, size):
+        path = Path(path)
+        if is_video_file(path) or is_animated_gif(path):
+            return path
+        stat = path.stat()
+        key = (str(path), stat.st_mtime_ns, stat.st_size, size)
+        if key in self.entries:
+            self.entries.move_to_end(key)
+            return self.entries[key]
+        with Image.open(path) as source:
+            # JPEG draft reduces decode memory for very large uploaded posters.
+            source.draft("RGB", size)
+            image = ImageOps.exif_transpose(source)
+            # Fill the actual display, including upscaling. Stretch instead of
+            # cropping so titles/labels at poster edges remain visible.
+            image = image.convert("RGBA").resize(size, Image.Resampling.LANCZOS)
+        canvas = Image.new("RGB", size, "black")
+        canvas.paste(image, (0, 0), image)
+        self.sequence += 1
+        output = self.directory / f"prepared-{self.sequence}.png"
+        canvas.save(output, compress_level=1)
+        self.entries[key] = output
+        while len(self.entries) > self.limit:
+            _, old = self.entries.popitem(last=False)
+            old.unlink(missing_ok=True)
+        return output
 
-        if event.type == pygame.KEYDOWN:
-            if event.key in (pygame.K_q, pygame.K_ESCAPE):
-                raise SystemExit
-            if interrupt_on_input:
-                return False
 
-        if interrupt_on_input and event.type == pygame.MOUSEBUTTONDOWN:
+def uncover_overlays(image, rotation, show_timer=True, timer_text="00:00"):
+    """Bitmap holds sit above ASS; leave the live timer and footer uncovered."""
+    image = image.convert("RGBA")
+    size = logical_size(image.size, rotation)
+    mask = Image.new("L", size, 255)
+    draw = ImageDraw.Draw(mask)
+    scale = overlay_scale(image.size)
+    if show_timer:
+        margin = round(16*scale)
+        width = max(120*scale, len(timer_text)*int(28*scale)*0.65+24*scale)
+        draw.rounded_rectangle((margin, margin, margin+round(width), margin+round(48*scale)), radius=round(16*scale), fill=0)
+    draw.rectangle((0, size[1]-footer_height(image.size), size[0], size[1]), fill=0)
+    if rotation:
+        mask = mask.rotate(-rotation, expand=True)
+    image.putalpha(mask)
+    # Zero RGB for transparent pixels: mpv expects premultiplied alpha.
+    blank = Image.new("RGBA", image.size)
+    blank.paste(image, mask=mask)
+    return blank
+
+
+class Display:
+    def __init__(self, hwdec="auto", player=None):
+        self.player = player or MpvPlayer(hwdec=hwdec)
+        self.temp = tempfile.TemporaryDirectory(prefix="eposter-frames-")
+        self.directory = Path(self.temp.name)
+        self.prepared = PreparedImages(self.directory)
+        self.lock = threading.Lock()
+        self.wake = threading.Event()
+        self.stopping = False
+        self.pending = None
+        self.preload = None
+        self.requested = None
+        self.shown = None
+        self.error = None
+        self.retry_at = 0
+        self.rotation = 0
+        self.menu_serial = 0
+        self.overlay_state = None
+        self.viewport = None
+        self.worker = threading.Thread(target=self._work, name="media-display", daemon=True)
+        self.worker.start()
+
+    @property
+    def size(self):
+        dims = self.player.properties.get("osd-dimensions") or {}
+        return (int(dims.get("w") or 1920), int(dims.get("h") or 1080))
+
+    def show(self, path, rotation=0, menu=None):
+        path = Path(path) if path else None
+        try:
+            stat = path.stat() if path else None
+            stamp = (stat.st_mtime_ns, stat.st_size) if stat else None
+        except OSError:
+            stamp = None
+        key = (str(path), stamp, rotation, self.size, menu["key"] if menu else None)
+        with self.lock:
+            if key == self.requested and (not self.error or time.monotonic() < self.retry_at):
+                return
+            self.requested = key
+            self.pending = (key, path, rotation, self.size, menu)
+            self.error = None
+        # Stop outgoing audio immediately, but let the video output finish any
+        # pending loop/seek before the worker captures its transition frame.
+        if self.shown is not None:
+            self.player.command("set_property", "mute", True)
+        self.wake.set()
+
+    def prefetch(self, path, rotation=0):
+        if path and not is_video_file(path) and not is_animated_gif(path):
+            with self.lock:
+                self.preload = (Path(path), media_size(self.size, rotation))
+            self.wake.set()
+
+    def overlay(self, deadline=None, paper_id=None, ip="", status="", rotation=0, menu=False):
+        state = {"deadline": deadline, "rotation": rotation, "status": status,
+                 "footer_left": f"Paper ID: {paper_id}" if paper_id is not None else "",
+                 "footer_right": ip}
+        if state != self.overlay_state:
+            self.player.set_overlay(**state)
+            self.overlay_state = state
+        desired_cursor = "no" if menu else "1000"
+        if getattr(self, "cursor", None) != desired_cursor:
+            self.player.command("set_property", "cursor-autohide", desired_cursor)
+            self.cursor = desired_cursor
+
+    def _set_viewport(self, size, rotation, menu=False):
+        key = (size, rotation, menu)
+        if key != self.viewport:
+            for side, ratio in media_margins(size, rotation, menu).items():
+                self.player.command("set_property", f"video-margin-ratio-{side}", ratio)
+            self.viewport = key
+
+    def _hold_frame(self, rotation):
+        if self.shown is None or self.player.headless:
+            return False
+        try:
+            snapshot = self.directory / "hold.png"
+            self.player.command("screenshot-to-file", str(snapshot), "window", timeout=2)
+            with Image.open(snapshot) as frame:
+                deadline = (self.overlay_state or {}).get("deadline")
+                self.player.bitmap(uncover_overlays(frame, rotation, deadline is not None,
+                                                   format_remaining((deadline or 0)-time.time())))
+            return True
+        except (PlayerError, OSError, ValueError) as error:
+            LOG.debug("Frame hold unavailable: %s", error)
             return False
 
-    return True
-
-def _wait_for_playback(seconds, clock=None, interrupt_on_input=False, on_tick=None):
-    end_time = time.monotonic() + max(0, seconds)
-    while time.monotonic() < end_time:
-        if on_tick:
-            on_tick()
-        if not _handle_playback_events(interrupt_on_input):
-            return False
-        if clock:
-            clock.tick(60)
-        else:
-            pygame.time.wait(10)
-    return True
-
-
-def _spawn_video_player(cmd, duration_seconds=None):
-    kwargs = {
-        "stdin": subprocess.DEVNULL,
-        "stdout": subprocess.DEVNULL,
-        "stderr": subprocess.DEVNULL,
-    }
-    try:
-        return subprocess.Popen(cmd, **kwargs)
-    except Exception as e:
-        print(f"[display] Could not start video player: {e}")
-        return None
-
-
-def _stop_video_player(proc):
-    if proc is None or proc.poll() is not None:
-        return
-    try:
-        proc.terminate()
-        proc.wait(timeout=2)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-        proc.wait(timeout=2)
-    except Exception as e:
-        print(f"[display] Could not stop video player cleanly: {e}")
-
-
-def _resolve_video_player(path):
-    candidates = [
-        ["ffplay", "-x", "{w}", "-y", "{h}", "-fs", "-alwaysontop", "-autoexit", "-loglevel", "error", "{path}"],
-        ["omxplayer", "--no-osd", "--orientation", "0", "{path}"],
-        ["mpv", "--fullscreen", "--ontop", "--no-terminal", "--keep-open=no", "{path}"],
-        ["cvlc", "--fullscreen", "--video-on-top", "--play-and-exit", "--no-osd", "{path}"],
-    ]
-
-    for cmd_tmpl in candidates:
-        binary = cmd_tmpl[0]
-        binary_path = shutil.which(binary)
-        if binary_path:
-            return [binary_path] + cmd_tmpl[1:]
-
-    return None
-
-
-def _apply_video_rotation(cmd, rotation):
-    """Apply the same clockwise rotation convention used for poster images."""
-    try:
-        rotation = int(rotation) % 360
-    except (TypeError, ValueError):
-        rotation = 0
-
-    if rotation not in (90, 180, 270):
-        return cmd
-
-    player = Path(cmd[0]).name
-    if player == "ffplay":
-        filters = {
-            90: "transpose=clock",
-            180: "hflip,vflip",
-            270: "transpose=cclock",
-        }
-        cmd[-1:-1] = ["-noautorotate", "-vf", filters[rotation]]
-    elif player == "mpv":
-        cmd.insert(1, f"--video-rotate={rotation}")
-    elif player == "omxplayer":
-        orientation_index = cmd.index("--orientation") + 1
-        cmd[orientation_index] = str(rotation)
-    elif player in ("cvlc", "vlc"):
-        cmd[-1:-1] = ["--video-filter=transform", f"--transform-type={rotation}"]
-
-    return cmd
-
-
-def video_countdown_duration(path, max_duration):
-    """Use clip length when it ends before the configured playback limit."""
-    duration = None
-    try:
-        result = subprocess.run([
-            "ffprobe", "-v", "error", "-show_entries", "format=duration",
-            "-of", "default=noprint_wrappers=1:nokey=1", str(path),
-        ], capture_output=True, text=True, check=True, timeout=3)
-        candidate = float(result.stdout.strip())
-        if math.isfinite(candidate) and candidate > 0:
-            duration = candidate
-    except (OSError, ValueError, subprocess.SubprocessError):
-        pass
-    if max_duration is not None:
-        duration = min(duration, max_duration) if duration is not None else max_duration
-    return duration
-
-
-def display_video(screen, video_path, scr_w, scr_h, rotation=0, max_duration=None,
-                  clock=None, poster_id=None, interrupt_on_input=False,
-                  next_image_path=None, next_poster_id=None):
-    if not is_video_file(video_path):
-        return False
-
-    cmd_tmpl = _resolve_video_player(video_path)
-    if not cmd_tmpl:
-        show_screensaver_message(screen, scr_w, scr_h, "No video player found. Install ffplay/omxplayer/mpv.")
-        pygame.display.flip()
-        _wait_for_playback(2, clock)
-        return False
-
-    cmd = [arg.format(w=scr_w, h=scr_h, path=str(video_path)) for arg in cmd_tmpl]
-    cmd = _apply_video_rotation(cmd, rotation)
-    if Path(cmd[0]).name == "ffplay" and interrupt_on_input:
-        cmd[-1:-1] = ["-exitonkeydown", "-exitonmousedown"]
-    duration = video_countdown_duration(video_path, max_duration)
-    timer_window = None
-    proc = None
-    next_surface = None
-    if next_image_path and not is_video_file(next_image_path) and not is_animated_gif(next_image_path):
-        next_surface = prepare_image_surface(next_image_path, scr_w, scr_h, rotation)
-
-    try:
-        # Keep Pygame alive behind the always-on-top player. Recreating the
-        # fullscreen display here causes a visible black flash after videos.
-        pygame.event.pump()
-        proc = _spawn_video_player(cmd)
-        if proc is None:
-            return False
-
-        start = time.monotonic()
-        if duration is not None:
-            try:
-                timer_window = VideoTimerWindow(PlaybackTimer(duration, (scr_w, scr_h), rotation), interrupt_on_input)
-            except Exception as error:
-                print(f"[display] Video countdown unavailable: {error}. Run the installer to install python3-tk.")
-        next_image_drawn = False
-        while True:
-            if proc.poll() is not None:
-                break
-
-            if timer_window is not None:
+    def _work(self):
+        while not self.stopping:
+            self.wake.wait(0.2)
+            self.wake.clear()
+            with self.lock:
+                job, self.pending = self.pending, None
+                preload = None
+                if job is None:
+                    preload, self.preload = self.preload, None
+            if job:
+                key, path, rotation, size, menu = job
+                held = False
                 try:
-                    timer_window.tick()
-                    if timer_window.closed:
-                        return True
-                except Exception as error:
-                    print(f"[display] Video countdown stopped: {error}")
-                    timer_window.close()
-                    timer_window = None
-            elapsed = time.monotonic() - start
-            if next_surface is not None and not next_image_drawn and elapsed >= 0.35:
-                screen.blit(next_surface, (0, 0))
-                if next_poster_id is not None:
-                    display_url(screen, scr_w, scr_h, rotation, poster_id=next_poster_id)
-                pygame.display.flip()
-                next_image_drawn = True
+                    if menu:
+                        self.menu_serial += 1
+                        prepared = self.directory / f"menu-{self.menu_serial % 2}.png"
+                        render_menu(menu["items"], menu["offset"], menu["selected"], logical_size(size, rotation)).save(prepared, compress_level=1)
+                    else:
+                        prepared = self.prepared.prepare(path, media_size(size, rotation))
+                    with self.lock:
+                        if key != self.requested:
+                            continue
+                    held = self._hold_frame(rotation)
+                    # Pause the outgoing clip before its replacement can load.
+                    self.player.command("set_property", "pause", True)
+                    self._set_viewport(size, rotation, bool(menu))
+                    self.player.load(prepared, rotation, start_paused=True)
+                    # Expose the decoded first frame before advancing the clip.
+                    if held:
+                        self.player.remove_bitmap()
+                        held = False
+                    with self.lock:
+                        superseded = key != self.requested
+                    if superseded:
+                        self.player.command("set_property", "pause", True)
+                    else:
+                        self.player.command("set_property", "mute", False)
+                        self.player.command("set_property", "pause", False)
+                    self.shown, self.rotation = key, rotation
+                    LOG.info("Showing %s at rotation %s", "menu" if menu else path.name, rotation)
+                except (PlayerError, OSError, ValueError) as error:
+                    LOG.error("Display failed: %s", error)
+                    if self.player.alive:
+                        try:
+                            self._set_viewport(size, rotation)
+                            content_size = media_size(size, rotation)
+                            fallback = self.directory / f"unavailable-{content_size[0]}x{content_size[1]}.png"
+                            if not fallback.exists():
+                                Image.new("RGB", content_size, (25, 30, 32)).save(fallback)
+                            self.player.load(fallback, rotation, timeout=3)
+                        except (PlayerError, OSError):
+                            LOG.warning("Could not load the unavailable-media background")
+                    with self.lock:
+                        if key == self.requested:
+                            self.error = str(error)
+                            self.retry_at = time.monotonic() + 15
+                finally:
+                    if held and self.player.alive:
+                        try:
+                            self.player.remove_bitmap()
+                        except PlayerError:
+                            pass
+            elif preload:
+                try:
+                    self.prepared.prepare(*preload)
+                except (OSError, ValueError):
+                    pass
 
-            if max_duration is not None and elapsed >= max_duration:
-                _stop_video_player(proc)
-                return True
-
-            if not _handle_playback_events(interrupt_on_input):
-                _stop_video_player(proc)
-                return True
-
-            if clock:
-                clock.tick(60)
-            else:
-                time.sleep(0.02)
-
-        if proc.returncode not in (0, None):
-            print(f"[display] Video player exited with status {proc.returncode}: {video_path}")
-            return False
-        return True
-    except Exception as e:
-        print(f"[display] Failed to play video {video_path}: {e}")
-        return False
-    finally:
-        _stop_video_player(proc)
-        if timer_window is not None:
-            timer_window.close()
-
-def _draw_gif_frame(screen, pil_img, scr_w, scr_h, rotation=0, poster_id=None, timer=None):
-    img = pil_img.convert("RGBA")
-    canvas = make_landscape_and_fit(img, scr_w, scr_h, rotation=-rotation)
-
-    bg = Image.new("RGBA", canvas.size, (0, 0, 0, 255))
-    bg.paste(canvas, (0, 0), canvas)
-
-    surf = pil_to_surface(bg)
-    screen.blit(surf, (0, 0))
-
-    if poster_id is not None:
-        display_url(screen, scr_w, scr_h, rotation, poster_id=poster_id)
-
-    if timer is not None:
-        timer.capture(screen)
-        timer.paint(screen)
-    pygame.display.flip()
-    return True
-
-def _draw_screensaver_frame(screen, pil_img, scr_w, scr_h, message="", rotation=0):
-    img = pil_img.convert("RGBA")
-    canvas = make_landscape_and_fit(img, scr_w, scr_h, rotation=-rotation)
-    surf = pil_to_surface(canvas)
-
-    screen.blit(surf, (0, 0))
-    _draw_status_bar(screen, scr_w, scr_h, message, rotation)
-    display_url(screen, scr_w, scr_h, rotation)
-    pygame.display.flip()
-    return True
-
-def _load_gif_frames(gif_path):
-    frames = []
-    durations = []
-
-    with Image.open(gif_path) as gif:
-        for frame in ImageSequence.Iterator(gif):
-            frames.append(frame.convert("RGBA").copy())
-            durations.append(max(20, int(frame.info.get("duration") or 100)))
-
-    return frames, durations
-
-def init_display():
-    """Initializes pygame display in fullscreen mode."""
-    try:
-        pygame.init()
-        pygame.display.init()
-        info = pygame.display.Info()
-        scr_w, scr_h = info.current_w, info.current_h
-        print(f"[display] Screen detected: {scr_w}x{scr_h}")
-
-        screen = pygame.display.set_mode((scr_w, scr_h), pygame.FULLSCREEN)
-        pygame.mouse.set_visible(False)
-        clock = pygame.time.Clock()
-        
-        # Check rotation immediately for the first loading screen
-        rot = get_rotation_degree()
-        show_waiting_message(screen, scr_w, scr_h, message="Loading...", rotation=rot)
-        
-        return screen, clock, scr_w, scr_h
-    except Exception as e:
-        print(f"[display] Failed to initialize display: {e}")
-        return None
-
-def show_waiting_message(screen, scr_w, scr_h, message="Waiting...", rotation=0):
-    """
-    Displays a multi-line message centered and rotated.
-    """
-    screen.fill((0, 0, 0))
-    try:
-        font = pygame.font.SysFont("Arial", 32, bold=True)
-        lines = message.split('\n')
-        
-        # 1. Render all lines to surfaces
-        rendered_lines = [font.render(line, True, (255, 255, 255)) for line in lines]
-        
-        # 2. Calculate dimensions of the text block
-        max_w = max(s.get_width() for s in rendered_lines) if rendered_lines else 0
-        total_h = sum(s.get_height() for s in rendered_lines) + (5 * (len(lines) - 1)) # 5px padding
-        
-        # 3. Create a transparent container for the text
-        text_container = pygame.Surface((max_w, total_h), pygame.SRCALPHA)
-        
-        # 4. Blit lines onto container centered
-        current_y = 0
-        for s in rendered_lines:
-            x_pos = (max_w - s.get_width()) // 2
-            text_container.blit(s, (x_pos, current_y))
-            current_y += s.get_height() + 5
-            
-        # 5. Rotate the entire container
-        # Pygame rotates counter-clockwise, so we use negative rotation
-        if rotation != 0:
-            text_container = pygame.transform.rotate(text_container, -rotation)
-            
-        # 6. Center the rotated container on the main screen
-        final_rect = text_container.get_rect(center=(scr_w // 2, scr_h // 2))
-        screen.blit(text_container, final_rect)
-        
-        pygame.display.flip()
-    except Exception as e:
-        print(f"[display] Error showing waiting message: {e}")
-        pygame.display.flip()
-
-def _draw_status_bar(screen, scr_w, scr_h, message, rotation=0):
-    if rotation in [90, 270]:
-        logical_w = scr_h
-        logical_h = scr_w
-    else:
-        logical_w = scr_w
-        logical_h = scr_h
-
-    bar_height = max(30, int(logical_h * 0.1))
-    bar_surface = pygame.Surface((logical_w, bar_height), pygame.SRCALPHA)
-    bar_surface.fill((0, 0, 0, 0))
-
-    lines = message.split('\n') if message else []
-    font_size = max(14, int(bar_height * 0.18))
-    font = pygame.font.SysFont("Arial", font_size, bold=True)
-    text_color = (210, 210, 210)
-    rendered = [font.render(line, True, text_color) for line in lines]
-    total_h = sum(s.get_height() for s in rendered) + (4 * (len(rendered) - 1))
-
-    while rendered and total_h > bar_height - 10 and font_size > 12:
-        font_size -= 2
-        font = pygame.font.SysFont("Arial", font_size, bold=True)
-        rendered = [font.render(line, True, text_color) for line in lines]
-        total_h = sum(s.get_height() for s in rendered) + (4 * (len(rendered) - 1))
-
-    y = (bar_height - total_h) // 2
-    for surf in rendered:
-        x = (logical_w - surf.get_width()) // 2
-        bar_surface.blit(surf, (x, y))
-        y += surf.get_height() + 4
-
-    if rotation == 0:
-        screen.blit(bar_surface, (0, scr_h - bar_height))
-    else:
-        rotated_bar = pygame.transform.rotate(bar_surface, -rotation)
-        if rotation == 90:
-            screen.blit(rotated_bar, (0, 0))
-        elif rotation == 180:
-            screen.blit(rotated_bar, (0, 0))
-        elif rotation == 270:
-            screen.blit(rotated_bar, (scr_w - rotated_bar.get_width(), 0))
-        else:
-            screen.blit(rotated_bar, (0, scr_h - bar_height))
-
-def show_screensaver_message(screen, scr_w, scr_h, message="Waiting...", rotation=0, image_path=None,
-                             animation_seconds=0, clock=None):
-    screen.fill((0, 0, 0))
-    try:
-        if image_path is None:
-            gif_path = ROOT_DIR / "ScreenSaver.gif"
-            image_path = gif_path if gif_path.exists() else ROOT_DIR / "ScreenSaver.png"
-
-        if Path(image_path).exists():
-            if is_animated_gif(image_path):
-                frames, durations = _load_gif_frames(image_path)
-
-                if frames and animation_seconds > 0:
-                    start_time = time.time()
-                    while time.time() - start_time < animation_seconds:
-                        for frame, duration_ms in zip(frames, durations):
-                            if time.time() - start_time >= animation_seconds:
-                                break
-                            _draw_screensaver_frame(screen, frame, scr_w, scr_h, message, rotation)
-                            wait_seconds = min(duration_ms / 1000, animation_seconds - (time.time() - start_time))
-                            _wait_for_playback(wait_seconds, clock)
-                    return
-
-                if frames:
-                    _draw_screensaver_frame(screen, frames[0], scr_w, scr_h, message, rotation)
-                    return
-            else:
-                with Image.open(image_path) as source:
-                    img = source.convert("RGBA")
-                    _draw_screensaver_frame(screen, img, scr_w, scr_h, message, rotation)
-
-                if animation_seconds > 0:
-                    _wait_for_playback(animation_seconds, clock)
+    def inputs(self):
+        while True:
+            try:
+                yield self.player.inputs.get_nowait()
+            except queue.Empty:
                 return
 
-        _draw_status_bar(screen, scr_w, scr_h, message, rotation)
-        display_url(screen, scr_w, scr_h, rotation)
-        pygame.display.flip()
-    except Exception as e:
-        print(f"[display] Error showing screensaver: {e}")
-        pygame.display.flip()
-
-def display_image(screen, image_path, scr_w, scr_h, rotation=0):
-    """Displays an image on the screen with a black background."""
-    try:
-        surf = prepare_image_surface(image_path, scr_w, scr_h, rotation)
-        if surf is None:
-            return False
-        screen.blit(surf, (0, 0))
-        pygame.display.flip()
-
-        return True
-
-    except Exception as e:
-        print(f"[display] Failed to display image {image_path}: {e}")
-        return False
-
-def display_animated_gif(screen, gif_path, scr_w, scr_h, rotation=0, max_duration=None,
-                         clock=None, poster_id=None, interrupt_on_input=False):
-    try:
-        frames, durations = _load_gif_frames(gif_path)
-
-        if not frames:
-            return display_image(screen, gif_path, scr_w, scr_h, rotation)
-
-        start_time = time.monotonic()
-        total_duration = max_duration if max_duration is not None else sum(durations) / 1000
-        timer = PlaybackTimer(total_duration, (scr_w, scr_h), rotation)
-
-        while True:
-            for frame, duration_ms in zip(frames, durations):
-                if max_duration is not None and time.monotonic() - start_time >= max_duration:
-                    return True
-
-                if not _handle_playback_events(interrupt_on_input):
-                    return True
-
-                _draw_gif_frame(screen, frame, scr_w, scr_h, rotation, poster_id=poster_id, timer=timer)
-
-                wait_seconds = duration_ms / 1000
-                if max_duration is not None:
-                    remaining = max_duration - (time.monotonic() - start_time)
-                    wait_seconds = min(wait_seconds, max(0, remaining))
-
-                if not _wait_for_playback(wait_seconds, clock, interrupt_on_input, on_tick=lambda: timer.paint(screen)):
-                    return True
-
-            if max_duration is None:
-                return True
-
-    except Exception as e:
-        print(f"[display] Failed to display animated GIF {gif_path}: {e}")
-        return False
-
-def display_connecting_wifi(screen, scr_w, scr_h, rotation=0):
-    """Wrapper to show wifi message with rotation."""
-    show_waiting_message(screen, scr_w, scr_h, "Connecting to WiFi...", rotation)
+    def close(self):
+        self.stopping = True
+        self.wake.set()
+        self.player.close()
+        self.worker.join(timeout=12)
+        if not self.worker.is_alive():
+            self.temp.cleanup()

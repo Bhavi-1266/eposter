@@ -24,3 +24,7 @@ event_data.json
 *.log
 /.agents/
 /.codex/
+
+.playback-status.json
+/.venvs/
+/.venv-previous-*

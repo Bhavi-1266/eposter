@@ -35,7 +35,7 @@
 </header>
 <main id="main" class="workspace">
   <section class="page-heading">
-    <div><p class="eyebrow">DEVICE CONTROL</p><h1>Your display, at a glance.</h1><p class="muted">Unit {{ settings.ID }} <span class="separator">/</span> <span id="device-identity">Screen {{ settings.display.device_id }} &middot; {{ settings.display.Mode }} mode</span></p></div>
+    <div><p class="eyebrow">DEVICE CONTROL</p><h1>Your display, at a glance.</h1><p class="muted">Unit {{ settings.ID }} <span class="separator">/</span> <span id="device-identity">Hardware ID {{ settings.display.hardware_ID }} &middot; {{ settings.display.Mode }} mode</span></p></div>
     <button type="button" class="button secondary" id="refresh-status">Refresh status</button>
   </section>
   <noscript><div class="notice error">Enable JavaScript to use status updates and the settings form. The portal uses only local scripts.</div></noscript>
@@ -72,7 +72,7 @@
             <small id="mode-help" class="help">Time follows the API schedule; Scroll cycles media; Menu lets viewers select.</small>
             <small id="mode-error" class="field-error"></small>
           </div>
-          {{ field('device_id', 'Screen number', settings.display.device_id, 'number', 'Must match the screen number in your API.', 0, 999999) }}
+          {{ field('hardware_ID', 'Hardware ID', settings.display.hardware_ID, 'number', 'Existing device identifier used to match this board to its API schedule.', 0, 999999) }}
           <div class="field">
             <label for="rotation">Display rotation</label>
             <select id="rotation" name="rotation" aria-describedby="rotation-help rotation-error">

@@ -91,6 +91,9 @@ def fetch_posters(token, api=None, timeout=None):
         with requests.get(api, params=params, timeout=timeout) as response:
             response.raise_for_status()
             data = response.json()
+        if (not isinstance(data, dict) or data.get("status") is False
+                or not any(isinstance(data.get(key), list) for key in ("screens", "booking_slot", "data"))):
+            raise ValueError("API response must contain a successful schedule with a records list")
         print( f"[fetch_posters] Successfully fetched posters from API")
         previous_data = load_json_file(API_DATA_JSON, None)
         content_changed = _without_fetch_metadata(previous_data) != _without_fetch_metadata(data)
@@ -113,19 +116,6 @@ def fetch_posters(token, api=None, timeout=None):
                 print(f"[fetch_posters] Failed to save API data to JSON: {e}")
         else:
             print("[fetch_posters] API content unchanged; keeping existing file")
-        
-        # Handle new API response structure: {status, message, data: [...]}
-        # if isinstance(data, dict):
-        #     # Check for new structure with status and data array
-        #     if "status" in data and "screens" in data:
-        #         posters = data.get("data", [])
-        #         if isinstance(posters, list):
-        #             return posters
-            
-            # Fallback to old structure
-            # arr = data.get("data") or data.get("eposters") or []
-            # if isinstance(arr, list):
-            #     return arr
         
         return data
         

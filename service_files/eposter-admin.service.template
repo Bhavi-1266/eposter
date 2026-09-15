@@ -6,10 +6,10 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-User=root
-WorkingDirectory=/home/rock/eposter
-ExecStartPre=/usr/bin/test -x /home/rock/eposter/venv/bin/python3
-ExecStart=/home/rock/eposter/venv/bin/python3 /home/rock/eposter/config_portal.py
+User={user}
+WorkingDirectory={base_dir}
+ExecStartPre=/usr/bin/test -x "{python_bin}"
+ExecStart="{python_bin}" "{base_dir}/config_portal.py"
 Restart=always
 RestartSec=5
 KillMode=control-group

@@ -52,6 +52,31 @@ class PortalTests(unittest.TestCase):
             ssid1="Conference", ssid2="", pass1="", pass2="", poster_token="",
         )
 
+    def test_hardware_id_save_and_status(self):
+        self.login()
+        form = self.form()
+        form.pop("device_id")
+        form["hardware_ID"] = "42"
+        result = self.client.post("/save", data=form)
+        self.assertEqual(result.status_code, 200, result.json)
+        saved = json.loads(self.path.read_text())
+        self.assertEqual(saved["display"]["hardware_ID"], 42)
+        self.assertNotIn("device_id", saved["display"])
+        page = self.client.get("/").get_data(as_text=True)
+        self.assertIn('name="hardware_ID"', page)
+        self.assertIn("Hardware ID 42", page)
+        with patch("config_portal.device_snapshot", return_value={"warnings": []}):
+            self.assertEqual(self.client.get("/api/status").json["device"]["hardware_ID"], 42)
+
+    def test_legacy_identity_is_migrated_before_defaults(self):
+        self.config["display"].pop("hardware_ID", None)
+        self.config["display"]["device_id"] = 93
+        self.path.write_text(json.dumps(self.config))
+        loaded, _ = portal.read_config(self.root)
+        self.assertEqual(loaded["display"]["hardware_ID"], 93)
+        self.login()
+        self.assertIn("Hardware ID 93", self.client.get("/").get_data(as_text=True))
+
     def test_update_requires_login_csrf_and_password(self):
         self.assertEqual(self.client.get("/api/update").status_code, 401)
         self.assertEqual(self.client.post("/api/update").status_code, 401)

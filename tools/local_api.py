@@ -64,7 +64,7 @@ def _generate_schedule(source, source_path):
     if not isinstance(templates, list) or not templates:
         raise ValueError("Simple API data requires a non-empty 'records' list")
 
-    device_id = source.get("device_id", source.get("screen_number", 1))
+    device_id = source.get("hardware_ID", source.get("device_id", source.get("screen_number", 1)))
     horizon_minutes = _positive_int(source.get("repeat_for_minutes"), 120, 1440)
     durations = [
         _positive_int(record.get("duration_seconds"), 15, 3600)

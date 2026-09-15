@@ -22,6 +22,7 @@ from flask import Flask, g, jsonify, redirect, render_template, request, session
 from werkzeug.exceptions import HTTPException
 
 from helper.json_utils import atomic_write_json
+from helper.configuration import normalize_config
 from device_update import UNIT, update_status, write_status
 
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -30,7 +31,7 @@ DEFAULTS = {
     "ID": 0,
     "wifi": {"ssid1": "", "password1": "", "ssid2": "", "password2": "", "connect_timeout": 20},
     "api": {"poster_api_url": "", "poster_token": "", "request_timeout": 15, "max_media_size_mb": 512},
-    "display": {"device_id": 1, "rotation_degree": 0, "Mode": "Menu", "Auto_Scroll": 5, "cache_refresh": 60},
+    "display": {"hardware_ID": 1, "rotation_degree": 0, "Mode": "Menu", "Auto_Scroll": 5, "cache_refresh": 60},
 }
 
 
@@ -59,6 +60,10 @@ def read_config(project_dir):
         raise PortalError("Cannot read config.json. Check the board's storage and permissions.", 503) from None
     if not isinstance(data, dict):
         raise PortalError("config.json must contain a JSON object.", 503)
+    try:
+        data = normalize_config(data)
+    except ValueError as error:
+        raise PortalError(str(error), 503) from None
     for key, default in DEFAULTS.items():
         if isinstance(default, dict):
             if key in data and not isinstance(data[key], dict):
@@ -103,13 +108,13 @@ def session_secret(project_dir):
 def validate_form(form):
     errors, values = {}, {}
     for field, lower, upper in (
-        ("device_id", 0, 999999), ("rotation", 0, 270),
+        ("hardware_ID", 0, 999999), ("rotation", 0, 270),
         ("auto_scroll", 1, 3600), ("cache_refresh", 30, 3600),
         ("request_timeout", 3, 120), ("connect_timeout", 5, 120),
         ("max_media_size_mb", 1, 2048),
     ):
         try:
-            value = int(form.get(field, ""))
+            value = int(form.get(field, form.get("device_id", "") if field == "hardware_ID" else ""))
             if not lower <= value <= upper:
                 raise ValueError
             values[field] = value
@@ -166,7 +171,7 @@ def save_config(project_dir, form):
             if not same_text(form.get("revision"), revision):
                 raise PortalError("Settings changed on the board or in another tab. Reload before saving; your edits are still shown here.", 409)
             config["display"].update({
-                "device_id": values["device_id"], "Mode": values["mode"],
+                "hardware_ID": values["hardware_ID"], "Mode": values["mode"],
                 "rotation_degree": values["rotation"], "Auto_Scroll": values["auto_scroll"],
                 "cache_refresh": values["cache_refresh"],
             })
@@ -241,9 +246,9 @@ def device_snapshot(project_dir):
     except OSError:
         result["cache_files"] = None
         warnings.append("Media cache is missing or unreadable.")
-    result["video_player"] = next((name for name in ("ffplay", "omxplayer", "mpv", "cvlc") if shutil.which(name)), None)
+    result["video_player"] = "mpv" if shutil.which("mpv") else None
     if not result["video_player"]:
-        warnings.append("No video player found. Install ffmpeg on the board to enable video.")
+        warnings.append("mpv is missing. Run the installer on the board to enable playback.")
     result["display_service"] = "unknown"
     if shutil.which("systemctl"):
         try:
@@ -403,7 +408,7 @@ def create_app(project_dir=None):
         try:
             config, revision = save_config(project_dir, request.form)
             snapshot["expires"] = 0
-            return jsonify(success=True, message="Settings saved. Display updates after its current playback or refresh cycle. Wi-Fi credentials are used on the next connection attempt.", revision=revision,
+            return jsonify(success=True, message="Settings saved. Display settings apply within a few seconds; content downloads continue in the background. Wi-Fi credentials are used on the next connection attempt.", revision=revision,
                            secret_saved={"pass1": bool(config["wifi"].get("password1")), "pass2": bool(config["wifi"].get("password2")), "poster_token": bool(config["api"].get("poster_token"))})
         finally:
             mutation_lock.release()
@@ -423,7 +428,8 @@ def create_app(project_dir=None):
         if not g.config["api"].get("poster_api_url"):
             result["warnings"].append("Poster API URL is not configured.")
         result["mode"] = g.config["display"].get("Mode")
-        result["device_id"] = g.config["display"].get("device_id")
+        result["hardware_ID"] = g.config["display"].get("hardware_ID")
+        result["device_id"] = result["hardware_ID"]  # Older open browser tabs during upgrade.
         return jsonify(success=True, device=result)
 
     @app.get("/api/update")
