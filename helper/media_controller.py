@@ -9,6 +9,7 @@ from helper import cache_handler
 from helper.display_handler import Display, get_local_ip, logical_point, logical_size, menu_geometry, menu_scale
 from helper.schedule import active_record, record_deadline
 from helper.json_utils import atomic_write_json
+from helper.mpv_player import playback_settings
 
 LOG = logging.getLogger(__name__)
 
@@ -149,7 +150,7 @@ class Controller:
             self.scroll_path = None
             self.offset = self.selected = self.scroll_index = 0
         self.mode, self.rotation = mode, rotation
-        hwdec = str(settings.get("video_hwdec", "auto"))
+        hwdec = playback_settings(settings)["hwdec"]
         if hwdec != self.applied_hwdec and self.display:
             self.display.player.command("set_property", "hwdec", hwdec)
             self.applied_hwdec = hwdec
@@ -278,7 +279,7 @@ class Controller:
             self.last_prefetch = prefetch_key
 
     def run(self):
-        self.display = self.display or Display(hwdec=self.config.get("display", {}).get("video_hwdec", "auto"))
+        self.display = self.display or Display(**playback_settings(self.config.get("display", {})))
         self.worker = RefreshWorker(self.refresh_fn)
         previous_handlers = {}
         if threading.current_thread() is threading.main_thread():
@@ -325,6 +326,8 @@ class Controller:
                             "player": "mpv", "pid": self.display.player.proc.pid, "mode": self.mode,
                             "hardware_decoder": self.display.player.properties.get("hwdec-current"),
                             "video_renderer": self.display.player.properties.get("current-vo"),
+                            "dropped_frames": self.display.player.properties.get("frame-drop-count"),
+                            "decoder_dropped_frames": self.display.player.properties.get("decoder-frame-drop-count"),
                             "display_size": list(self.display.size),
                             "error": self.display.error, "ready": self.display.player.ready > 0,
                         })

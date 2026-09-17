@@ -19,14 +19,30 @@ LOG = logging.getLogger(__name__)
 SCRIPT = Path(__file__).with_name("player.lua")
 
 
-def video_output_options(headless=False, software_rendering=False):
+def playback_settings(settings):
+    profile = settings.get("video_profile", "default")
+    if profile not in ("default", "radxa-zero3"):
+        raise ValueError("display.video_profile must be default or radxa-zero3")
+    audio = settings.get("video_audio", True)
+    if not isinstance(audio, bool):
+        raise ValueError("display.video_audio must be true or false")
+    hwdec = str(settings.get("video_hwdec", "auto"))
+    if profile == "radxa-zero3" and hwdec == "auto":
+        hwdec = "rkmpp"
+    return {"hwdec": hwdec, "profile": profile, "audio": audio}
+
+
+def video_output_options(headless=False, software_rendering=False, profile="default"):
     if headless:
         return ["--vo=null", "--ao=null", "--force-window=no"]
     # Radxa's ARM graphics stack reports GL errors after gpu-next initializes,
     # so an initialization-only VO fallback never tries the alternate renderer.
     arm = platform.machine().lower().startswith(("arm", "aarch64"))
-    renderer = "gpu" if arm and not software_rendering else "gpu-next,gpu"
+    renderer = "gpu" if profile == "radxa-zero3" or (arm and not software_rendering) else "gpu-next,gpu"
     options = [f"--vo={renderer}", "--gpu-api=opengl"]
+    if profile == "radxa-zero3":
+        options += ["--profile=fast", "--swapchain-depth=8",
+                    "--opengl-swapinterval=0", "--x11-bypass-compositor=yes"]
     if software_rendering:
         options.append("--gpu-sw=yes")
     return options
@@ -37,7 +53,10 @@ class PlayerError(RuntimeError):
 
 
 class MpvPlayer:
-    def __init__(self, hwdec="auto", headless=False, startup_timeout=10, script=SCRIPT, software_rendering=False):
+    def __init__(self, hwdec="auto", headless=False, startup_timeout=10, script=SCRIPT, software_rendering=False,
+                 profile="default", audio=True):
+        settings = playback_settings({"video_hwdec": hwdec, "video_profile": profile, "video_audio": audio})
+        hwdec = settings["hwdec"]
         binary = shutil.which("mpv")
         if not binary:
             raise PlayerError("mpv is missing. Run sudo python3 installer.py on the board.")
@@ -68,10 +87,14 @@ class MpvPlayer:
                 "--cursor-autohide=1000", "--stop-screensaver=yes", "--border=no",
                 "--audio-display=no", "--save-position-on-quit=no", "--resume-playback=no",
                 "--screenshot-format=png", "--screenshot-png-compression=0",
-                "--msg-level=all=warn", f"--hwdec={hwdec}"]
-        output_options = video_output_options(headless, software_rendering)
+                # All media is already on disk; bound compressed packet buffers.
+                "--demuxer-max-bytes=32MiB", "--demuxer-max-back-bytes=4MiB",
+                "--msg-level=all=warn"]
+        output_options = video_output_options(headless, software_rendering, profile)
         args += output_options
-        LOG.info("Starting mpv video output: %s", " ".join(output_options))
+        # Explicit settings follow the built-in profile so it cannot override them.
+        args += [f"--hwdec={hwdec}", "--audio=auto" if audio else "--audio=no"]
+        LOG.info("Starting mpv video output: %s; hwdec=%s; audio=%s", " ".join(output_options), hwdec, audio)
         try:
             # Errors go to the service journal, never silently to DEVNULL.
             self.proc = subprocess.Popen(args, stdin=subprocess.DEVNULL)
@@ -91,7 +114,8 @@ class MpvPlayer:
                 raise PlayerError("mpv IPC startup timed out")
             self.reader = threading.Thread(target=self._read, name="mpv-ipc", daemon=True)
             self.reader.start()
-            for index, prop in enumerate(("osd-dimensions", "hwdec-current", "video-codec", "path", "current-vo")):
+            for index, prop in enumerate(("osd-dimensions", "hwdec-current", "video-codec", "path", "current-vo",
+                                          "frame-drop-count", "decoder-frame-drop-count")):
                 self.command("observe_property", index, prop)
             while time.monotonic() < end:
                 try:
@@ -226,13 +250,18 @@ class MpvPlayer:
 
     def bitmap(self, image, overlay_id=0):
         path = self.directory / f"overlay-{overlay_id}.bgra"
-        rgba = image.convert("RGBA")
+        rgba = image if image.mode == "RGBA" else image.convert("RGBA")
         # mpv expects premultiplied BGRA. Holds are opaque except for cutouts.
-        path.write_bytes(rgba.tobytes("raw", "BGRA"))
-        self.command("overlay-add", overlay_id, 0, 0, str(path), 0, "bgra", rgba.width, rgba.height, rgba.width * 4)
+        try:
+            path.write_bytes(rgba.tobytes("raw", "BGRA"))
+            self.command("overlay-add", overlay_id, 0, 0, str(path), 0, "bgra", rgba.width, rgba.height, rgba.width * 4)
+        finally:
+            if rgba is not image:
+                rgba.close()
 
     def remove_bitmap(self, overlay_id=0):
         self.command("overlay-remove", overlay_id)
+        (self.directory / f"overlay-{overlay_id}.bgra").unlink(missing_ok=True)
 
     def close(self):
         if self.proc is not None and self.proc.poll() is None:

@@ -195,14 +195,26 @@ class PreparedImages:
             # JPEG draft reduces decode memory for very large uploaded posters.
             source.draft("RGB", size)
             image = ImageOps.exif_transpose(source)
-            # Fill the actual display, including upscaling. Stretch instead of
-            # cropping so titles/labels at poster edges remain visible.
-            image = image.convert("RGBA").resize(size, Image.Resampling.LANCZOS)
-        canvas = Image.new("RGB", size, "black")
-        canvas.paste(image, (0, 0), image)
         self.sequence += 1
         output = self.directory / f"prepared-{self.sequence}.png"
-        canvas.save(output, compress_level=1)
+        try:
+            # Opaque posters do not need an RGBA buffer and a second canvas.
+            # Close each large intermediate before allocating the next one.
+            if image.mode != "RGB":
+                converted = image.convert("RGBA")
+                image.close()
+                image = converted
+            resized = image.resize(size, Image.Resampling.LANCZOS)
+            image.close()
+            image = resized
+            if image.mode == "RGBA":
+                canvas = Image.new("RGB", size, "black")
+                canvas.paste(image, (0, 0), image)
+                image.close()
+                image = canvas
+            image.save(output, compress_level=1)
+        finally:
+            image.close()
         self.entries[key] = output
         while len(self.entries) > self.limit:
             _, old = self.entries.popitem(last=False)
@@ -213,22 +225,22 @@ class PreparedImages:
 def uncover_overlays(image, rotation):
     """Bitmap holds sit above ASS; leave the live timer and footer uncovered."""
     image = image.convert("RGBA")
-    size = logical_size(image.size, rotation)
-    mask = Image.new("L", size, 255)
-    draw = ImageDraw.Draw(mask)
-    draw.rectangle((0, size[1]-footer_height(image.size), size[0], size[1]), fill=0)
-    if rotation:
-        mask = mask.rotate(-rotation, expand=True)
-    image.putalpha(mask)
-    # Zero RGB for transparent pixels: mpv expects premultiplied alpha.
-    blank = Image.new("RGBA", image.size)
-    blank.paste(image, mask=mask)
-    return blank
+    w, h = image.size
+    strip = footer_height(image.size)
+    bounds = {0: (0, h-strip, w-1, h-1),
+              90: (0, 0, strip-1, h-1),
+              180: (0, 0, w-1, strip-1),
+              270: (w-strip, 0, w-1, h-1)}[rotation % 360]
+    image.putalpha(255)
+    # Clear the physical footer directly, avoiding a rotated mask and another
+    # full-screen RGBA copy. Zero RGB also keeps transparent pixels premultiplied.
+    ImageDraw.Draw(image).rectangle(bounds, fill=(0, 0, 0, 0))
+    return image
 
 
 class Display:
-    def __init__(self, hwdec="auto", player=None):
-        self.player = player or MpvPlayer(hwdec=hwdec)
+    def __init__(self, hwdec="auto", player=None, profile="default", audio=True):
+        self.player = player or MpvPlayer(hwdec=hwdec, profile=profile, audio=audio)
         self.temp = tempfile.TemporaryDirectory(prefix="eposter-frames-")
         self.directory = Path(self.temp.name)
         self.prepared = PreparedImages(self.directory)
@@ -301,15 +313,18 @@ class Display:
     def _hold_frame(self, rotation):
         if self.shown is None or self.player.headless:
             return False
+        snapshot = self.directory / "hold.png"
         try:
-            snapshot = self.directory / "hold.png"
             self.player.command("screenshot-to-file", str(snapshot), "window", timeout=2)
             with Image.open(snapshot) as frame:
-                self.player.bitmap(uncover_overlays(frame, rotation))
+                with uncover_overlays(frame, rotation) as hold:
+                    self.player.bitmap(hold)
             return True
         except (PlayerError, OSError, ValueError) as error:
             LOG.debug("Frame hold unavailable: %s", error)
             return False
+        finally:
+            snapshot.unlink(missing_ok=True)
 
     def _work(self):
         while not self.stopping:

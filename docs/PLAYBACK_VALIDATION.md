@@ -146,3 +146,61 @@ changes are saved so configuration refreshes do not undo keyboard navigation.
 The menu uses outlined selection cards, media thumbnails, and uniform Paper ID
 labels. Pillow previews were checked in portrait and landscape; live Radxa
 rendering and its audio/video synchronization still require device validation.
+
+## Memory optimization (September 17, 2026)
+
+Opaque poster preparation now avoids the RGBA/compositing path and closes
+intermediate images promptly. Transition holds clear the rotated footer in one
+RGBA buffer instead of allocating a mask and another full-screen buffer.
+Uploading an RGBA hold avoids another conversion copy; temporary PNG/BGRA files
+are removed after use. mpv compressed packet limits are 32 MiB forward and
+4 MiB backward for local media; these limits do not cap decoded frames or GPU RAM.
+
+A fresh-process Python workload prepared a 3840x2160 RGB PNG at 3840x2016,
+then created and closed 3840x2160 frame holds at all four rotations. Linux
+resource.getrusage(resource.RUSAGE_SELF).ru_maxrss decreased from 186672 KiB
+to 122484 KiB (about 34%). This is a local synthetic Python peak, not a
+measurement of total Radxa memory or a promise of video memory savings.
+94 unit tests and the real mpv headless playback/looping check passed.
+
+For a device comparison, replay the same media after restarting the app and use:
+
+```sh
+free -h
+ps -eo pid,comm,rss,%mem,args --sort=-rss | head -15
+vmstat 1 10
+```
+
+RSS is in KiB and can include shared pages; free reports the entire system.
+Compare available memory and sustained swap-in/swap-out, not free memory alone.
+A nonzero amount of allocated swap does not by itself show current swap activity.
+
+## Radxa ZERO 3 playback profile
+
+To use the settings from the user's improved 1080x1920/59.94fps test, set these
+fields within the existing `display` object in the board's `config.json`:
+
+```json
+"video_profile": "radxa-zero3",
+"video_hwdec": "rkmpp"
+```
+
+Restart the app after changing the profile or audio setting. This profile selects
+`gpu`, OpenGL, `profile=fast`, `swapchain-depth=8`, `opengl-swapinterval=0`, and
+`x11-bypass-compositor=yes`. The player already runs fullscreen. An `auto`
+decoder setting resolves to `rkmpp` only with this explicit profile; explicit
+values such as `no` or `rkmpp-copy` are preserved. The default profile retains
+previous renderer selection for other devices.
+
+`video_audio` defaults to `true`. Set it to `false` for silent playback matching
+the successful command-line test. Audio is disabled at track selection, so
+transition unmuting cannot reactivate it. Audio-on performance remains unverified
+because the device reported a PipeWire timeout during the earlier audio test.
+
+The user's swapchain-depth test dropped 248 frames; disabling OpenGL vsync
+waiting reduced that to 129, and the user reported visibly better playback.
+This is improved playback, not zero-drop validation. Disabling vsync can cause
+tearing and the larger queue trades memory/latency for better pipelining.
+Validate the full app with its footer, rotation, and transitions on the board.
+`.playback-status.json` now includes rendering and decoder dropped-frame counts
+for the current media, alongside the active decoder and renderer.

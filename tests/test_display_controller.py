@@ -41,6 +41,14 @@ class ControllerTests(unittest.TestCase):
         self.controller.tick(250)
         self.assertEqual(self.display.overlay.call_args.kwargs['deadline'],400)
 
+    def test_radxa_profile_keeps_hardware_decoder_during_config_reload(self):
+        self.config['display']['video_profile'] = 'radxa-zero3'
+        self.controller.apply_config(self.config)
+        self.display.player.command.assert_called_with('set_property', 'hwdec', 'rkmpp')
+        self.display.player.command.reset_mock()
+        self.controller.apply_config(copy.deepcopy(self.config))
+        self.display.player.command.assert_not_called()
+
     def test_same_schedule_refresh_does_not_restart_timer(self):
         self.controller.tick(200)
         self.controller.records=copy.deepcopy(self.records)
@@ -203,6 +211,27 @@ class PreparationTests(unittest.TestCase):
             path=self.root/name
             self.assertEqual(prepared.prepare(path,(320,180)),path)
         self.assertEqual(len(prepared.entries),0)
+
+    def test_transparent_posters_still_composite_on_black(self):
+        source = self.root/'transparent.png'
+        Image.new('RGBA', (20, 20), (200, 100, 50, 128)).save(source)
+        original = source.read_bytes()
+        output = PreparedImages(self.root).prepare(source, (40, 40))
+        with Image.open(output) as image:
+            self.assertEqual(image.mode, 'RGB')
+            pixel = image.getpixel((20, 20))
+            self.assertTrue(all(abs(a-b) <= 1 for a, b in zip(pixel, (100, 50, 25))))
+        self.assertEqual(source.read_bytes(), original)
+
+    def test_frame_hold_preserves_source_and_clears_footer_rgb(self):
+        for rotation in (0, 90, 180, 270):
+            with self.subTest(rotation=rotation):
+                source = Image.new('RGB', (960, 540), 'red')
+                hold = uncover_overlays(source, rotation)
+                logical = hold.rotate(rotation, expand=True)
+                self.assertEqual(logical.getpixel((logical.width//2, logical.height-1)), (0, 0, 0, 0))
+                self.assertEqual(logical.getpixel((logical.width//2, 0)), (255, 0, 0, 255))
+                self.assertEqual(source.getpixel((0, 0)), (255, 0, 0))
 
     def test_small_poster_fills_4k_without_cropping_edges(self):
         path=self.root/'small.png'
