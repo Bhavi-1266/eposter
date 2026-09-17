@@ -88,9 +88,13 @@ an opaque footer background, and left/right text positions in rendered frames.
 
 The longer capture exposed intermittent blank video intervals with the legacy
 `gpu` renderer under software OpenGL, including with frame holding disabled.
-The player now prefers `gpu-next`; the final 1080p/UHD runs passed with it.
-Builds without that renderer fall back to `gpu`, which still requires validation
-on the target board. The active renderer and display dimensions are reported
+Desktop and explicit software-rendering checks prefer `gpu-next`; the final
+1080p/UHD runs passed with it. ARM boards now select `gpu` directly following
+reported Radxa `gpu-next/libplacebo` GL_INVALID_ENUM and GL_INVALID_OPERATION
+errors with a missing footer. The previous `gpu-next,gpu` list did not help
+because those errors occurred after initialization. This compatibility change
+still requires visual validation on the target board; desktop checks do not
+establish that the board's graphics driver works. The active renderer and display dimensions are reported
 in `.playback-status.json` alongside the decoder.
 
 The display now mutes outgoing audio, holds the outgoing frame, loads the next

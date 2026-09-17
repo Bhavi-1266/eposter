@@ -5,6 +5,7 @@ thread dispatches replies so loading a file cannot block countdown/input events.
 """
 import json
 import logging
+import platform
 import queue
 import shutil
 import socket
@@ -16,6 +17,19 @@ from pathlib import Path
 
 LOG = logging.getLogger(__name__)
 SCRIPT = Path(__file__).with_name("player.lua")
+
+
+def video_output_options(headless=False, software_rendering=False):
+    if headless:
+        return ["--vo=null", "--ao=null", "--force-window=no"]
+    # Radxa's ARM graphics stack reports GL errors after gpu-next initializes,
+    # so an initialization-only VO fallback never tries the alternate renderer.
+    arm = platform.machine().lower().startswith(("arm", "aarch64"))
+    renderer = "gpu" if arm and not software_rendering else "gpu-next,gpu"
+    options = [f"--vo={renderer}", "--gpu-api=opengl"]
+    if software_rendering:
+        options.append("--gpu-sw=yes")
+    return options
 
 
 class PlayerError(RuntimeError):
@@ -55,9 +69,9 @@ class MpvPlayer:
                 "--audio-display=no", "--save-position-on-quit=no", "--resume-playback=no",
                 "--screenshot-format=png", "--screenshot-png-compression=0",
                 "--msg-level=all=warn", f"--hwdec={hwdec}"]
-        args += ["--vo=null", "--ao=null", "--force-window=no"] if headless else ["--vo=gpu-next,gpu", "--gpu-api=opengl"]
-        if software_rendering:
-            args.append("--gpu-sw=yes")
+        output_options = video_output_options(headless, software_rendering)
+        args += output_options
+        LOG.info("Starting mpv video output: %s", " ".join(output_options))
         try:
             # Errors go to the service journal, never silently to DEVNULL.
             self.proc = subprocess.Popen(args, stdin=subprocess.DEVNULL)
