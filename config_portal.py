@@ -28,10 +28,10 @@ from device_update import UNIT, update_status, write_status
 PROJECT_DIR = Path(__file__).resolve().parent
 CONFIG_LIMIT = 256 * 1024
 DEFAULTS = {
-    "ID": 0,
+    "hardware_id": 0,
     "wifi": {"ssid1": "", "password1": "", "ssid2": "", "password2": "", "connect_timeout": 20},
     "api": {"poster_api_url": "", "poster_token": "", "request_timeout": 15, "max_media_size_mb": 512},
-    "display": {"hardware_ID": 1, "rotation_degree": 0, "Mode": "Menu", "Auto_Scroll": 5, "cache_refresh": 60},
+    "display": {"screen_number": 1, "rotation_degree": 0, "Mode": "Menu", "Auto_Scroll": 5, "cache_refresh": 60},
 }
 
 
@@ -108,13 +108,13 @@ def session_secret(project_dir):
 def validate_form(form):
     errors, values = {}, {}
     for field, lower, upper in (
-        ("hardware_ID", 0, 999999), ("rotation", 0, 270),
+        ("screen_number", 0, 999999), ("rotation", 0, 270),
         ("auto_scroll", 1, 3600), ("cache_refresh", 30, 3600),
         ("request_timeout", 3, 120), ("connect_timeout", 5, 120),
         ("max_media_size_mb", 1, 2048),
     ):
         try:
-            value = int(form.get(field, form.get("device_id", "") if field == "hardware_ID" else ""))
+            value = int(form.get(field, form.get("hardware_ID", form.get("device_id", "")) if field == "screen_number" else ""))
             if not lower <= value <= upper:
                 raise ValueError
             values[field] = value
@@ -171,7 +171,7 @@ def save_config(project_dir, form):
             if not same_text(form.get("revision"), revision):
                 raise PortalError("Settings changed on the board or in another tab. Reload before saving; your edits are still shown here.", 409)
             config["display"].update({
-                "hardware_ID": values["hardware_ID"], "Mode": values["mode"],
+                "screen_number": values["screen_number"], "Mode": values["mode"],
                 "rotation_degree": values["rotation"], "Auto_Scroll": values["auto_scroll"],
                 "cache_refresh": values["cache_refresh"],
             })
@@ -428,8 +428,11 @@ def create_app(project_dir=None):
         if not g.config["api"].get("poster_api_url"):
             result["warnings"].append("Poster API URL is not configured.")
         result["mode"] = g.config["display"].get("Mode")
-        result["hardware_ID"] = g.config["display"].get("hardware_ID")
-        result["device_id"] = result["hardware_ID"]  # Older open browser tabs during upgrade.
+        result["hardware_id"] = g.config.get("hardware_id")
+        result["screen_number"] = g.config["display"].get("screen_number")
+        # Older open browser tabs used these names for the schedule selector.
+        result["hardware_ID"] = result["screen_number"]
+        result["device_id"] = result["screen_number"]
         return jsonify(success=True, device=result)
 
     @app.get("/api/update")

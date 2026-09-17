@@ -1,5 +1,5 @@
 {
-  "ID": 0,
+  "hardware_id": 1,
   "username": "admin",
   "password": "change-me",
   "wifi": {
@@ -21,9 +21,9 @@
   "display": {
     "cache_refresh": 60,
     "rotation_degree": 0,
-    "hardware_ID": 0,
+    "screen_number": 1,
     "Auto_Scroll": 5,
-    "Mode": "Menu",
+    "Mode": "Time",
     "video_hwdec": "auto"
   }
 }

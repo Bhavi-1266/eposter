@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from PIL import Image
+from PIL import Image, ImageChops
 from helper.mpv_player import MpvPlayer, PlayerError
 
 
@@ -163,7 +163,7 @@ def controller_test():
             assert not failure, failure
             assert seen=={'image','video','gif'},seen
             assert sorted(downloads)==['animation.gif','poster.png','video.mp4'],downloads
-            assert json.loads(config_path.read_text())['display']['hardware_ID']==7
+            assert json.loads(config_path.read_text())['display']['screen_number']==7
             assert len(list((root/'eposter_cache').glob('*')))==3
             print('PASS: actual HTTP API -> unchanged cache -> scheduler -> persistent player; API deadlines; unchanged refresh does not redownload; identifier migration')
         finally:
@@ -260,8 +260,38 @@ def visual_test(args):
         assert frames >= capture_fps*2, frames
         sheet.save(output/'transition-frames.jpg')
         assert seen_colors == {'first','second','video','gif'}, seen_colors
+
+        def color_mask(image, color):
+            diff = ImageChops.difference(image.convert('RGB'), Image.new('RGB', image.size, color))
+            bands = [band.point(lambda v: 255 if v < 4 else 0) for band in diff.split()]
+            return ImageChops.multiply(ImageChops.multiply(bands[0], bands[1]), bands[2])
+
+        def check_timer(logical, state):
+            w, h = logical.size
+            strip = footer_height(screen_size)
+            footer = logical.crop((0, h-strip, w, h))
+            background, foreground = {'normal': ((255,255,255), (0,0,0)),
+                                      'warning': ((254,240,138), (0,0,0)),
+                                      'urgent': ((185,28,28), (0,0,0))}[state]
+            bounds = color_mask(footer, background).getbbox()
+            assert bounds, ('Missing countdown background', state)
+            x0, y0, x1, y1 = bounds
+            scale = overlay_scale(screen_size)
+            assert abs((x0+x1)/2-w/2) <= 2*scale, ('Timer not horizontally centered', bounds)
+            assert abs((y0+y1)/2-strip/2) <= 2*scale, ('Timer not vertically centered', bounds)
+            digits = footer.crop(bounds)
+            ink = color_mask(digits, foreground).getbbox()
+            assert ink, 'Missing countdown text'
+            assert ink[3]-ink[1] >= 26*scale, ('Countdown text too small', ink)
+            assert abs((ink[0]+ink[2])/2-digits.width/2) <= 3*scale, ('Digits not centered', ink)
+            # ASS aligns line boxes; visible digits should also be near center.
+            assert abs((ink[1]+ink[3])/2-digits.height/2) <= 5*scale, ('Digits not vertically centered', ink)
+
+            assert digits.getpixel((0, 0)) == (245,245,245), 'Timer corners are not rounded'
+            return ink[3]-ink[1]
+
         for rotation in (0,90,180,270):
-            display.overlay(deadline=deadline,paper_id='Test 42',ip='192.0.2.10',rotation=rotation)
+            display.overlay(deadline=int(time.time())+180,paper_id='3263',ip='192.0.2.10',rotation=rotation)
             show(video,rotation)
             # Check the actual renderer's video rectangle excludes the footer.
             dimensions = player.command('get_property','osd-dimensions')
@@ -290,6 +320,17 @@ def visual_test(args):
                 assert right, 'Missing right address'
                 right_gap = w-(w*3//4+right[2])
                 assert 8*overlay_scale(screen_size) <= right_gap <= 32*overlay_scale(screen_size), (rotation,right_gap)
+                normal_height = check_timer(logical, 'normal')
+            for name, remaining in (('warning', 120), ('urgent', 60), ('expired', 0)):
+                display.overlay(deadline=int(time.time())+remaining,paper_id='3263',ip='192.0.2.10',rotation=rotation)
+                time.sleep(.15)
+                filename = output/f'timer-{name}-{rotation}.png'
+                player.command('screenshot-to-file',str(filename),'window')
+                with Image.open(filename) as snapshot:
+                    height = check_timer(snapshot.rotate(rotation,expand=True).convert('RGB'),
+                                         'warning' if name == 'warning' else 'urgent')
+                    if name != 'warning':
+                        assert height > normal_height, 'Final-minute digits did not grow'
         menu={'key':(1,0,0),'items':[{'path':first,'paper_id':42},{'path':video,'paper_id':43}], 'offset':0,'selected':0}
         display.overlay(ip='192.0.2.10',rotation=0,menu=True)
         show(None,0,menu)
@@ -300,8 +341,12 @@ def visual_test(args):
         assert any(event[0]=='ENTER' for event in display.inputs())
         remaining = player.properties.get('eposter-countdown')
         assert remaining == '', remaining
+        with Image.open(output/'menu.png') as snapshot:
+            footer = snapshot.crop((0,screen_size[1]-footer_height(screen_size),screen_size[0],screen_size[1]))
+            assert color_mask(footer, (185,28,28)).getbbox() is None
+            assert color_mask(footer, (248,240,222)).getbbox() is None
         assert dark == 0, f'{dark}/{frames} frames went black at the center'
-        (output/'result.txt').write_text(f'PASS: {args.resolution}; {frames} captured transition frames at {capture_fps} fps, {dark} black center frames; all test media observed; same window {window} and PID {pid}; reserved footer below images/video, left Paper ID/right address at four rotations; menu input.\n')
+        (output/'result.txt').write_text(f'PASS: {args.resolution}; {frames} captured transition frames at {capture_fps} fps, {dark} black center frames; all test media observed; same window {window} and PID {pid}; reserved footer, centered large timer, white/yellow/red/expired states, left Paper ID/right address at four rotations; menu input and no unscheduled timer.\n')
         print((output/'result.txt').read_text())
     finally:
         if display:

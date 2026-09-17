@@ -16,11 +16,36 @@ class ConfigurationTests(unittest.TestCase):
     def test_identity_precedence_zero_and_unknown_settings(self):
         config={'username':'admin','password':'secret','display':{'device_id':9,'custom':True},'ID':55}
         converted=normalize_config(config)
-        self.assertEqual(converted['display'],{'hardware_ID':9,'custom':True})
+        self.assertEqual(converted['display'],{'screen_number':9,'custom':True})
         self.assertEqual(converted['password'],'secret')
-        self.assertEqual(converted['ID'],55)
+        self.assertEqual(converted['hardware_id'],55)
+        self.assertNotIn('ID', converted)
         self.assertIn('device_id',config['display'])
-        self.assertEqual(normalize_config({'display':{'device_id':9,'hardware_ID':0}})['display']['hardware_ID'],0)
+        self.assertEqual(normalize_config({'display':{'device_id':9,'hardware_ID':0}})['display']['screen_number'],0)
+
+    def test_separate_hardware_and_screen_identifiers_preserve_values(self):
+        for legacy in ('hardware_ID', 'hardware_id', 'device_id'):
+            with self.subTest(legacy=legacy):
+                source = {'ID': 55, 'display': {legacy: 7}, 'custom': {'keep': True}}
+                converted = normalize_config(source)
+                self.assertEqual(converted, {'hardware_id': 55, 'display': {'screen_number': 7}, 'custom': {'keep': True}})
+                self.assertEqual(normalize_config(converted), converted)
+                self.assertIn('ID', source)
+
+    def test_explicit_new_identifiers_win_including_zero(self):
+        config = {'ID': 55, 'hardware_id': 0,
+                  'display': {'hardware_ID': 7, 'hardware_id': 8, 'device_id': 9, 'screen_number': 0}}
+        self.assertEqual(normalize_config(config), {'hardware_id': 0, 'display': {'screen_number': 0}})
+
+    def test_api_screen_number_takes_precedence_over_legacy_alias(self):
+        row = {'screen_number': 0, 'hardware_ID': 55, 'file': 'one.png',
+               'start_date_time': '2026-09-17T10:00:00Z', 'end_date_time': '2026-09-17T10:05:00Z'}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'api_data.json'
+            path.write_text(json.dumps({'data': [row]}))
+            with patch.object(RunThis, 'API_DATA_JSON', path), patch.object(RunThis, 'load_config', return_value={}):
+                self.assertEqual(len(RunThis.get_device_records(0)[0]), 1)
+                self.assertEqual(RunThis.get_device_records(55)[0], [])
 
     def test_atomic_idempotent_migration_preserves_permissions(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -28,7 +53,7 @@ class ConfigurationTests(unittest.TestCase):
             path.write_text(json.dumps({'display':{'device_id':23},'extra':'keep'}))
             path.chmod(0o640)
             migrate_config(path)
-            self.assertEqual(json.loads(path.read_text())['display']['hardware_ID'],23)
+            self.assertEqual(json.loads(path.read_text())['display']['screen_number'],23)
             stamp=path.stat().st_mtime_ns
             migrate_config(path)
             self.assertEqual(path.stat().st_mtime_ns,stamp)
@@ -42,11 +67,11 @@ class ConfigurationTests(unittest.TestCase):
                 migrate_config(path)
             self.assertEqual(path.read_text(),'{broken')
 
-    def test_missing_hardware_id_never_matches_unassigned_api_rows(self):
+    def test_missing_screen_number_never_matches_unassigned_api_rows(self):
         self.assertEqual(RunThis.get_device_records(None), ([], 5))
         self.assertEqual(RunThis.get_device_records(''), ([], 5))
 
-    def test_legacy_api_screen_fields_still_match_hardware_id(self):
+    def test_legacy_api_screen_fields_still_match_screen_number(self):
         with tempfile.TemporaryDirectory() as tmp:
             path=Path(tmp)/'api_data.json'
             record={'id':1,'start_date_time':'15-09-2026 10:00:00','end_date_time':'15-09-2026 10:05:00','file':'one.png'}
@@ -94,7 +119,7 @@ class InstallerTests(unittest.TestCase):
             self.assertTrue(installer.prepare_runtime_state(user))
             self.assertTrue(installer.prepare_runtime_state(user))
         self.assertEqual(json.loads((self.root/'config.json.before-player-update').read_text()),config)
-        self.assertEqual(json.loads((self.root/'config.json').read_text())['display']['hardware_ID'],23)
+        self.assertEqual(json.loads((self.root/'config.json').read_text())['display']['screen_number'],23)
         self.assertEqual(media.read_bytes(),b'cached-content')
 
     def test_dependency_failure_never_stops_services(self):

@@ -15,7 +15,6 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from helper.mpv_player import MpvPlayer, PlayerError
-from helper.playback_timer import format_remaining
 
 LOG = logging.getLogger(__name__)
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -59,7 +58,7 @@ def overlay_scale(size):
 
 
 def footer_height(size):
-    return round(56*overlay_scale(size))
+    return round(72*overlay_scale(size))
 
 
 def media_size(size, rotation):
@@ -133,7 +132,8 @@ def _render_menu(items, offset, selected, size):
                     image.paste(thumb, (34+(thumb_w-thumb.width)//2, y+10+(thumb_h-thumb.height)//2))
         except (OSError, ValueError):
             draw.text((34, y+20), "Unavailable", font=font(16), fill=(80, 80, 80))
-        label = f"Paper ID: {item.get('paper_id') or item['path'].stem}"
+        paper_id = item.get('paper_id')
+        label = f"Paper ID: {paper_id if paper_id is not None and paper_id != '' else 'Unavailable'}"
         while draw.textlength(label, font=font(22)) > w-thumb_w-90 and len(label) > 4:
             label = label[:-4] + "..."
         draw.text((thumb_w+55, y+24), label, font=font(22), fill=(45, 45, 45))
@@ -179,17 +179,12 @@ class PreparedImages:
         return output
 
 
-def uncover_overlays(image, rotation, show_timer=True, timer_text="00:00"):
+def uncover_overlays(image, rotation):
     """Bitmap holds sit above ASS; leave the live timer and footer uncovered."""
     image = image.convert("RGBA")
     size = logical_size(image.size, rotation)
     mask = Image.new("L", size, 255)
     draw = ImageDraw.Draw(mask)
-    scale = overlay_scale(image.size)
-    if show_timer:
-        margin = round(16*scale)
-        width = max(120*scale, len(timer_text)*int(28*scale)*0.65+24*scale)
-        draw.rounded_rectangle((margin, margin, margin+round(width), margin+round(48*scale)), radius=round(16*scale), fill=0)
     draw.rectangle((0, size[1]-footer_height(image.size), size[0], size[1]), fill=0)
     if rotation:
         mask = mask.rotate(-rotation, expand=True)
@@ -279,9 +274,7 @@ class Display:
             snapshot = self.directory / "hold.png"
             self.player.command("screenshot-to-file", str(snapshot), "window", timeout=2)
             with Image.open(snapshot) as frame:
-                deadline = (self.overlay_state or {}).get("deadline")
-                self.player.bitmap(uncover_overlays(frame, rotation, deadline is not None,
-                                                   format_remaining((deadline or 0)-time.time())))
+                self.player.bitmap(uncover_overlays(frame, rotation))
             return True
         except (PlayerError, OSError, ValueError) as error:
             LOG.debug("Frame hold unavailable: %s", error)

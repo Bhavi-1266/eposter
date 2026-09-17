@@ -26,7 +26,7 @@ def positive_seconds(value, fallback, minimum=1):
 
 def refresh_key(config):
     display, api = config.get("display", {}), config.get("api", {})
-    return (str(display.get("hardware_ID", "")), api.get("poster_token"), api.get("poster_api_url"), api.get("timezone"))
+    return (str(display.get("screen_number", "")), api.get("poster_token"), api.get("poster_api_url"), api.get("timezone"))
 
 
 class RefreshWorker:
@@ -86,7 +86,7 @@ class Controller:
         self.set_mode = set_mode
         self.display = display
         self.config = load_config()
-        self.records, self.default_duration = read_records(self.config.get("display", {}).get("hardware_ID"))
+        self.records, self.default_duration = read_records(self.config.get("display", {}).get("screen_number"))
         self.items = []
         self.mode = None
         self.rotation = 0
@@ -108,20 +108,26 @@ class Controller:
             self.idle = self.root / "ScreenSaver.png"
 
     def rebuild_items(self):
-        by_url = {}
+        by_paper = {}
         for record in self.records:
             url = media_url(record)
-            if url and url not in by_url:
+            key = (url, record.get("paper_id"))
+            if url and key not in by_paper:
                 path = cache_handler.get_media_path(url)
                 if path:
-                    by_url[url] = {"path": path, "url": url, "paper_id": record.get("paper_id")}
-        self.items = list(by_url.values())
+                    by_paper[key] = {"path": path, "url": url, "paper_id": record.get("paper_id")}
+        self.items = list(by_paper.values())
         self.selected = min(self.selected, max(0, len(self.items)-1))
         self.offset = min(self.offset, max(0, len(self.items)-1))
         self.revision += 1
 
     def record_for_url(self, url, now):
         return active_record([r for r in self.records if media_url(r) == url], now)
+
+    def record_for_item(self, item, now):
+        return active_record([r for r in self.records
+                              if media_url(r) == item["url"]
+                              and r.get("paper_id") == item.get("paper_id")], now)
 
     def apply_config(self, config):
         old_key = refresh_key(self.config)
@@ -191,7 +197,7 @@ class Controller:
                 self.selected = index
                 self.preview = self.items[index]
         if self.preview:
-            self.preview_deadline = record_deadline(self.record_for_url(self.preview["url"], now))
+            self.preview_deadline = record_deadline(self.record_for_item(self.preview, now))
         self.offset = min(self.offset, self.selected)
         if self.selected >= self.offset+count:
             self.offset = self.selected-count+1
@@ -211,7 +217,7 @@ class Controller:
                 self.preview = None
                 self.preview_deadline = None
             if self.preview:
-                record = self.record_for_url(self.preview["url"], now)
+                record = self.record_for_item(self.preview, now)
                 if self.preview_deadline is not None and record is None:
                     self.preview = None
                     self.preview_deadline = None
@@ -223,17 +229,18 @@ class Controller:
             return None, None, None, "", menu
         if not self.items:
             return self.idle, None, None, "", None
-        urls = {item["url"] for item in self.items}
-        if now >= self.scroll_until or not self.scroll_path or self.scroll_path["url"] not in urls:
+        identities = {(item["url"], item.get("paper_id")) for item in self.items}
+        if (now >= self.scroll_until or not self.scroll_path
+                or (self.scroll_path["url"], self.scroll_path.get("paper_id")) not in identities):
             self.scroll_index %= len(self.items)
             self.scroll_path = self.items[self.scroll_index]
             self.scroll_index = (self.scroll_index+1) % len(self.items)
-            record = self.record_for_url(self.scroll_path["url"], now)
+            record = self.record_for_item(self.scroll_path, now)
             duration = positive_seconds((record or {}).get("duration_seconds"), positive_seconds(self.config.get("display", {}).get("Auto_Scroll"), 5))
             self.scroll_until = now+duration
             if record:
                 self.scroll_until = min(self.scroll_until, record_deadline(record))
-        record = self.record_for_url(self.scroll_path["url"], now)
+        record = self.record_for_item(self.scroll_path, now)
         return self.scroll_path["path"], record_deadline(record), self.scroll_path.get("paper_id"), "", None
 
     def tick(self, now):
@@ -300,7 +307,8 @@ class Controller:
                 if mono >= next_health:
                     try:
                         atomic_write_json(self.root / ".playback-status.json", {
-                            "checked_at": now, "hardware_ID": self.config.get("display", {}).get("hardware_ID"),
+                            "checked_at": now, "hardware_id": self.config.get("hardware_id"),
+                            "screen_number": self.config.get("display", {}).get("screen_number"),
                             "player": "mpv", "pid": self.display.player.proc.pid, "mode": self.mode,
                             "hardware_decoder": self.display.player.properties.get("hwdec-current"),
                             "video_renderer": self.display.player.properties.get("current-vo"),

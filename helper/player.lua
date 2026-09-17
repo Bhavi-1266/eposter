@@ -35,8 +35,8 @@ local function render()
         local px, py = position(x, y)
         return string.format('\\rDefault\\fscx100\\fscy100\\an%d\\pos(%.2f,%.2f)\\frz%d\\bord0\\shad0', alignment or 7, px, py, -rotation)
     end
-    local function text(x, y, value, size, color, alignment)
-        lines[#lines+1] = '{' .. tags(x,y,alignment) .. '\\fnDejaVu Sans Mono\\fs' .. size .. '\\1c&H' .. color .. '&}' .. escape(value)
+    local function text(x, y, value, size, color, alignment, bold, font)
+        lines[#lines+1] = '{' .. tags(x,y,alignment) .. '\\fn' .. (font or 'DejaVu Sans Mono') .. '\\b' .. (bold and '1' or '0') .. '\\fs' .. size .. '\\1c&H' .. color .. '&}' .. escape(value)
     end
     local function box(x, y, width, height, color, alpha, radius)
         local r = radius or 0
@@ -44,18 +44,41 @@ local function render()
             r,width-r,width,width,width,r,width,height-r,width,height,width,height,width-r,height,r,height,height,height,height-r,r,r)
         lines[#lines+1] = '{' .. tags(x,y) .. '\\1c&H' .. color .. '&\\1a&H' .. alpha .. '&\\p1}' .. path .. '{\\p0}'
     end
-    if deadline then
-        local value = string.format('%02d:%02d', math.floor(left/60), left%60)
-        local size = math.floor(28*scale)
-        local width = math.max(120*scale, #value*size*0.65 + 24*scale)
-        box(16*scale,16*scale,width,48*scale,'DEF0F8','30',math.floor(16*scale))
-        text(28*scale,23*scale,value,size,'2C3841')
-    end
     -- The renderer reserves this strip outside the media viewport.
-    local footer_height = math.floor(56*scale + 0.5)
+    local footer_height = math.floor(72*scale + 0.5)
+    local center_y = lh-footer_height/2
     box(0,lh-footer_height,lw,footer_height,'F5F5F5','00',0)
-    text(16*scale,lh-footer_height+8*scale,state.footer_left or '',math.floor(32*scale),'2D2D2D')
-    text(lw-16*scale,lh-footer_height+8*scale,state.footer_right or '',math.floor(32*scale),'2D2D2D',9)
+    box(0,lh-footer_height,lw,math.max(1,math.floor(scale)),'E0DDDA','00',0)
+    local value = deadline and string.format('%02d:%02d', math.floor(left/60), left%60) or ''
+    local urgent = left and left <= 60
+    local warning = left and left <= 120
+    local timer_size = math.floor((urgent and 50 or 44)*scale)
+    -- Reserve room for the larger final-minute digits without shifting labels.
+    local timer_width = math.min(lw*0.32, math.max(176*scale, math.max(5,#value)*50*scale*0.65+32*scale))
+    if deadline then
+        timer_size = math.min(timer_size, math.floor((timer_width-24*scale)/(#value*0.65)))
+        -- ASS colors are BGR: white, yellow at 2:00, red at 1:00.
+        local background = urgent and '1C1CB9' or (warning and '8AF0FE' or 'FFFFFF')
+        local foreground = '000000'
+        -- A fine outline gives the white timer a clear, restrained edge.
+        box((lw-timer_width)/2-scale,lh-footer_height+5*scale,timer_width+2*scale,footer_height-10*scale,
+            'DEDAD6','00',math.floor(17*scale))
+        box((lw-timer_width)/2,lh-footer_height+6*scale,timer_width,footer_height-12*scale,
+            background,'00',math.floor(16*scale))
+        text(lw/2,center_y,value,timer_size,foreground,5,true)
+    end
+    -- One continuous Paper ID label, balanced against the secondary address.
+    -- Equal outer padding and a reserved center keep the footer aligned.
+    local padding = 24*scale
+    local side_width = (lw-timer_width)/2-padding-20*scale
+    local paper = state.footer_left or ''
+    local address = state.footer_right or ''
+    local paper_size = math.max(1, math.min(math.floor(32*scale),
+        math.floor(side_width/(math.max(1,#paper)*0.7))))
+    local address_size = math.max(1, math.min(math.floor(24*scale),
+        math.floor(side_width/(math.max(1,#address)*0.65))))
+    text(padding,center_y,paper,paper_size,'242424',4,true,'DejaVu Sans')
+    text(lw-padding,center_y,address,address_size,'635950',6)
     if state.status and state.status ~= '' then
         local size = math.max(18, math.floor(lw/45))
         local value = tostring(state.status)

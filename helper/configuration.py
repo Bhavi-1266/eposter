@@ -13,15 +13,22 @@ def normalize_config(config):
         if section in config and not isinstance(config[section], dict):
             raise ValueError(f"{section} must be an object")
     display = config.setdefault("display", {})
-    if "hardware_ID" not in display and "device_id" in display:
-        display["hardware_ID"] = display["device_id"]
-    display.pop("device_id", None)
+    if "hardware_id" not in config and "ID" in config:
+        config["hardware_id"] = config["ID"]
+    config.pop("ID", None)
+    if "screen_number" not in display:
+        for legacy_key in ("hardware_ID", "hardware_id", "device_id"):
+            if legacy_key in display:
+                display["screen_number"] = display[legacy_key]
+                break
+    for legacy_key in ("hardware_ID", "hardware_id", "device_id"):
+        display.pop(legacy_key, None)
     return config
 
 
 def load_config(path):
     # Reload failures must reach the controller, which retains its last config.
-    # Substituting an empty object would clear its hardware ID and schedule.
+    # Substituting an empty object would clear its screen number and schedule.
     return normalize_config(load_json_file(path))
 
 

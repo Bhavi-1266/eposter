@@ -30,17 +30,18 @@ def update_config_mode(new_mode):
     update_json_file(CONFIG_FILE, apply_mode)
 
 
-def get_device_records(device_id):
-    if device_id is None or str(device_id) == "":
+def get_device_records(screen_number):
+    if screen_number is None or str(screen_number) == "":
         return [], 5
     api_timezone = load_config().get("api", {}).get("timezone")
     if not API_DATA_JSON.exists():
         return [], 5
 
     def _device_values(row):
+        if "screen_number" in row:
+            return [row["screen_number"]]
         return [
             row.get("hardware_ID"),
-            row.get("screen_number"),
             row.get("screen_id"),
             row.get("device_id"),
             row.get("screen"),
@@ -51,7 +52,7 @@ def get_device_records(device_id):
         if not isinstance(row, dict):
             return False
         for val in _device_values(row):
-            if val is not None and str(val) == str(device_id):
+            if val is not None and str(val) == str(screen_number):
                 return True
         return False
 
@@ -123,11 +124,11 @@ def get_device_records(device_id):
         return [], 5
 
 
-def refresh_data_and_cache(poster_token, device_id, publish=None):
+def refresh_data_and_cache(poster_token, screen_number, publish=None):
     """The existing fetch/cache algorithm, executed by a single background worker."""
     if wifi_connect.ensure_wifi_connection():
         api_handler.fetch_posters(poster_token)
-    records, duration = get_device_records(device_id)
+    records, duration = get_device_records(screen_number)
     if publish:
         publish(records, duration)
     cache_handler.sync_cache(records or [])

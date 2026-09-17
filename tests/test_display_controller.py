@@ -23,7 +23,7 @@ class ControllerTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name)
-        self.config={'display':{'hardware_ID':7,'Mode':'Time','rotation_degree':0,'Auto_Scroll':5},'api':{}}
+        self.config={'display':{'screen_number':7,'Mode':'Time','rotation_degree':0,'Auto_Scroll':5},'api':{}}
         self.records=[record()]
         self.display=Mock(error=None,size=(960,540))
         self.display.inputs.return_value=[]
@@ -47,6 +47,32 @@ class ControllerTests(unittest.TestCase):
         self.controller.rebuild_items()
         self.controller.tick(260)
         self.assertEqual(self.display.overlay.call_args.kwargs['deadline'],400)
+
+    def test_actual_paper_id_is_preserved_in_time_mode(self):
+        for paper_id in ('003154', 0, 'P-3154'):
+            with self.subTest(paper_id=paper_id):
+                self.controller.records = [dict(record(), id=221, paper_id=paper_id)]
+                self.controller.tick(200)
+                self.assertEqual(self.display.overlay.call_args.kwargs['paper_id'], paper_id)
+
+    def test_shared_media_keeps_distinct_papers_and_their_deadlines(self):
+        self.controller.records = [dict(record(), paper_id='003154'),
+                                   dict(record('b', 200, 500), file='a', paper_id='003155')]
+        self.controller.rebuild_items()
+        self.assertEqual([item['paper_id'] for item in self.controller.items], ['003154', '003155'])
+        for mode in ('Menu', 'Scroll'):
+            with self.subTest(mode=mode):
+                self.config['display']['Mode'] = mode
+                self.controller.apply_config(self.config)
+                if mode == 'Menu':
+                    self.controller.selected = 1
+                    self.controller.input(['ENTER'], 250)
+                else:
+                    self.controller.scroll_index = 1
+                self.controller.tick(250)
+                overlay = self.display.overlay.call_args.kwargs
+                self.assertEqual(overlay['paper_id'], '003155')
+                self.assertEqual(overlay['deadline'], 500)
 
     def test_changed_api_deadline_takes_effect(self):
         self.controller.records=[record(end=500)]
@@ -91,10 +117,10 @@ class ControllerTests(unittest.TestCase):
         self.assertIsNotNone(self.controller.choose(250)[4])
         self.assertIsNone(self.controller.preview)
 
-    def test_hardware_change_resets_preview_and_scroll(self):
+    def test_screen_change_resets_preview_and_scroll(self):
         self.controller.preview={'url':'a'}
         changed=copy.deepcopy(self.config)
-        changed['display']['hardware_ID']=8
+        changed['display']['screen_number']=8
         self.controller.apply_config(changed)
         self.assertIsNone(self.controller.preview)
         self.assertEqual(self.controller.scroll_until,0)
@@ -171,8 +197,8 @@ class PreparationTests(unittest.TestCase):
             hold=uncover_overlays(Image.new('RGB',size,'red'),rotation)
             logical=hold.rotate(rotation,expand=True)
             w,h=logical.size
-            self.assertEqual(logical.getpixel((w//2,h-100)),(0,0,0,0))
-            self.assertEqual(logical.getpixel((w//2,h-120)),(255,0,0,255))
+            self.assertEqual(logical.getpixel((w//2,h-footer_height(size)+2)),(0,0,0,0))
+            self.assertEqual(logical.getpixel((w//2,h-footer_height(size)-2)),(255,0,0,255))
 
     def test_media_viewport_reserves_footer_in_every_orientation(self):
         for size in ((1920,1080),(3840,2160)):
@@ -202,7 +228,7 @@ class PreparationTests(unittest.TestCase):
             x,y={0:(30,30),90:(930,30),180:(930,510),270:(30,510)}[rotation]
             self.assertEqual(logical_point(x,y,size,rotation),(30,30))
             hold=uncover_overlays(Image.new('RGB',size,'red'),rotation)
-            self.assertEqual(hold.getpixel((x,y)),(0,0,0,0))
+            self.assertEqual(hold.getpixel((x,y)),(255,0,0,255))
             self.assertEqual(hold.getpixel((480,270)),(255,0,0,255))
 
 

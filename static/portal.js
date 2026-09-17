@@ -258,7 +258,7 @@
       byId("cache-state").textContent = data.cache_files == null ? "Unknown" : String(data.cache_files) + (data.cache_capped ? "+" : "");
       byId("player-state").textContent = data.video_player ? "Video player: " + data.video_player : "No video player found";
       byId("device-ip").textContent = "Local address: " + data.ip;
-      byId("device-identity").textContent = "Hardware ID " + data.hardware_ID + " / " + data.mode + " mode";
+      byId("device-identity").textContent = "Screen " + data.screen_number + " / " + data.mode + " mode";
       byId("status-checked").textContent = "Board sampled: " + data.checked_at;
       byId("feed-updated").textContent = data.feed_updated_at || "No saved feed";
       const list = byId("device-notices");
