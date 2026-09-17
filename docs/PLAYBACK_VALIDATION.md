@@ -134,3 +134,15 @@ The service currently targets the existing X11 session on `:0`. A Wayland-only
 board needs a corresponding service/session setup. Frame holding depends on the
 video output's window screenshot support; if unavailable, the persistent mpv
 window's keep-open behavior remains the fallback.
+
+## Menu shortcuts
+
+Press `m` or `M` during playback to open the poster library. Use Up/Down or
+Page Up/Page Down to browse, and Enter/Space or a tap to preview. `M` returns
+from a preview to the library. Escape returns from a preview to the library;
+Escape in the library or Start schedule resumes scheduled playback. Mode
+changes are saved so configuration refreshes do not undo keyboard navigation.
+
+The menu uses outlined selection cards, media thumbnails, and uniform Paper ID
+labels. Pillow previews were checked in portrait and landscape; live Radxa
+rendering and its audio/video synchronization still require device validation.

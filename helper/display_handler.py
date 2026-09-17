@@ -107,39 +107,70 @@ def render_menu(items, offset, selected, size):
 
 def _render_menu(items, offset, selected, size):
     w, h = size
-    image = Image.new("RGB", size, (245, 245, 240))
+    background, ink, muted = (246, 247, 250), (28, 32, 43), (91, 99, 116)
+    accent = (91, 61, 190)
+    image = Image.new("RGB", size, background)
     draw = ImageDraw.Draw(image)
     top, row, count = menu_geometry(size)
-    draw.rectangle((0, 0, w, top), fill=(234, 234, 228))
-    draw.rounded_rectangle((20, 15, min(w-20, 270), top-15), radius=8, fill=(30, 117, 133))
-    draw.text((34, 25), "Start Schedule", font=font(24), fill="white")
+    draw.rectangle((0, 0, w, top), fill="white")
+    draw.line((0, top, w, top), fill=(223, 226, 233))
+    button = (20, 15, min(w-20, 270), top-15)
+    draw.rounded_rectangle(button, radius=12, fill=accent)
+    draw.text(((button[0]+button[2])/2, top/2), "Start schedule", anchor="mm", font=font(23), fill="white")
+    if w >= 480:
+        draw.text((298, top/2-13), "Poster library", anchor="lm", font=font(27 if w >= 600 else 20), fill=ink)
+        draw.text((298, top/2+17), f"{len(items)} posters available", anchor="lm", font=font(16), fill=muted)
     if not items:
-        draw.text((30, top+40), "No cached media available", font=font(24), fill=(55, 55, 55))
+        cy = (top+h-104)//2
+        draw.rounded_rectangle((24, top+24, w-24, h-110), radius=18, fill="white", outline=(223, 226, 233))
+        draw.text((w/2, cy-18), "Your poster library is empty", anchor="mm", font=font(24), fill=ink)
+        draw.text((w/2, cy+22), "Downloaded posters will appear here.", anchor="mm", font=font(17), fill=muted)
     for index, item in enumerate(items[offset:offset+count], offset):
         y = top + (index-offset)*row + 10
-        fill = (219, 239, 239) if selected == index else (255, 255, 255)
-        draw.rounded_rectangle((20, y, w-20, y+row-18), radius=12, fill=fill)
-        thumb_w, thumb_h = min(200, w//3), row-38
+        active = selected == index
+        fill = (241, 237, 253) if active else (255, 255, 255)
+        draw.rounded_rectangle((20, y, w-20, y+row-18), radius=14, fill=fill,
+                               outline=accent if active else (224, 227, 235), width=2 if active else 1)
+        if active:
+            draw.rounded_rectangle((20, y+16, 24, y+row-34), radius=2, fill=accent)
+        thumb_w, thumb_h = min(180, w//4), row-42
+        thumb_x, thumb_y = 36, y+12
+        draw.rounded_rectangle((thumb_x, thumb_y, thumb_x+thumb_w, thumb_y+thumb_h), radius=8, fill=(231, 234, 241))
         try:
             if is_video_file(item["path"]):
-                draw.rectangle((34, y+10, 34+thumb_w, y+10+thumb_h), fill=(27, 80, 93))
-                cx, cy = 34+thumb_w//2, y+10+thumb_h//2
-                draw.polygon([(cx-12, cy-20), (cx-12, cy+20), (cx+20, cy)], fill="white")
+                cx, cy = thumb_x+thumb_w//2, thumb_y+thumb_h//2
+                draw.ellipse((cx-23, cy-23, cx+23, cy+23), fill=accent)
+                draw.polygon([(cx-6, cy-11), (cx-6, cy+11), (cx+11, cy)], fill="white")
             else:
                 with Image.open(item["path"]) as source:
-                    source.thumbnail((thumb_w, thumb_h))
                     thumb = ImageOps.exif_transpose(source).convert("RGB")
-                    image.paste(thumb, (34+(thumb_w-thumb.width)//2, y+10+(thumb_h-thumb.height)//2))
+                    thumb.thumbnail((thumb_w-8, thumb_h-8))
+                    image.paste(thumb, (thumb_x+(thumb_w-thumb.width)//2, thumb_y+(thumb_h-thumb.height)//2))
         except (OSError, ValueError):
-            draw.text((34, y+20), "Unavailable", font=font(16), fill=(80, 80, 80))
+            draw.text((thumb_x+thumb_w/2, thumb_y+thumb_h/2), "No preview", anchor="mm", font=font(15), fill=muted)
         paper_id = item.get('paper_id')
         label = f"Paper ID: {paper_id if paper_id is not None and paper_id != '' else 'Unavailable'}"
-        while draw.textlength(label, font=font(22)) > w-thumb_w-90 and len(label) > 4:
+        text_x = thumb_x+thumb_w+24
+        label_size = 27
+        while label_size > 12 and draw.textlength(label, font=font(label_size)) > w-text_x-64:
+            label_size -= 1
+        while draw.textlength(label, font=font(label_size)) > w-text_x-64 and len(label) > 4:
             label = label[:-4] + "..."
-        draw.text((thumb_w+55, y+24), label, font=font(22), fill=(45, 45, 45))
+        center = y+(row-18)/2
+        draw.text((text_x, center-14), label, anchor="lm", font=font(label_size), fill=ink)
         kind = "Video" if is_video_file(item["path"]) else "GIF" if is_animated_gif(item["path"]) else "Image"
-        draw.text((thumb_w+55, y+58), kind + "  /  Tap to view", font=font(16), fill=(85, 85, 85))
-    draw.text((24, h-90), f"{min(offset+1, len(items))}-{min(offset+count, len(items))} of {len(items)}   Scroll to browse", font=font(20), fill=(65, 65, 65))
+        draw.text((text_x, center+17), kind + "  ·  " + ("Enter or tap to open" if active else "Tap to preview"),
+                  anchor="lm", font=font(15), fill=accent if active else muted)
+        cx = w-42
+        draw.line((cx-4, center-7, cx+3, center, cx-4, center+7), fill=accent if active else muted, width=2)
+    start = min(offset+1, len(items))
+    end = min(offset+count, len(items))
+    draw.text((24, h-91), f"{start}-{end} of {len(items)}", anchor="lm", font=font(17), fill=muted)
+    hint = "Up/Down  Browse    Enter  Open    Esc  Schedule"
+    if draw.textlength(hint, font=font(15)) >= w-190:
+        hint = "Enter  Open    Esc  Schedule"
+    if draw.textlength(hint, font=font(15)) < w-190:
+        draw.text((w-24, h-91), hint, anchor="rm", font=font(15), fill=muted)
     return image
 
 

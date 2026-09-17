@@ -107,6 +107,9 @@ end
 for _, key in ipairs({'q','ESC','ENTER','SPACE','UP','DOWN','PGUP','PGDWN','WHEEL_UP','WHEEL_DOWN'}) do
     mp.add_forced_key_binding(key, 'eposter-' .. key, function() send(key) end, {repeatable=true})
 end
+for _, key in ipairs({'m', 'M'}) do
+    mp.add_forced_key_binding(key, 'eposter-menu-' .. key, function() send('M') end)
+end
 local press = nil
 mp.add_forced_key_binding('MBTN_LEFT', 'eposter-click', function(event)
     local x, y = mp.get_mouse_pos()

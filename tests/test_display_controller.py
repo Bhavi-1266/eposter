@@ -132,6 +132,33 @@ class ControllerTests(unittest.TestCase):
         self.controller.set_mode.assert_called_once_with('Time')
         self.assertEqual(self.controller.mode,'Time')
 
+    def test_m_opens_menu_from_playback_and_persists_mode(self):
+        for mode, key in (('Time', 'm'), ('Scroll', 'M')):
+            with self.subTest(mode=mode):
+                self.config['display']['Mode'] = mode
+                self.controller.apply_config(self.config)
+                self.controller.input([key], 200)
+                self.controller.set_mode.assert_called_with('Menu')
+                self.assertEqual(self.controller.mode, 'Menu')
+                self.assertIsNotNone(self.controller.choose(200)[4])
+
+    def test_m_returns_from_preview_and_escape_resumes_schedule(self):
+        self.controller.input(['M'], 200)
+        self.controller.input(['ENTER'], 200)
+        self.assertIsNotNone(self.controller.preview)
+        self.controller.input(['M'], 210)
+        self.assertIsNone(self.controller.preview)
+        self.assertEqual(self.controller.mode, 'Menu')
+        self.controller.input(['ESC'], 220)
+        self.controller.set_mode.assert_called_with('Time')
+        self.assertEqual(self.controller.choose(220)[1], 400)
+
+    def test_failed_m_mode_save_retains_playback(self):
+        self.controller.set_mode.side_effect = OSError('disk unavailable')
+        with self.assertLogs('helper.media_controller', level='ERROR'):
+            self.controller.input(['M'], 200)
+        self.assertEqual(self.controller.mode, 'Time')
+
     def test_failed_mode_save_keeps_menu_running(self):
         self.config['display']['Mode'] = 'Menu'
         self.controller.apply_config(self.config)

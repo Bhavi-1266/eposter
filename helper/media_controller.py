@@ -154,16 +154,35 @@ class Controller:
             self.display.player.command("set_property", "hwdec", hwdec)
             self.applied_hwdec = hwdec
 
+    def change_mode(self, mode):
+        try:
+            self.set_mode(mode)
+        except (OSError, ValueError):
+            LOG.exception("Could not save mode; retaining the current settings")
+            return
+        config = dict(self.config, display=dict(self.config.get("display", {}), Mode=mode))
+        self.apply_config(config)
+
     def input(self, event, now):
         key = event[0]
         if key == "q":
             self.running = False
+            return
+        if key in ("m", "M"):
+            if self.mode != "Menu":
+                self.change_mode("Menu")
+            else:
+                self.preview = None
+                self.preview_deadline = None
             return
         if self.mode != "Menu":
             return
         if self.preview:
             self.preview = None
             self.preview_deadline = None
+            return
+        if key == "ESC":
+            self.change_mode("Time")
             return
         size = logical_size(self.display.size, self.rotation)
         top, row, count = menu_geometry(size)
@@ -183,13 +202,7 @@ class Controller:
             x, y = logical_point(float(event[1]), float(event[2]), self.display.size, self.rotation)
             scale = menu_scale(size)
             if 20*scale <= x <= min(size[0]-20*scale, 270*scale) and 15*scale <= y <= top-15*scale:
-                try:
-                    self.set_mode("Time")
-                except (OSError, ValueError):
-                    LOG.exception("Could not save mode; retaining the current settings")
-                    return
-                config = dict(self.config, display=dict(self.config.get("display", {}), Mode="Time"))
-                self.apply_config(config)
+                self.change_mode("Time")
                 return
             local = y-top-10*scale
             index = self.offset + int(local//row)
