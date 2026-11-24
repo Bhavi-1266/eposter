@@ -9,7 +9,9 @@ from unittest.mock import Mock, patch
 
 from PIL import Image
 from helper.media_controller import Controller, RefreshWorker
-from helper.display_handler import PreparedImages, render_menu, logical_size, logical_point, uncover_overlays, menu_geometry, media_size, media_margins, footer_height
+from helper.display_handler import (Display, PreparedImages, render_menu, logical_size,
+                                    logical_point, uncover_overlays, menu_geometry,
+                                    media_size, media_margins, footer_height)
 
 
 def record(name='a', start=100, end=400, duration=10):
@@ -183,12 +185,57 @@ class ControllerTests(unittest.TestCase):
         self.controller.input(['CLICK','500','60'],200)
         self.controller.set_mode.assert_called_once_with('Time')
 
+    def test_remote_ok_toggles_only_visible_video(self):
+        self.controller.choose = Mock(return_value=(self.root/'talk.mp4', 400, 'a', '', None))
+        self.controller.remote_input({'type': 'button', 'key': 'OK'}, 200)
+        self.display.toggle_pause.assert_called_once_with(self.root/'talk.mp4')
+        self.display.toggle_pause.reset_mock()
+        self.controller.choose = Mock(return_value=(self.root/'poster.png', 400, 'a', '', None))
+        self.controller.remote_input({'type': 'button', 'key': 'OK'}, 200)
+        self.display.toggle_pause.assert_not_called()
+
+    def test_remote_navigation_cannot_open_the_library(self):
+        for key in ('UP', 'DOWN', 'LEFT', 'RIGHT', 'BACK', 'HOME'):
+            self.controller.remote_input({'type': 'button', 'key': key}, 200)
+        self.assertEqual(self.controller.mode, 'Time')
+        self.controller.set_mode.assert_not_called()
+
+    def test_remote_motion_is_rotated_bounded_and_added_to_overlay(self):
+        self.controller.rotation = 90
+        self.controller.remote_key = (True, '/dev/null', 64, 2.0)
+        self.controller.remote_input({'type': 'motion', 'dx': 10, 'dy': -5}, 200)
+        self.assertEqual((self.controller.pointer_x, self.controller.pointer_y), (260, 433))
+        self.controller.tick(200.5)
+        self.assertEqual(self.display.overlay.call_args.kwargs['pointer'], {'x': 260, 'y': 433})
+        self.controller.tick(201.1)
+        self.assertIsNone(self.display.overlay.call_args.kwargs['pointer'])
+
+    def test_remote_ok_cannot_open_screen_wide_library_item(self):
+        self.config['display']['Mode'] = 'Menu'
+        self.controller.apply_config(self.config)
+        self.controller.pointer_x = 100
+        self.controller.pointer_y = 150
+        self.controller.pointer_visible_until = 300
+        self.controller.remote_input({'type': 'button', 'key': 'OK'}, 200)
+        self.assertIsNone(self.controller.preview)
+
 
 class PreparationTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name)
+
+    def test_pause_toggle_is_guarded_by_current_visible_path(self):
+        display = Display.__new__(Display)
+        display.lock = threading.Lock()
+        display.shown = ('/visible.mp4', None, 0)
+        display.paused = False
+        display.player = Mock()
+        self.assertFalse(display.toggle_pause('/replacement.mp4'))
+        display.player.command.assert_not_called()
+        self.assertTrue(display.toggle_pause('/visible.mp4'))
+        display.player.command.assert_called_once_with('set_property', 'pause', True)
 
     def test_bounded_preparation_does_not_modify_originals(self):
         prepared=PreparedImages(self.root)

@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+"""Start from the Radxa desktop terminal or SSH."""
+import argparse
+import os
+from pathlib import Path
+import sys
+from channel_control import change_channel
+
+base = Path(__file__).resolve().parent
+parser = argparse.ArgumentParser()
+sub = parser.add_subparsers(dest="command", required=True)
+for mode in ("start", "video"):
+    cmd = sub.add_parser(mode)
+    cmd.add_argument("--port", default="/dev/ttyS6")
+    if mode == "video":
+        cmd.add_argument("--file")
+cmd = sub.add_parser("channel")
+cmd.add_argument("device_id")
+cmd.add_argument("number", type=int, choices=range(1, 12))
+cmd = sub.add_parser("status")
+cmd.add_argument("device_id")
+sub.add_parser("staff", help="Open the current staff configuration UI")
+args = parser.parse_args()
+if args.command in ("channel", "status"):
+    try:
+        result = change_channel(args.device_id, getattr(args, "number", 0))
+    except (OSError, ValueError) as exc:
+        sys.exit(f"Channel request failed: {exc}. Start the receiver first.")
+    print(result)
+    sys.exit(0 if result.startswith(("OK ", "CURRENT ")) else 1)
+if args.command == "staff":
+    os.execv(sys.executable, [sys.executable, str(base/"configure.py")])
+script = "radxa_receiver.py" if args.command == "start" else "video_demo.py"
+params = ["--quiet"] if args.command == "start" else (["--video", args.file] if args.file else [])
+os.execv(sys.executable, [sys.executable, "-u", str(base/script), args.port, *params])

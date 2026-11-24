@@ -1,0 +1,125 @@
+RADXA REMOTE -> EPOSTER INTEGRATION HANDOFF
+24 November 2026 | Start here
+
+GOAL
+Integrate the existing remote into https://github.com/Bhavi-1266/eposter.
+Presenters control their assigned session/media only; no desktop-wide mouse,
+shell access or unrestricted browsing. Preserve the schedule and slot deadline.
+The transport works with our standalone player; eposter integration is NOT yet
+implemented or tested. PCB/enclosure work is continuing separately.
+
+WHAT IS INCLUDED
+firmware/  One ESP-IDF project: ESP32-WROOM-32 or ESP32-C3, sender or receiver.
+radxa/     UART receiver/parser, video test, staff configuration UI and tests.
+README.md  Programming, wiring and staff-operation instructions.
+UART_AND_INTEGRATION.txt  Event contract and integration cautions.
+SOURCE_MANIFEST.json     File hashes and the eposter revision inspected.
+VALIDATION.md            Historical checks; newest entries supersede older ones.
+firmware/schematic/     Reference only, NOT the finalized fabrication design.
+
+No private keys, local setup/station files, binaries, logs or old nRF project.
+Keep the current regression tests; they are not alternative firmware.
+
+QUICK START
+ESP-IDF 5.5.5, from firmware/:
+  idf.py set-target esp32c3
+  python generate_key.py
+  [edit data/setup.json]
+  idf.py build flash monitor -p COMx
+
+Use target esp32 for WROOM. Before generate_key.py, obtain the existing fleet
+key privately from Prashant and place it at data/encryption_key.txt. For an
+isolated NEW test fleet, generate one key once and reuse it on every board.
+Never regenerate the deployed fleet's key. Same device_id/channel/key at both
+ends, opposite role; default channel 11. Normal setup:
+  {"device_id":"remote-001","channel":11,"role":"sender"}
+Default profile is presenter-matrix. Use role receiver for the other board.
+For the WROOM single-button room test, use profile presenter-one-button on the
+pair; sender OK is GPIO16 switched to 3.3 V. Do not use the synthetic crowd
+profile for presenter integration. No manual MAC entry is required.
+
+Copy radxa/ CONTENTS to ~/Prashant/remote. ROCK 5C UART6-M1 must be enabled:
+  physical 19 TX -> C3 GPIO20 RX / WROOM GPIO16 RX
+  physical 21 RX <- C3 GPIO21 TX / WROOM GPIO17 TX
+  physical 20 GND <-> receiver GND
+115200 8N1, /dev/ttyS6, 3.3 V logic; use one board power source.
+The display user needs serial-device access (normally membership in dialout;
+log out/in after adding it). See README for the sender's separate pin map.
+
+Standalone check, in the Radxa desktop terminal:
+  cd ~/Prashant/remote
+  python3 remote video --file /absolute/path/to/video.mp4
+Console listener instead: python3 remote start
+These are alternatives: only ONE process may own the UART.
+GTK video/staff tools need Debian packages python3-gi, gir1.2-gtk-3.0,
+gir1.2-gstreamer-1.0, gstreamer1.0-gtk3, gstreamer1.0-plugins-base and
+gstreamer1.0-plugins-good. Extra codecs depend on submitted media.
+The Linux UART parser itself uses Python's standard library, not pyserial.
+
+EPOSTER INTEGRATION POINTS
+Inspected main commit: 904eb818e586dc3531f8e0eac5a66c872c7cd9c6.
+Recheck these hooks if your branch differs; no eposter source is bundled.
+
+1. Reuse radxa_receiver.Receiver, StationFrames, openLinuxUart/writeUart and
+   channel_control.ControlSocket. Add one serial worker owned by the eposter
+   lifecycle. Feed accepted events into a bounded application queue, retain
+   session/sequence deduplication and service the staff control socket.
+   Stop standalone remote start/video before enabling integrated ownership.
+
+2. helper/media_controller.py: Controller.input(), tick(), run() are the
+   application hooks. Dispatch on the controller thread; do not mutate its
+   state from the serial worker. Its loop sleeps 50 ms, so keep ACK processing
+   independent and make cursor updates responsive without waiting for slow
+   media loads or API work. Stop/join the worker on exit; recover from UART
+   loss without freezing the display.
+
+3. helper/mpv_player.py: MpvPlayer.command() provides existing JSON IPC.
+   Add context-aware OK play/pause via this player. Current Controller.input()
+   closes a preview on ANY input and ignores normal keys outside Menu. Simply
+   translating OK to ENTER/SPACE will not give our required playback behavior.
+   helper/display_handler.py also unpauses newly loaded media: synchronize
+   pause state with media transitions. Never pause/extend the session clock.
+
+4. Add an application-local AIM pointer/overlay and hit-testing through the
+   display/player layer (helper/player.lua). Respect rotation and content
+   bounds; no global mouse injection. Resolve OK selection vs video pause by
+   the visible context. PDF/URL viewers, zoom/pan and session-scoped selection
+   still need application work; they are not delivered by this UART transport.
+   Never expose another author's items merely by entering the existing menu.
+
+BUTTONS
+S1 Back | S2 Up | S3 Home | S4 Left | S5 OK | S6 Right
+S7 hold AIM | S8 Down | S9 Mode (presenter action reserved; not transmitted).
+Back/Home should stay within the active author's session. Navigation and
+zoom/pan mappings beyond the tested OK/AIM behavior need application design.
+Hold AIM then tap OK: sensitivity. Hold AIM then tap Home, release and leave
+still: save gyro calibration. These chords are handled on the sender; do not
+also trigger playback/Home. Hold S7+S9 for 3 seconds: spare setup.
+Calibration is staff-triggered and saved; never require it on every wake.
+Matrix sender deep-sleeps after 33 idle seconds; held AIM keeps it awake.
+Receiver stays awake. S9 wakes/blinks but has no app action yet.
+
+KEEP STAFF CONFIGURATION WORKING
+Run python3 configure.py separately, with the UART owner running. Keep files
+at ~/Prashant/remote: the SSH agent path is currently hardcoded. Run the owner
+and staff agent as the same user and with a consistent XDG_RUNTIME_DIR so
+they resolve the same control.sock. LAN targets are explicit SSH hosts or
+local stations.json aliases, not LAN broadcasts. ID/channel changes update
+both ESPs; role/profile and JSON preview remain locked. For spare setup use
+one staff bridge, identify the selected remote and switch off its predecessor.
+The approved fleet key belongs only in staff private/encryption_key.txt
+(directory 700, file 600), never in Git, URLs or logs. Runtime changes live in
+NVS; unchanged flash defaults preserve them. Keep remote ID separate from
+eposter's API/screen identifiers.
+
+ACCEPTANCE BEFORE DEPLOYMENT
+Confirm each press acts once under retries; no lost presses or delayed cursor
+backlog; correct play/pause, AIM and chords; deadline still wins while paused;
+UART/app restart recovery; independent paired stations; staff ID/channel and
+spare replacement; deep-sleep wake. Test landscape and portrait. Run eposter's
+existing tests and playback smoke checks plus our regression checks (README).
+Already bench-tested: C3 play/pause/AIM, saved calibration, staff reconfiguration,
+33-second deep sleep and S9 wake. ESP32/C3 builds passed on 23 November.
+WROOM hardware, conference crowd, final PCB power/runtime and the integrated
+eposter path remain unqualified. No firmware, Radxa deployment or repo was
+changed while preparing this package.

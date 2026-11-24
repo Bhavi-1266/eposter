@@ -1,0 +1,8 @@
+PACKAGE CHECKS - 24 November 2026
+44 source/reference files copied byte-for-byte from the canonical project.
+13 Python/launcher files parsed successfully.
+8 configuration/provisioning/UART regression tests passed on the packaged source.
+Fresh-checkout generation is covered using temporary keys, not the fleet key.
+No ESP build/reflash, Radxa deployment or eposter integration test was run for packaging.
+Earlier hardware/build evidence and limitations are in VALIDATION.md and HANDOFF.txt.
+ZIP integrity, extracted hashes and private-key exclusions are checked before delivery.

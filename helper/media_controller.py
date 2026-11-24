@@ -1,12 +1,14 @@
 """Responsive scheduling for Time, Scroll and Menu using one display backend."""
 import logging
+import math
 import signal
 import threading
 import time
 from pathlib import Path
 
 from helper import cache_handler
-from helper.display_handler import Display, get_local_ip, logical_point, logical_size, menu_geometry, menu_scale
+from helper.display_handler import (Display, get_local_ip, is_video_file, logical_point,
+                                    logical_size, menu_geometry, menu_scale)
 from helper.schedule import active_record, record_deadline
 from helper.json_utils import atomic_write_json
 from helper.mpv_player import playback_settings
@@ -103,7 +105,12 @@ class Controller:
         self.revision = 0
         self.last_prefetch = None
         self.worker = None
+        self.remote = None
+        self.remote_key = None
         self.applied_hwdec = None
+        self.pointer_x = None
+        self.pointer_y = None
+        self.pointer_visible_until = 0.0
         self.idle = self.root / "ScreenSaver.gif"
         if not self.idle.exists():
             self.idle = self.root / "ScreenSaver.png"
@@ -149,6 +156,7 @@ class Controller:
             self.scroll_until = 0
             self.scroll_path = None
             self.offset = self.selected = self.scroll_index = 0
+            self.pointer_visible_until = 0.0
         self.mode, self.rotation = mode, rotation
         hwdec = playback_settings(settings)["hwdec"]
         if hwdec != self.applied_hwdec and self.display:
@@ -199,8 +207,11 @@ class Controller:
             self.selected = max(0, min(len(self.items)-1, self.selected-int(delta/row or (1 if delta > 0 else -1))))
         elif key in ("ENTER", "SPACE") and self.items:
             self.preview = self.items[self.selected]
-        elif key == "CLICK":
-            x, y = logical_point(float(event[1]), float(event[2]), self.display.size, self.rotation)
+        elif key in ("CLICK", "AIM_CLICK"):
+            if key == "AIM_CLICK":
+                x, y = float(event[1]), float(event[2])
+            else:
+                x, y = logical_point(float(event[1]), float(event[2]), self.display.size, self.rotation)
             scale = menu_scale(size)
             if 20*scale <= x <= min(size[0]-20*scale, 270*scale) and 15*scale <= y <= top-15*scale:
                 self.change_mode("Time")
@@ -215,6 +226,88 @@ class Controller:
         self.offset = min(self.offset, self.selected)
         if self.selected >= self.offset+count:
             self.offset = self.selected-count+1
+
+    def _remote_settings(self):
+        settings = self.config.get("presenter_remote", {})
+        enabled = settings.get("enabled", True)
+        if not isinstance(enabled, bool):
+            raise ValueError("presenter_remote.enabled must be true or false")
+        port = str(settings.get("port", "/dev/ttyS6")).strip()
+        queue_size = int(settings.get("queue_size", 64))
+        pointer_speed = float(settings.get("pointer_speed", 1.0))
+        if not port or not 1 <= queue_size <= 256:
+            raise ValueError("presenter_remote requires a port and queue_size from 1 to 256")
+        if not math.isfinite(pointer_speed) or not 0.1 <= pointer_speed <= 10:
+            raise ValueError("presenter_remote.pointer_speed must be from 0.1 to 10")
+        return enabled, port, queue_size, pointer_speed
+
+    def sync_remote(self):
+        """Start or replace the UART owner after a relevant config change."""
+        try:
+            key = self._remote_settings()
+        except (TypeError, ValueError):
+            LOG.exception("Invalid presenter remote settings; disabling the remote")
+            key = (False, "/dev/ttyS6", 64, 1.0)
+        if key == self.remote_key:
+            return
+        if self.remote:
+            self.remote.close()
+            self.remote = None
+        self.remote_key = key
+        if key[0]:
+            from helper.remote_input import RemoteInput
+            self.remote = RemoteInput(port=key[1], queue_size=key[2])
+
+    def move_pointer(self, dx, dy, now):
+        width, height = logical_size(self.display.size, self.rotation)
+        content_height = max(1, height - round(72 * max(0.75, min(self.display.size) / 1080)))
+        if self.pointer_x is None or self.pointer_y is None:
+            self.pointer_x, self.pointer_y = width / 2, content_height / 2
+        # The receiver reports physical right/down motion. Store logical
+        # coordinates so the Lua overlay and menu hit-testing share rotation.
+        dx, dy = {0: (dx, dy), 90: (dy, -dx), 180: (-dx, -dy), 270: (-dy, dx)}[self.rotation]
+        speed = self.remote_key[3] if self.remote_key else 1.0
+        self.pointer_x = max(0, min(width - 1, self.pointer_x + dx * speed))
+        self.pointer_y = max(0, min(content_height - 1, self.pointer_y + dy * speed))
+        self.pointer_visible_until = now + 1.0
+
+    def remote_input(self, event, now):
+        kind = event.get("type")
+        if kind == "motion":
+            self.move_pointer(event.get("dx", 0), event.get("dy", 0), now)
+            return
+        if kind != "button":
+            return
+        key = event.get("key")
+        if key == "BACK":
+            if self.preview:
+                self.preview = None
+                self.preview_deadline = None
+            if self.mode == "Menu":
+                self.change_mode("Time")
+            return
+        if key == "HOME":
+            self.preview = None
+            self.preview_deadline = None
+            if self.mode != "Time":
+                self.change_mode("Time")
+            return
+        if key == "OK":
+            if self.mode == "Menu":
+                # The existing library is screen-wide, not author-scoped. Do
+                # not let a presenter remote open or act on another paper.
+                return
+            path, _, _, _, menu = self.choose(now)
+            if not menu and path and is_video_file(path):
+                self.display.toggle_pause(path)
+            return
+        # Directional navigation/zoom needs an author-scoped content model.
+        # Until then it is deliberately not mapped to the screen-wide library.
+
+    def pointer_state(self, now):
+        if now >= self.pointer_visible_until or self.pointer_x is None:
+            return None
+        return {"x": round(self.pointer_x, 2), "y": round(self.pointer_y, 2)}
 
     def choose(self, now):
         """Return path, API deadline, paper ID, status, menu specification."""
@@ -260,11 +353,15 @@ class Controller:
     def tick(self, now):
         for event in self.display.inputs():
             self.input(event, now)
+        if self.remote:
+            for event in self.remote.read():
+                self.remote_input(event, now)
         path, deadline, paper, status, menu = self.choose(now)
         if self.display.error:
             status = "Media unavailable; retrying"
         self.display.overlay(deadline=deadline, paper_id=paper, ip=self.ip, status=status,
-                             rotation=self.rotation, menu=self.mode == "Menu")
+                             rotation=self.rotation, menu=self.mode == "Menu",
+                             pointer=self.pointer_state(now))
         self.display.show(path, self.rotation, menu)
         upcoming = None
         if self.mode == "Time":
@@ -287,6 +384,7 @@ class Controller:
                 previous_handlers[signum] = signal.signal(signum, lambda *_: setattr(self, "running", False))
         try:
             self.apply_config(self.config)
+            self.sync_remote()
             self.rebuild_items()
             next_config = next_refresh = next_ip = next_health = 0
             version = 0
@@ -299,6 +397,7 @@ class Controller:
                         config = self.load_config()
                         changed = refresh_key(config) != refresh_key(self.config)
                         self.apply_config(config)
+                        self.sync_remote()
                         if changed:
                             self.records = []
                             self.rebuild_items()
@@ -336,6 +435,8 @@ class Controller:
                     next_health = mono+(30 if self.display.player.ready > 0 else 1)
                 time.sleep(0.05)
         finally:
+            if self.remote:
+                self.remote.close()
             self.worker.close()
             self.display.close()
             for signum, handler in previous_handlers.items():

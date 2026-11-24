@@ -1,0 +1,291 @@
+{
+  "package": "radxa_remote_eposter_2026-11-24",
+  "prepared_date": "2026-11-24",
+  "eposter_repository": "https://github.com/Bhavi-1266/eposter",
+  "eposter_commit_reviewed": "904eb818e586dc3531f8e0eac5a66c872c7cd9c6",
+  "integration_status": "Handoff only; eposter not modified or integrated",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 55,
+      "sha256": "6707b6c4b4c6e094b6f02d33a9f667af08b97f1fd083b4e94c65767667ca0aa1",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 486,
+      "sha256": "c1eabdcf7d1e66a6a84bfb0a805ca77ab4d068e5a81d3d71851bab91df795fe7",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/CMakeLists.txt",
+      "bytes": 777,
+      "sha256": "59b1012238ba7de91fd2961f1287207c861aee50191bbfd01ad7c08905e7997a",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/data/.gitignore",
+      "bytes": 14,
+      "sha256": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/generate_key.py",
+      "bytes": 1796,
+      "sha256": "74bbac3064dcfe9339bdb070296ea21cbafcbb5c135a68ba9cc4b12607b42e7f",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/board.h",
+      "bytes": 1167,
+      "sha256": "e073ed9900fe75b509ba2207a36c80a2ccbfa3855feb063b3e8157d57c9ffa4f",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/buttons.h",
+      "bytes": 1077,
+      "sha256": "ad3d18b4fb0ffae45f06eaa56c97fc04c5c50308c4878e5f918ee91be76b3a70",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/channel.c",
+      "bytes": 6801,
+      "sha256": "52df81c989dc774df11fe2099556dad4fedf8e894011f92267b0335f8d2ce4b1",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/channel.h",
+      "bytes": 211,
+      "sha256": "5d03dc880f77a170134e216b657ed8271aa863e4b4436430aacf0336c660fa8c",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/CMakeLists.txt",
+      "bytes": 399,
+      "sha256": "1afe2534177e024b0a983fd8d8529f2fb2a6f773120344f6f98201700baf0f1e",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/configuration.c",
+      "bytes": 20199,
+      "sha256": "21ee19ad41cab3d1d1a8ce5f48f8a0165e5060a4785d83602c1a4614522870e8",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/configuration.h",
+      "bytes": 550,
+      "sha256": "c2678e7f8c50e6a100e63659f31deb1c330325d5d014fd0e19328e31699bdd69",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/controls.c",
+      "bytes": 15095,
+      "sha256": "649c897c509634632d149288971a9c9d936ae92303a39423a2f4f8ce2f063b49",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/controls.h",
+      "bytes": 458,
+      "sha256": "a8c08cf917d8cdf096c9abac57a50a0d647f433509c46089acf5f2300f1175ab",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/handheld.c",
+      "bytes": 10697,
+      "sha256": "33265365589448b0fc2e2f0b197cbc98766ede51d687d3ae997bb443ab8472c7",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/link.c",
+      "bytes": 8028,
+      "sha256": "f4f497768cdf6177a7ed6b04e6d0f65aa16c1c362a70e903b2bbb2dbaf9ec193",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/link.h",
+      "bytes": 1753,
+      "sha256": "9f3b9348074be1bec470da8cfe4e5ecd63b04e53db408992d0abcf710d5a8bfd",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/main.c",
+      "bytes": 457,
+      "sha256": "371008e91f8588a7b0207c77b2fdd13f9c1701435c63afecbc4578fe98418f32",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/station.c",
+      "bytes": 4714,
+      "sha256": "f91f14ff6b95868cc18322286e34f15dabefe683c9e034bd6064c79fede2f89a",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/usb.c",
+      "bytes": 1363,
+      "sha256": "fd11e523bc50f1017a596cda010baad1a3c9daa0d35cf3bdc13a1647618b6371",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/main/usb.h",
+      "bytes": 154,
+      "sha256": "1b1b3912d1b58312e942d35e34be735a0376a2105d10997b5ed58af64ef9fccb",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/partitions.csv",
+      "bytes": 164,
+      "sha256": "74b783a53eb847cc2c5657dfc4ea984a469cbd095daf1cac8b11f61a71a20af6",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/schematic/01-power-usb.png",
+      "bytes": 517928,
+      "sha256": "1976f403e3aee347e493adc783b5e99d0f9b7d20ad8536d29001be7eab072d2c",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/schematic/01-power-usb.svg",
+      "bytes": 33992,
+      "sha256": "e9510368dfdb275ee3318a1bc9352f82e3ed0054d6b01493bf26db52f7fff30f",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/schematic/02-controller-inputs.png",
+      "bytes": 675319,
+      "sha256": "ee3aa55c346cdf9cff70c6d06041cfa68930d9c5ff369dbf2bf1d209583803ff",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/schematic/02-controller-inputs.svg",
+      "bytes": 52730,
+      "sha256": "30ff795ea57d10b13653805a40f64c13b7a6ef6c4c82d18e5fcaf2b1566245ef",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/schematic/PCB_NOTES.md",
+      "bytes": 7503,
+      "sha256": "87c7890e8578f9c4c541f40fb48d5129d4475538854da129e725bc584b6b8a25",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/sdkconfig.defaults",
+      "bytes": 250,
+      "sha256": "47aec0875870bb6c832715fa4a595cef86ff87628457092b7410bba396bcd3c3",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/sdkconfig.defaults.esp32c3",
+      "bytes": 37,
+      "sha256": "e1eed4c3cab465350dbb2b0f5c5f17b911cb1c18f6498347e515e227eb2d9d1b",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/setup_board.py",
+      "bytes": 4794,
+      "sha256": "e6ee7f1235f9152bce6b527d7ffb8c2656e0e83ead722eeb2ea757b708629c77",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/tests/button_actions.c",
+      "bytes": 1288,
+      "sha256": "430acaee01953cf2aa28744789e556a9dbb03bf799d36f361cb2f33f8ef7c4b7",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/tests/channel_sim.py",
+      "bytes": 5170,
+      "sha256": "1997f0380890611416a6e85a1f21c380b6fc7733fe64ad2fd2956670567e528b",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "firmware/tests/configuration_sim.py",
+      "bytes": 9697,
+      "sha256": "35f9d462c4f9f2c8fc19cd7ca2055ed7debf35f2b374d9b1a42a75ddbfe3f588",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "HANDOFF.txt",
+      "bytes": 7190,
+      "sha256": "17eba49d30883d33efc0a222751b3cd5cc6b6b434fd136803c7d64dd0dc47319",
+      "origin": "handoff documentation"
+    },
+    {
+      "path": "PACKAGE_CHECKS.txt",
+      "bytes": 587,
+      "sha256": "09073073efcce4791c9174ac0fa8fb418f9a6fae8373c162c0852cccc1a0e211",
+      "origin": "handoff documentation"
+    },
+    {
+      "path": "radxa/channel_control.py",
+      "bytes": 5221,
+      "sha256": "0cd9bc4bd97aaaae87da9fecd51f5018ff3e13d1bb31aaac2d345b412ac30dfe",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "radxa/configuration_model.py",
+      "bytes": 4024,
+      "sha256": "a2dc49367cc7be1500daae9998bb4a434d11dd2628c51a20b5b7b8de90c45565",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "radxa/configure.py",
+      "bytes": 17514,
+      "sha256": "503efdf33d700f68330617ffa8323438909a6b65d94af5c20cefc1ea3179dd7e",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "radxa/radxa_receiver.py",
+      "bytes": 5638,
+      "sha256": "3eada3fbeab52f3ca4987f75cec68956668a6411f2a53d83f2791079a4bf560f",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "radxa/remote",
+      "bytes": 1463,
+      "sha256": "8d323cc5fca8edc6baa34294978dc433150572b11ab63370a80dd8cd7b4d93db",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "radxa/tests/configuration.py",
+      "bytes": 6110,
+      "sha256": "edf86f7d61e8d5c2a97653ec9e729e09b6bf15408782c476e0d62eed1dc94807",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "radxa/tests/configure_ui.py",
+      "bytes": 2365,
+      "sha256": "243b1e3feeb2bf9f04a7eead5a76a4d5e9d4c4bf1f270543d17037b837d6b566",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "radxa/tests/station_pty.py",
+      "bytes": 3005,
+      "sha256": "2cedbf7f0d1394b21927389ae7a5f8c884c3e060eaf5028d8757f6e6101bc65b",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "radxa/video_demo.py",
+      "bytes": 5476,
+      "sha256": "c86ebd6d187be1ab629b8d1160c730d621856c559d19e77a1b44761def9a83e6",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "README.md",
+      "bytes": 5960,
+      "sha256": "22a9520d092bf3abec54e92abdbd98f0e4daf03e4d10753cf91303f68d16f880",
+      "origin": "canonical source; unchanged"
+    },
+    {
+      "path": "UART_AND_INTEGRATION.txt",
+      "bytes": 4444,
+      "sha256": "fdd357379e801dc0efedcb0f1b7d4d2e80966575abca149be818719da46bc0aa",
+      "origin": "handoff documentation"
+    },
+    {
+      "path": "VALIDATION.md",
+      "bytes": 7289,
+      "sha256": "f26a253e0a40aee1322bea9ecaadae0ba710895eca093ff1b72fa49a72ad486a",
+      "origin": "canonical source; unchanged"
+    }
+  ]
+}

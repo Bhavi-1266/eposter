@@ -1,0 +1,4 @@
+* text=auto
+radxa/remote text eol=lf
+*.py text eol=lf
+*.bin binary

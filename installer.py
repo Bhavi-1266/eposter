@@ -321,11 +321,12 @@ def finish_install():
     
     # Ensure the user is in the correct groups
     groups = ["netdev", "audio", "video", "sudo"]
-    try:
-        grp.getgrnam("render")
-        groups.append("render")
-    except KeyError:
-        pass
+    for optional_group in ("render", "dialout"):
+        try:
+            grp.getgrnam(optional_group)
+            groups.append(optional_group)
+        except KeyError:
+            pass
     run(["usermod", "-aG", ",".join(groups), REAL_USER])
 
     # Path for modern Polkit rules

@@ -11,6 +11,7 @@ A Linux digital signage player for Radxa ROCK boards and other compatible device
 - 🎨 **Image Processing**: Automatic landscape conversion and rotation
 - ⚙️ **Configurable**: All settings in a single `config.json` file
 - 📱 **Fullscreen Display**: Optimized for portrait/landscape displays
+- 🎛️ **Presenter remote**: Local ESP-NOW/UART control with in-app AIM and video play/pause
 
 ## Requirements
 
@@ -194,6 +195,37 @@ The controller will:
 2. Connect to WiFi (if configured)
 3. Fetch posters from API
 4. Display them in a fullscreen slideshow
+
+### Presenter remote on Radxa ROCK 5C
+
+The display service owns `/dev/ttyS6` and reconnects automatically. Presenter
+input is accepted into a bounded queue before the receiver is ACKed, while AIM
+motion is coalesced so it cannot build a delayed cursor backlog. OK toggles only
+the active scheduled video. Back and Home return toward the active schedule and
+the remote cannot enter or navigate the screen-wide poster library, use a desktop
+mouse, open a shell, or browse unrestricted URLs. The API slot deadline continues
+while a video is paused.
+
+UART6-M1 must be enabled. Wire ROCK 5C physical pins 19/21/20 to the receiver's
+RX/TX/GND at 115200 8N1, 3.3 V logic, and add the display user to `dialout`.
+Only the integrated display may own the UART; stop standalone `radxa/remote
+start` or `video` first. Staff configuration still connects through the owner's
+local control socket with `python3 radxa/configure.py`.
+
+Configuration defaults are:
+
+```json
+"presenter_remote": {
+  "enabled": true,
+  "port": "/dev/ttyS6",
+  "queue_size": 64,
+  "pointer_speed": 1.0
+}
+```
+
+Set `enabled` to `false` on a non-presenter station. See
+[remote programming and operation](docs/RADXA_REMOTE.md), [the integration
+contract](UART_AND_INTEGRATION.txt), and [the handoff](HANDOFF.txt).
 
 ### Playback and countdown
 

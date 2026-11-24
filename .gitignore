@@ -28,3 +28,41 @@ event_data.json
 .playback-status.json
 /.venvs/
 /.venv-previous-*
+
+# Presenter remote: private pairing data and station-local configuration
+/.vscode/
+/firmware/.vscode/
+/firmware/data/*
+!/firmware/data/.gitignore
+/radxa/private/
+/radxa/stations.json
+/radxa/.stations-*
+encryption_key.txt
+
+# ESP-IDF and native build output is reproducible and must stay local
+/firmware/build*/
+/firmware/images/
+/firmware/managed_components/
+/firmware/dependencies.lock
+/firmware/sdkconfig
+/firmware/sdkconfig.old
+compile_commands.json
+*.bin
+*.elf
+*.map
+*.o
+*.obj
+*.a
+*.so
+
+# Delivered archives and workstation debris are not source
+*.zip
+*.tar
+*.tar.gz
+*.bak
+.coverage
+htmlcov/
+.mypy_cache/
+.DS_Store
+Thumbs.db
+Desktop.ini

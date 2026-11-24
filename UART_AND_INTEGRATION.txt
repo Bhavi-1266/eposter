@@ -1,0 +1,76 @@
+UART CONTRACT / ACK SEMANTICS
+Source of truth: firmware/main/station.c, handheld.c, buttons.h;
+radxa/radxa_receiver.py and channel_control.py. Reuse these parsers.
+
+Receiver ESP -> Radxa, ASCII newline-terminated:
+  EV ssssssss qqqqqqqq kind x y battery_mv\n
+session and sequence: nonzero 8-digit lowercase hex.
+kind, x, y, battery_mv: decimal. x/y signed int16; battery_mv uint16.
+kind 1 = debounced button press, x=index, y=0.
+  0 BACK, 1 UP, 2 HOME, 3 LEFT, 4 OK, 5 RIGHT, 6 AIM, 7 DOWN.
+  AIM is consumed locally by current sender firmware; no standalone AIM edge
+  or release/held-state message is emitted. S9 has no wire index/action.
+kind 2 = relative motion, x=dx, y=dy; not absolute position/raw MPU samples.
+  Tested orientation: positive dx right, positive dy down. Up to about 50 Hz;
+  reports only while AIM is active and a nonzero delta is produced.
+kind 3 = diagnostic probe, x=y=0; do not map to an application action.
+
+Receiver callback dictionaries:
+  {"session":"00000001","sequence":2,"battery_mv":3000,
+   "type":"button","key":"OK"}
+  {"session":"00000001","sequence":3,"battery_mv":3000,
+   "type":"motion","dx":12,"dy":-4}
+Battery telemetry is raw measured millivolts, not a calibrated percentage.
+
+Radxa -> receiver ESP, for accepted button/probe frames only:
+  ACK ssssssss qqqqqqqq\n
+Example: EV 00000001 00000002 1 4 0 3000\n
+Reply:   ACK 00000001 00000002\n
+No application ACK for motion; do not add motion retransmission queues.
+Normal path: sender -> receiver ESP -> Radxa callback -> UART ACK ->
+receiver ESP -> ESP-NOW ACK -> sender. The synthetic crowd profile is an
+exception that ACKs directly at the receiver; don't use it to measure UI time.
+Sender allows three attempts, approximately 50 ms ACK wait per attempt,
+reusing the same session/sequence. A send failure also consumes an attempt.
+
+Receiver.process calls accept(event), then remembers the event and returns
+the ACK. StationFrames writes it. Duplicate button/probe frames are ACKed
+again without another callback. History is 512 event IDs IN MEMORY; it is not
+durable exactly-once delivery across a process crash/restart.
+
+For an asynchronous eposter integration, define acceptance as successful
+enqueue into a bounded application queue. Return from accept only on that
+success. Returning False currently DOES NOT reject the event: return values
+are ignored. On full/failure, raise a controlled exception before accepting,
+handle it in the owner, withhold ACK, and keep parsing/recovery alive.
+Do not block the UART thread on media loading or slow mpv commands. An ACK
+then means accepted by the application queue, not rendered on the screen.
+The stock console listener ACKs after printing; piping its stdout into eposter
+would acknowledge before eposter receives the event. Integrate at the callback.
+
+Avoid using MpvPlayer.inputs as a silent-dropping button sink: its current
+128-entry queue drops when full. Keep button order and prioritize buttons.
+Motion can be coalesced for responsiveness: sum recent relative deltas, bound
+the accumulator, and discard stale motion at transitions/disconnects. There
+is no AIM-release event, so do not rely on one to hide a pointer or clear state.
+
+Keep StationFrames routing CHANNEL/RCFG lines to ControlSocket.reply while
+ordinary events flow. Poll ControlSocket promptly and serialize ALL UART writes
+through the owner. Close both UART and control socket on shutdown. The advisory
+UART lock protects cooperating owners; do not open another reader/writer.
+
+App-specific actions are future integration work, not promised wire commands:
+presses have no auto-repeat or release events, S9 is reserved, drag state is not
+provided, and configuration chords must never become accidental UI commands.
+AIM pointer orientation/rotation, menu selection, pause and session restriction
+belong in eposter. Preserve the current firmware/protocol unless both ends and
+their tests are intentionally updated together.
+
+REPOSITORY REFERENCES (inspected pinned revision)
+https://github.com/Bhavi-1266/eposter/tree/904eb818e586dc3531f8e0eac5a66c872c7cd9c6
+helper/media_controller.py: Controller.input 167, tick 260, run 281; sleep 337.
+helper/mpv_player.py: _dispatch 163; command 196.
+helper/display_handler.py: overlay 294; _work 329; inputs 397.
+helper/player.lua: input bindings 104-134.
+service_files/eposter-display.service.template: user/session/ExecStart settings.
+Use symbol names if line numbers move in your branch.

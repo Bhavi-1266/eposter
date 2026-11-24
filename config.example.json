@@ -27,5 +27,11 @@
     "video_hwdec": "auto",
     "video_profile": "default",
     "video_audio": true
+  },
+  "presenter_remote": {
+    "enabled": true,
+    "port": "/dev/ttyS6",
+    "queue_size": 64,
+    "pointer_speed": 1.0
   }
 }

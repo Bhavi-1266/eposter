@@ -1,0 +1,426 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1720" height="1710" viewBox="0 0 1720 1710">
+<rect width="1720" height="1710" fill="white"/>
+<rect x="0" y="0" width="1720" height="98" fill="#182E3C" stroke="#182E3C" stroke-width="1"/>
+<text x="36" y="33.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#97DAD2">RADXA CONTROL   /   HANDHELD ELECTRONICS</text>
+<text x="36" y="76.9" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="35" font-weight="700" fill="white">ESP32-C3 handheld  /  keypad and MPU wiring</text>
+<text x="1684" y="72.82" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="23" font-weight="400" fill="white">02 / 02</text>
+<rect x="35" y="119" width="758" height="505" fill="white" stroke="#B7CACB" stroke-width="1"/>
+<rect x="35" y="119" width="758" height="44" fill="#F2F8F7" stroke="#B7CACB" stroke-width="1"/>
+<text x="52" y="148.14" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#182E3C">U2   /   ESP32-C3-MINI-1 module pin map</text>
+<rect x="254" y="200" width="292" height="305" fill="#F2F8F7" stroke="#17615E" stroke-width="2"/>
+<text x="267" y="231.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">3   3V3</text>
+<polyline points="204.00,226.00 254.00,226.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="193" y="231.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">SYS_3V3</text>
+<text x="267" y="263.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">8   EN</text>
+<polyline points="204.00,258.00 254.00,258.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="193" y="263.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">EN_RESET</text>
+<text x="267" y="295.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">12   GPIO0</text>
+<polyline points="204.00,290.00 254.00,290.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="193" y="295.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">ROW1</text>
+<text x="267" y="327.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">13   GPIO1</text>
+<polyline points="204.00,322.00 254.00,322.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="193" y="327.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">ROW2</text>
+<text x="267" y="359.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">6   GPIO3</text>
+<polyline points="204.00,354.00 254.00,354.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="193" y="359.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">ROW3</text>
+<text x="267" y="391.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">20   GPIO6</text>
+<polyline points="204.00,386.00 254.00,386.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="193" y="391.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">MCU_C1</text>
+<text x="267" y="423.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">21   GPIO7</text>
+<polyline points="204.00,418.00 254.00,418.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="193" y="423.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">MCU_C2</text>
+<text x="267" y="455.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">16   GPIO10</text>
+<polyline points="204.00,450.00 254.00,450.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="193" y="455.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">MCU_C3</text>
+<text x="267" y="487.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">18   GPIO4</text>
+<polyline points="204.00,482.00 254.00,482.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="193" y="487.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">BAT_ADC</text>
+<text x="533" y="231.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">GPIO5   19</text>
+<polyline points="546.00,226.00 592.00,226.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="604" y="231.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">MPU_SDA</text>
+<text x="533" y="263.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">GPIO20   30</text>
+<polyline points="546.00,258.00 592.00,258.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="604" y="263.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">MPU_SCL</text>
+<text x="533" y="295.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">GPIO21   31</text>
+<polyline points="546.00,290.00 592.00,290.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="604" y="295.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">LED_K</text>
+<text x="533" y="327.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">GPIO19   27</text>
+<polyline points="546.00,322.00 592.00,322.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="604" y="327.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">USB_DP</text>
+<text x="533" y="359.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">GPIO18   26</text>
+<polyline points="546.00,354.00 592.00,354.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="604" y="359.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">USB_DM</text>
+<text x="533" y="391.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">GPIO2   5</text>
+<polyline points="546.00,386.00 592.00,386.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="604" y="391.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">STRAP2</text>
+<text x="533" y="423.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">GPIO8   22</text>
+<polyline points="546.00,418.00 592.00,418.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="604" y="423.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">STRAP8</text>
+<text x="533" y="455.78" text-anchor="end" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">GPIO9   23</text>
+<polyline points="546.00,450.00 592.00,450.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="604" y="455.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">BOOT9</text>
+<text x="65" y="542.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">GND   Pads 1, 2, 11, 14 and 36–53 (including the exposed pad).</text>
+<text x="65" y="570.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#182E3C">NC      Pads 4, 7, 9, 10, 15, 17, 24, 25, 28, 29 and 32–35.</text>
+<text x="65" y="602.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">MCU_C1/C2/C3 connect to COL1/2/3 through R20/R21/R22 below.</text>
+<rect x="815" y="119" width="870" height="505" fill="white" stroke="#B7CACB" stroke-width="1"/>
+<rect x="815" y="119" width="870" height="44" fill="#F2F8F7" stroke="#B7CACB" stroke-width="1"/>
+<text x="832" y="148.14" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#182E3C">3 × 3 keypad   /   nine normally open tactile switches</text>
+<text x="836" y="207.12" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#182E3C">S1   BACK</text>
+<text x="836" y="245.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">ROW1</text>
+<polyline points="883.00,240.00 899.00,240.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="899" cy="240" r="3" fill="white" stroke="#17615E"/>
+<circle cx="927" cy="240" r="3" fill="white" stroke="#17615E"/>
+<polyline points="901.00,238.00 925.00,226.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="927.00,240.00 973.00,240.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="973.00,231.00 987.00,240.00 973.00,249.00 973.00,231.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="988.00,230.00 988.00,250.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="988.00,240.00 1022.00,240.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1029" y="245.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">COL1</text>
+<text x="981" y="269.76" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="400" fill="#495E69">D1</text>
+<text x="836" y="270.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO0</text>
+<text x="1029" y="270.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO6</text>
+<text x="1114" y="207.12" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#182E3C">S2   UP</text>
+<text x="1114" y="245.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">ROW1</text>
+<polyline points="1161.00,240.00 1177.00,240.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="1177" cy="240" r="3" fill="white" stroke="#17615E"/>
+<circle cx="1205" cy="240" r="3" fill="white" stroke="#17615E"/>
+<polyline points="1179.00,238.00 1203.00,226.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1205.00,240.00 1251.00,240.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1251.00,231.00 1265.00,240.00 1251.00,249.00 1251.00,231.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1266.00,230.00 1266.00,250.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1266.00,240.00 1300.00,240.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1307" y="245.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">COL2</text>
+<text x="1259" y="269.76" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="400" fill="#495E69">D2</text>
+<text x="1114" y="270.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO0</text>
+<text x="1307" y="270.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO7</text>
+<text x="1392" y="207.12" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#182E3C">S3   HOME</text>
+<text x="1392" y="245.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">ROW1</text>
+<polyline points="1439.00,240.00 1455.00,240.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="1455" cy="240" r="3" fill="white" stroke="#17615E"/>
+<circle cx="1483" cy="240" r="3" fill="white" stroke="#17615E"/>
+<polyline points="1457.00,238.00 1481.00,226.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1483.00,240.00 1529.00,240.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1529.00,231.00 1543.00,240.00 1529.00,249.00 1529.00,231.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1544.00,230.00 1544.00,250.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1544.00,240.00 1578.00,240.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1585" y="245.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">COL3</text>
+<text x="1537" y="269.76" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="400" fill="#495E69">D3</text>
+<text x="1392" y="270.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO0</text>
+<text x="1585" y="270.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO10</text>
+<text x="836" y="314.12" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#182E3C">S4   LEFT</text>
+<text x="836" y="352.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">ROW2</text>
+<polyline points="883.00,347.00 899.00,347.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="899" cy="347" r="3" fill="white" stroke="#17615E"/>
+<circle cx="927" cy="347" r="3" fill="white" stroke="#17615E"/>
+<polyline points="901.00,345.00 925.00,333.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="927.00,347.00 973.00,347.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="973.00,338.00 987.00,347.00 973.00,356.00 973.00,338.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="988.00,337.00 988.00,357.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="988.00,347.00 1022.00,347.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1029" y="352.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">COL1</text>
+<text x="981" y="376.76" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="400" fill="#495E69">D4</text>
+<text x="836" y="377.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO1</text>
+<text x="1029" y="377.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO6</text>
+<text x="1114" y="314.12" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#182E3C">S5   OK</text>
+<text x="1114" y="352.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">ROW2</text>
+<polyline points="1161.00,347.00 1177.00,347.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="1177" cy="347" r="3" fill="white" stroke="#17615E"/>
+<circle cx="1205" cy="347" r="3" fill="white" stroke="#17615E"/>
+<polyline points="1179.00,345.00 1203.00,333.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1205.00,347.00 1251.00,347.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1251.00,338.00 1265.00,347.00 1251.00,356.00 1251.00,338.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1266.00,337.00 1266.00,357.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1266.00,347.00 1300.00,347.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1307" y="352.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">COL2</text>
+<text x="1259" y="376.76" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="400" fill="#495E69">D5</text>
+<text x="1114" y="377.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO1</text>
+<text x="1307" y="377.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO7</text>
+<text x="1392" y="314.12" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#182E3C">S6   RIGHT</text>
+<text x="1392" y="352.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">ROW2</text>
+<polyline points="1439.00,347.00 1455.00,347.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="1455" cy="347" r="3" fill="white" stroke="#17615E"/>
+<circle cx="1483" cy="347" r="3" fill="white" stroke="#17615E"/>
+<polyline points="1457.00,345.00 1481.00,333.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1483.00,347.00 1529.00,347.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1529.00,338.00 1543.00,347.00 1529.00,356.00 1529.00,338.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1544.00,337.00 1544.00,357.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1544.00,347.00 1578.00,347.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1585" y="352.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">COL3</text>
+<text x="1537" y="376.76" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="400" fill="#495E69">D6</text>
+<text x="1392" y="377.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO1</text>
+<text x="1585" y="377.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO10</text>
+<text x="836" y="421.12" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#182E3C">S7   AIM</text>
+<text x="836" y="459.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">ROW3</text>
+<polyline points="883.00,454.00 899.00,454.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="899" cy="454" r="3" fill="white" stroke="#17615E"/>
+<circle cx="927" cy="454" r="3" fill="white" stroke="#17615E"/>
+<polyline points="901.00,452.00 925.00,440.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="927.00,454.00 973.00,454.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="973.00,445.00 987.00,454.00 973.00,463.00 973.00,445.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="988.00,444.00 988.00,464.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="988.00,454.00 1022.00,454.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1029" y="459.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">COL1</text>
+<text x="981" y="483.76" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="400" fill="#495E69">D7</text>
+<text x="836" y="484.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO3</text>
+<text x="1029" y="484.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO6</text>
+<text x="1114" y="421.12" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#182E3C">S8   DOWN</text>
+<text x="1114" y="459.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">ROW3</text>
+<polyline points="1161.00,454.00 1177.00,454.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="1177" cy="454" r="3" fill="white" stroke="#17615E"/>
+<circle cx="1205" cy="454" r="3" fill="white" stroke="#17615E"/>
+<polyline points="1179.00,452.00 1203.00,440.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1205.00,454.00 1251.00,454.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1251.00,445.00 1265.00,454.00 1251.00,463.00 1251.00,445.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1266.00,444.00 1266.00,464.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1266.00,454.00 1300.00,454.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1307" y="459.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">COL2</text>
+<text x="1259" y="483.76" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="400" fill="#495E69">D8</text>
+<text x="1114" y="484.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO3</text>
+<text x="1307" y="484.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO7</text>
+<text x="1392" y="421.12" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#182E3C">S9   MODE</text>
+<text x="1392" y="459.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">ROW3</text>
+<polyline points="1439.00,454.00 1455.00,454.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="1455" cy="454" r="3" fill="white" stroke="#17615E"/>
+<circle cx="1483" cy="454" r="3" fill="white" stroke="#17615E"/>
+<polyline points="1457.00,452.00 1481.00,440.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1483.00,454.00 1529.00,454.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1529.00,445.00 1543.00,454.00 1529.00,463.00 1529.00,445.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1544.00,444.00 1544.00,464.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1544.00,454.00 1578.00,454.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1585" y="459.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">COL3</text>
+<text x="1537" y="483.76" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="400" fill="#495E69">D9</text>
+<text x="1392" y="484.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO3</text>
+<text x="1585" y="484.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">GPIO10</text>
+<text x="836" y="534.46" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="19" font-weight="700" fill="#182E3C">Band (cathode) toward column. All D1–D9 must be fitted.</text>
+<text x="836" y="567.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">PCB: 1N4148W, SOD123. AIM + MODE (S7 + S9) = staff setup.</text>
+<text x="836" y="599.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#495E69">Supply each row through its own 10 kΩ pull-up. See R11–R13 below.</text>
+<rect x="35" y="643" width="758" height="447" fill="white" stroke="#B7CACB" stroke-width="1"/>
+<rect x="35" y="643" width="758" height="44" fill="#F2F8F7" stroke="#B7CACB" stroke-width="1"/>
+<text x="52" y="672.14" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#182E3C">Reset, boot and status LED</text>
+<text x="56" y="733.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">SYS_3V3</text>
+<polyline points="177.00,728.00 267.00,728.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<rect x="267" y="722" width="44" height="12" fill="white" stroke="#17615E" stroke-width="2"/>
+<polyline points="311.00,728.00 404.00,728.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="417" y="733.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">EN_RESET</text>
+<text x="546" y="733.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">R7   10 kΩ</text>
+<text x="56" y="771.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">EN_RESET</text>
+<polyline points="177.00,766.00 267.00,766.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="267.00,766.00 285.00,766.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="285.00,754.00 285.00,778.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="293.00,754.00 293.00,778.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="293.00,766.00 404.00,766.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="417" y="771.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">GND</text>
+<text x="546" y="771.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">C11   1 µF</text>
+<text x="56" y="809.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">EN_RESET</text>
+<polyline points="177.00,804.00 267.00,804.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="267.00,804.00 275.00,804.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="275" cy="804" r="3" fill="white" stroke="#17615E"/>
+<circle cx="303" cy="804" r="3" fill="white" stroke="#17615E"/>
+<polyline points="277.00,802.00 301.00,790.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="303.00,804.00 404.00,804.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="417" y="809.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">GND</text>
+<text x="546" y="809.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">S10   RESET (service)</text>
+<text x="56" y="847.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">BOOT9</text>
+<polyline points="177.00,842.00 267.00,842.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="267.00,842.00 275.00,842.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="275" cy="842" r="3" fill="white" stroke="#17615E"/>
+<circle cx="303" cy="842" r="3" fill="white" stroke="#17615E"/>
+<polyline points="277.00,840.00 301.00,828.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="303.00,842.00 404.00,842.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="417" y="847.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">GND</text>
+<text x="546" y="847.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">S11   BOOT (service)</text>
+<text x="57" y="896.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#182E3C">R8, R9, R10   Each 10 kΩ from SYS_3V3 to STRAP2, STRAP8, BOOT9</text>
+<text x="57" y="929.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">Hold BOOT and pulse RESET to enter download mode.</text>
+<text x="57" y="996.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">SYS_3V3</text>
+<polyline points="154.00,991.00 212.00,991.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<rect x="212" y="985" width="44" height="12" fill="white" stroke="#17615E" stroke-width="2"/>
+<polyline points="256.00,991.00 333.00,991.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="333.00,982.00 347.00,991.00 333.00,1000.00 333.00,982.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="348.00,981.00 348.00,1001.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="348.00,991.00 420.00,991.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="430" y="996.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">LED_K</text>
+<text x="235" y="969.44" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">R14   1 kΩ</text>
+<text x="340" y="969.44" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">D10  LED</text>
+<text x="57" y="1053.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">GPIO21 sinks current to turn the LED on. Connect the cathode to LED_K.</text>
+<rect x="815" y="643" width="870" height="447" fill="white" stroke="#B7CACB" stroke-width="1"/>
+<rect x="815" y="643" width="870" height="44" fill="#F2F8F7" stroke="#B7CACB" stroke-width="1"/>
+<text x="832" y="672.14" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#182E3C">J2   /   MPU6050 breakout with 1 × 8 header</text>
+<rect x="838" y="703" width="105" height="30" fill="#F2F8F7" stroke="#17615E" stroke-width="1"/>
+<text x="846" y="723.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#182E3C">1   VCC</text>
+<polyline points="943.00,718.00 987.00,718.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="997" y="723.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">V_MPU</text>
+<rect x="838" y="746" width="105" height="30" fill="#F2F8F7" stroke="#17615E" stroke-width="1"/>
+<text x="846" y="766.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#182E3C">2   GND</text>
+<polyline points="943.00,761.00 987.00,761.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="997" y="766.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">GND</text>
+<rect x="838" y="789" width="105" height="30" fill="#F2F8F7" stroke="#17615E" stroke-width="1"/>
+<text x="846" y="809.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#182E3C">3   SCL</text>
+<polyline points="943.00,804.00 987.00,804.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="997" y="809.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">MPU_SCL / IO20</text>
+<rect x="838" y="832" width="105" height="30" fill="#F2F8F7" stroke="#17615E" stroke-width="1"/>
+<text x="846" y="852.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#182E3C">4   SDA</text>
+<polyline points="943.00,847.00 987.00,847.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="997" y="852.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">MPU_SDA / IO5</text>
+<rect x="1232" y="703" width="105" height="30" fill="#F2F8F7" stroke="#17615E" stroke-width="1"/>
+<text x="1240" y="723.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#182E3C">5   XDA</text>
+<polyline points="1337.00,718.00 1381.00,718.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1391" y="723.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">NC</text>
+<rect x="1232" y="746" width="105" height="30" fill="#F2F8F7" stroke="#17615E" stroke-width="1"/>
+<text x="1240" y="766.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#182E3C">6   XCL</text>
+<polyline points="1337.00,761.00 1381.00,761.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1391" y="766.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">NC</text>
+<rect x="1232" y="789" width="105" height="30" fill="#F2F8F7" stroke="#17615E" stroke-width="1"/>
+<text x="1240" y="809.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#182E3C">7   AD0</text>
+<polyline points="1337.00,804.00 1381.00,804.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1391" y="809.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">MPU_AD0 → JP2</text>
+<rect x="1232" y="832" width="105" height="30" fill="#F2F8F7" stroke="#17615E" stroke-width="1"/>
+<text x="1240" y="852.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#182E3C">8   INT</text>
+<polyline points="1337.00,847.00 1381.00,847.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="1391" y="852.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">NC</text>
+<text x="840" y="904.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#182E3C">JP2  •  3-pad address selector; bridge only one side</text>
+<text x="840" y="932.12" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#006C66">1 = GND   |   2 = MPU_AD0   |   3 = V_MPU. FIT 2–3: 0x69.</text>
+<text x="840" y="961.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#182E3C">C12: 100 nF, FIT from V_MPU to GND. C20: 1 µF, DNP in parallel.</text>
+<text x="840" y="986.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#182E3C">R15/R16: 4.7 kΩ, SDA/SCL → SYS_3V3. DNP if module has pull-ups.</text>
+<text x="840" y="1013.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">Use these J2 numbers only if they match the actual module pin order.</text>
+<text x="840" y="1039.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">Check the module regulator/LED current; its VCC input gets 3.3 V.</text>
+<rect x="35" y="1109" width="1005" height="281" fill="white" stroke="#B7CACB" stroke-width="1"/>
+<rect x="35" y="1109" width="1005" height="44" fill="#F2F8F7" stroke="#B7CACB" stroke-width="1"/>
+<text x="52" y="1138.14" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#182E3C">FIT row pull-ups   /   DNP filters   /   six keypad test pads</text>
+<text x="57" y="1205.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">SYS_3V3</text>
+<polyline points="149.00,1200.00 197.00,1200.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<rect x="197" y="1194" width="44" height="12" fill="white" stroke="#17615E" stroke-width="2"/>
+<polyline points="241.00,1200.00 326.00,1200.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="219" y="1188.1" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">R11   10 kΩ</text>
+<circle cx="326" cy="1200" r="3" fill="#17615E" stroke="#17615E"/>
+<polyline points="326.00,1200.00 326.00,1185.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="326" cy="1181" r="4" fill="white" stroke="#17615E"/>
+<text x="337" y="1183.76" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#182E3C">TP1</text>
+<polyline points="326.00,1200.00 546.00,1200.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="384" y="1190.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">ROW1  /  GPIO0</text>
+<polyline points="546.00,1188.00 546.00,1212.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="554.00,1188.00 554.00,1212.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="554.00,1200.00 591.00,1200.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="601" y="1205.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">GND</text>
+<text x="563" y="1222.76" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="400" fill="#495E69">C13    0603    DNP</text>
+<text x="782" y="1205.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">COL1  /  GPIO6</text>
+<polyline points="909.00,1200.00 940.00,1200.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="945" cy="1200" r="5" fill="white" stroke="#17615E"/>
+<text x="956" y="1205.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#182E3C">TP4</text>
+<text x="57" y="1258.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">SYS_3V3</text>
+<polyline points="149.00,1253.00 197.00,1253.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<rect x="197" y="1247" width="44" height="12" fill="white" stroke="#17615E" stroke-width="2"/>
+<polyline points="241.00,1253.00 326.00,1253.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="219" y="1241.1" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">R12   10 kΩ</text>
+<circle cx="326" cy="1253" r="3" fill="#17615E" stroke="#17615E"/>
+<polyline points="326.00,1253.00 326.00,1238.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="326" cy="1234" r="4" fill="white" stroke="#17615E"/>
+<text x="337" y="1236.76" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#182E3C">TP2</text>
+<polyline points="326.00,1253.00 546.00,1253.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="384" y="1243.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">ROW2  /  GPIO1</text>
+<polyline points="546.00,1241.00 546.00,1265.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="554.00,1241.00 554.00,1265.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="554.00,1253.00 591.00,1253.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="601" y="1258.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">GND</text>
+<text x="563" y="1275.76" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="400" fill="#495E69">C14    0603    DNP</text>
+<text x="782" y="1258.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">COL2  /  GPIO7</text>
+<polyline points="909.00,1253.00 940.00,1253.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="945" cy="1253" r="5" fill="white" stroke="#17615E"/>
+<text x="956" y="1258.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#182E3C">TP5</text>
+<text x="57" y="1311.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">SYS_3V3</text>
+<polyline points="149.00,1306.00 197.00,1306.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<rect x="197" y="1300" width="44" height="12" fill="white" stroke="#17615E" stroke-width="2"/>
+<polyline points="241.00,1306.00 326.00,1306.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="219" y="1294.1" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">R13   10 kΩ</text>
+<circle cx="326" cy="1306" r="3" fill="#17615E" stroke="#17615E"/>
+<polyline points="326.00,1306.00 326.00,1291.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="326" cy="1287" r="4" fill="white" stroke="#17615E"/>
+<text x="337" y="1289.76" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#182E3C">TP3</text>
+<polyline points="326.00,1306.00 546.00,1306.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="384" y="1296.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">ROW3  /  GPIO3</text>
+<polyline points="546.00,1294.00 546.00,1318.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="554.00,1294.00 554.00,1318.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="554.00,1306.00 591.00,1306.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="601" y="1311.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#006C66">GND</text>
+<text x="563" y="1328.76" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="400" fill="#495E69">C15    0603    DNP</text>
+<text x="782" y="1311.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">COL3  /  GPIO10</text>
+<polyline points="909.00,1306.00 940.00,1306.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="945" cy="1306" r="5" fill="white" stroke="#17615E"/>
+<text x="956" y="1311.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#182E3C">TP6</text>
+<text x="56" y="1365.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#495E69">Leave C13–C15 empty for the first test. Large row capacitors can cause a false key in the next column.</text>
+<rect x="1057" y="1109" width="628" height="281" fill="white" stroke="#B7CACB" stroke-width="1"/>
+<rect x="1057" y="1109" width="628" height="44" fill="#F2F8F7" stroke="#B7CACB" stroke-width="1"/>
+<text x="1074" y="1138.14" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#182E3C">Local 3.3 V supply   /   close to U2 pad 3</text>
+<text x="1077" y="1197.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">SYS_3V3</text>
+<text x="1077" y="1303.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">GND</text>
+<polyline points="1163.00,1192.00 1601.00,1192.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="1606" cy="1192" r="5" fill="white" stroke="#17615E"/>
+<polyline points="1163.00,1298.00 1601.00,1298.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="1606" cy="1298" r="5" fill="white" stroke="#17615E"/>
+<text x="1620" y="1197.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#182E3C">TP7</text>
+<text x="1620" y="1303.1" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#182E3C">TP8</text>
+<circle cx="1192" cy="1192" r="3" fill="#17615E" stroke="#17615E"/>
+<polyline points="1192.00,1192.00 1192.00,1237.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1179.00,1237.00 1205.00,1237.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1179.00,1245.00 1205.00,1245.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1192.00,1245.00 1192.00,1298.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="1192" cy="1298" r="3" fill="#17615E" stroke="#17615E"/>
+<text x="1211" y="1235.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#182E3C">C9</text>
+<text x="1211" y="1258.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">22 µF</text>
+<circle cx="1340" cy="1192" r="3" fill="#17615E" stroke="#17615E"/>
+<polyline points="1340.00,1192.00 1340.00,1237.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1327.00,1237.00 1353.00,1237.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1327.00,1245.00 1353.00,1245.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1340.00,1245.00 1340.00,1298.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="1340" cy="1298" r="3" fill="#17615E" stroke="#17615E"/>
+<text x="1359" y="1235.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#182E3C">C10</text>
+<text x="1359" y="1258.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">100 nF</text>
+<circle cx="1490" cy="1192" r="3" fill="#17615E" stroke="#17615E"/>
+<polyline points="1490.00,1192.00 1490.00,1237.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1477.00,1237.00 1503.00,1237.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1477.00,1245.00 1503.00,1245.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<polyline points="1490.00,1245.00 1490.00,1298.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<circle cx="1490" cy="1298" r="3" fill="#17615E" stroke="#17615E"/>
+<text x="1509" y="1235.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#182E3C">C16</text>
+<text x="1509" y="1258.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">DNP</text>
+<text x="1079" y="1340.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#182E3C">FIT C9/C10. C16: 1206 ceramic reserve, DNP.</text>
+<text x="1079" y="1365.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">Use TP7 / TP8 to measure the ESP supply during radio activity.</text>
+<rect x="35" y="1409" width="1005" height="235" fill="white" stroke="#B7CACB" stroke-width="1"/>
+<rect x="35" y="1409" width="1005" height="44" fill="#F2F8F7" stroke="#B7CACB" stroke-width="1"/>
+<text x="52" y="1438.14" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#182E3C">Column isolation links and sensor supply link   /   FIT 0 Ω</text>
+<text x="57" y="1505.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">MCU_C1</text>
+<polyline points="138.00,1500.00 167.00,1500.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<rect x="167" y="1494" width="44" height="12" fill="white" stroke="#17615E" stroke-width="2"/>
+<polyline points="211.00,1500.00 237.00,1500.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="249" y="1505.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">COL1</text>
+<text x="189" y="1481.44" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">R20  0 Ω</text>
+<text x="379" y="1505.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">MCU_C2</text>
+<polyline points="460.00,1500.00 489.00,1500.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<rect x="489" y="1494" width="44" height="12" fill="white" stroke="#17615E" stroke-width="2"/>
+<polyline points="533.00,1500.00 559.00,1500.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="571" y="1505.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">COL2</text>
+<text x="511" y="1481.44" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">R21  0 Ω</text>
+<text x="701" y="1505.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">MCU_C3</text>
+<polyline points="782.00,1500.00 811.00,1500.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<rect x="811" y="1494" width="44" height="12" fill="white" stroke="#17615E" stroke-width="2"/>
+<polyline points="855.00,1500.00 881.00,1500.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="893" y="1505.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">COL3</text>
+<text x="833" y="1481.44" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#495E69">R22  0 Ω</text>
+<text x="57" y="1544.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#182E3C">R20/R21/R22: 0603 footprints. Keep at 0 Ω for the tested scan behavior.</text>
+<text x="57" y="1600.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">SYS_3V3</text>
+<polyline points="176.00,1595.00 247.00,1595.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<rect x="247" y="1589" width="44" height="12" fill="white" stroke="#17615E" stroke-width="2"/>
+<polyline points="291.00,1595.00 344.00,1595.00" stroke="#17615E" stroke-width="2" fill="none"/>
+<text x="357" y="1600.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="700" fill="#006C66">V_MPU</text>
+<text x="269" y="1577.1" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="400" fill="#495E69">R23  0 Ω • FIT</text>
+<text x="558" y="1600.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#182E3C">0603; isolates J2 supply for rework.</text>
+<rect x="1057" y="1409" width="628" height="235" fill="white" stroke="#B7CACB" stroke-width="1"/>
+<rect x="1057" y="1409" width="628" height="44" fill="#F2F8F7" stroke="#B7CACB" stroke-width="1"/>
+<text x="1074" y="1438.14" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="21" font-weight="700" fill="#182E3C">PCB and assembly reminders</text>
+<text x="1079" y="1485.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#182E3C">Use the MINI-1 module land pattern, not a SuperMini board.</text>
+<text x="1079" y="1516.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#182E3C">Antenna at board edge; no batteries/metal in its keepout.</text>
+<text x="1079" y="1547.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#182E3C">TP17 EN_RESET • TP18 BOOT9 • TP19 SDA • TP20 SCL</text>
+<text x="1079" y="1578.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" fill="#006C66">DNP means reserve pads, leave component uninstalled.</text>
+<text x="1079" y="1609.44" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="400" fill="#182E3C">Check Fusion ERC, footprints and layout before fabrication.</text>
+<polyline points="35.00,1660.00 1685.00,1660.00" stroke="#B7CACB" stroke-width="1" fill="none"/>
+<text x="36" y="1690.78" text-anchor="start" font-family="Segoe UI,Arial,sans-serif" font-size="17" font-weight="400" fill="#495E69">Rev C • 23 Nov 2026 • ESP32-C3-MINI-1 module • Same net names connect • FIT = install; DNP = leave empty</text>
+</svg>

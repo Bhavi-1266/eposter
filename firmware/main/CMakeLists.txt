@@ -1,0 +1,5 @@
+set(deps esp_wifi esp_event esp_netif esp_partition nvs_flash esp_driver_gpio esp_driver_i2c esp_adc esp_timer esp_hw_support esp_driver_uart mbedtls)
+if(IDF_TARGET STREQUAL "esp32c3")
+    list(APPEND deps esp_driver_usb_serial_jtag)
+endif()
+idf_component_register(SRCS "main.c" "link.c" "channel.c" "station.c" "handheld.c" "controls.c" "usb.c" "configuration.c" INCLUDE_DIRS "." REQUIRES ${deps})

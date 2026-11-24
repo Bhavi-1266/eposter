@@ -86,6 +86,21 @@ local function render()
         box(0,lh/2-12,lw,size*2.2,'000000','30',0)
         text(x,lh/2,value,size,'FFFFFF')
     end
+    if state.pointer and state.pointer.x and state.pointer.y then
+        local x, y = tonumber(state.pointer.x), tonumber(state.pointer.y)
+        if x and y then
+            local radius = math.max(12, math.floor(16*scale))
+            -- Application-local AIM cursor: high-contrast rings plus crosshair.
+            lines[#lines+1] = '{' .. tags(x,y,5) .. '\\1c&H000000&\\3c&H000000&\\bord0\\p1}' ..
+                string.format('m %d 0 b %d %d %d %d 0 %d b %d %d %d %d %d 0 m %d %d l %d %d m %d %d l %d %d',
+                    radius, radius, 0, radius, radius, radius*2, -radius, radius*2, -radius, 0, radius, 0,
+                    -radius-7, radius, radius+7, radius, radius, -7, radius, radius*2+7) .. '{\\p0}'
+            lines[#lines+1] = '{' .. tags(x,y,5) .. '\\1c&HFFFFFF&\\3c&HFFFFFF&\\bord0\\p1}' ..
+                string.format('m %d 2 b %d %d %d %d 2 %d b %d %d %d %d %d 2',
+                    radius, radius-2, 2, radius-2, radius, radius*2-2,
+                    -radius+2, radius*2-2, -radius+2, 2, radius, 2) .. '{\\p0}'
+        end
+    end
     local data = table.concat(lines, '\n')
     local key = data .. w .. ':' .. h
     if key == previous then return end

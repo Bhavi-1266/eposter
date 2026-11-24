@@ -257,6 +257,7 @@ class Display:
         self.menu_serial = 0
         self.overlay_state = None
         self.viewport = None
+        self.paused = False
         self.worker = threading.Thread(target=self._work, name="media-display", daemon=True)
         self.worker.start()
 
@@ -277,6 +278,8 @@ class Display:
             if key == self.requested and (not self.error or time.monotonic() < self.retry_at):
                 return
             self.requested = key
+            if self.shown is None or key[:3] != self.shown[:3]:
+                self.paused = False
             self.pending = (key, path, rotation, self.size, menu)
             self.error = None
         # Stop outgoing audio immediately, but let the video output finish any
@@ -291,10 +294,11 @@ class Display:
                 self.preload = (Path(path), media_size(self.size, rotation))
             self.wake.set()
 
-    def overlay(self, deadline=None, paper_id=None, ip="", status="", rotation=0, menu=False):
+    def overlay(self, deadline=None, paper_id=None, ip="", status="", rotation=0, menu=False,
+                pointer=None):
         state = {"deadline": deadline, "rotation": rotation, "status": status,
                  "footer_left": f"Paper ID: {paper_id}" if paper_id is not None else "",
-                 "footer_right": ip}
+                 "footer_right": ip, "pointer": pointer}
         if state != self.overlay_state:
             self.player.set_overlay(**state)
             self.overlay_state = state
@@ -302,6 +306,16 @@ class Display:
         if getattr(self, "cursor", None) != desired_cursor:
             self.player.command("set_property", "cursor-autohide", desired_cursor)
             self.cursor = desired_cursor
+
+    def toggle_pause(self, path=None):
+        """Toggle only the visible media; a replacement always starts playing."""
+        with self.lock:
+            if self.shown is None or (path is not None and self.shown[0] != str(Path(path))):
+                return False
+            self.paused = not self.paused
+            paused = self.paused
+        self.player.command("set_property", "pause", paused)
+        return paused
 
     def _set_viewport(self, size, rotation, menu=False):
         key = (size, rotation, menu)
@@ -359,11 +373,12 @@ class Display:
                         held = False
                     with self.lock:
                         superseded = key != self.requested
+                        paused = self.paused
                     if superseded:
                         self.player.command("set_property", "pause", True)
                     else:
                         self.player.command("set_property", "mute", False)
-                        self.player.command("set_property", "pause", False)
+                        self.player.command("set_property", "pause", paused)
                     self.shown, self.rotation = key, rotation
                     LOG.info("Showing %s at rotation %s", "menu" if menu else path.name, rotation)
                 except (PlayerError, OSError, ValueError) as error:
