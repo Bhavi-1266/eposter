@@ -11,8 +11,9 @@ local function escape(text)
 end
 
 local function render()
+    local now = os.time()
     local deadline = tonumber(state.deadline)
-    local left = deadline and math.max(0, math.ceil(deadline - os.time())) or nil
+    local left = deadline and math.max(0, math.ceil(deadline - now)) or nil
     local countdown = left and tostring(left) or ''
     if countdown ~= state.last_countdown then
         mp.commandv('script-message', 'eposter-state', 'countdown', countdown)
@@ -48,7 +49,7 @@ local function render()
         lines[#lines+1] = '{' .. tags(x,y) .. '\\1c&H' .. color .. '&\\1a&H' .. opacity .. '&\\p1}' .. path .. '{\\p0}'
     end
     -- Light information board is an application-local overlay on a white still.
-    -- Only the row region fades; the header, footer and clock remain stationary.
+    -- Only the row region fades; the header, footer and clocks remain stationary.
     local function fit(value, width, size)
         local chars = {}
         for c in tostring(value or ''):gmatch('[%z\1-\127\194-\244][\128-\191]*') do chars[#chars+1] = c end
@@ -60,89 +61,147 @@ local function render()
     end
     local footer_height = math.floor(48*scale + .5)
     if state.information and board_visible then
+        local page_fade = 0
+        if board_started then
+            local elapsed = mp.get_time() - board_started
+            if elapsed >= .18 and board_pending then
+                board_visible, board_pending = board_pending, nil
+            end
+            if elapsed < .36 then
+                page_fade = math.floor(255 * (1 - math.abs(elapsed - .18) / .18))
+            else
+                board_started = nil
+            end
+        end
+
         local info = board_visible
-        box(0,0,lw,lh,'FFFFFF','00')
-        local gutter = lw*.03
-        text(gutter,gutter,'EPOSTER / SESSION DIRECTORY',14*scale,'6E6760',7,false,'DejaVu Sans')
-        text(gutter,gutter+24*scale,fit('Match your paper and author to a screen.',lw*.68,18*scale),18*scale,'736B61',7,false,'DejaVu Sans')
-        text(lw-gutter,gutter,os.date('%H:%M'),42*scale,'2D2925',9)
-        text(lw-gutter,gutter+54*scale,os.date('%d %b %Y'),15*scale,'736B61',9,false,'DejaVu Sans')
-        if board_started then
-            local elapsed = mp.get_time()-board_started
-            if elapsed < .18 then
-                fade = math.floor(255*elapsed/.18)
-            else
-                if board_pending then board_visible = board_pending; board_pending = nil end
-                info = board_visible
-                fade = math.max(0,math.floor(255*(1-(elapsed-.18)/.18)))
-                if elapsed >= .36 then board_started = nil; fade = 0 end
-            end
-        end
         local g = info.geometry
-        local top = g.top
-        local available = lw-2*gutter
-        local portrait = lh>lw
-        local columns = portrait and {0,.14,.32,.79} or {0,.12,.29,.68,.86}
-        local headings = portrait and {'SCREEN','PAPER ID','AUTHOR / PAPER','STATUS'}
-                          or {'SCREEN','PAPER ID','AUTHOR / PAPER','SESSION','STATUS'}
-        fade = 0
-        for i, heading in ipairs(headings) do
-            text(gutter+available*columns[i]+12*scale,top,heading,13*scale,'6A6359',7,true,'DejaVu Sans')
+        local u = g.unit
+        local portrait = lh > lw
+        local navy, gold, white = '723E00', '43B1DE', 'FFFFFF'
+        local ink, muted, tint = '2D2925', '6B6156', 'F2F9FC'
+        local gutter = lw * (portrait and .04 or .03)
+        local available = lw - 2*gutter
+        local columns = portrait and {0, .15, .30, .74, 1} or {0, .12, .26, .76, 1}
+        local padding = portrait and u or .8*u
+        local function cell(index) return gutter + available*columns[index] + padding end
+        local function cell_width(index)
+            return available * (columns[index+1] - columns[index]) - 2*padding
         end
-        box(gutter,top+g.headings-2*scale,available,2*scale,'B8B2AA','00')
-        if board_started then
-            local elapsed = mp.get_time()-board_started
-            fade = math.max(0,math.min(255,math.floor(255*(elapsed<.18 and elapsed/.18 or 1-(elapsed-.18)/.18))))
+
+        -- Navy Banner / Standard / None from the approved HTML review.
+        box(0,0,lw,lh,white,'00')
+        box(0,0,lw,g.banner,navy,'00')
+        local clock_width = u * (portrait and 19 or 12)
+        local clock_size = u * (portrait and 3.6 or 2.2)
+        local title_size = u * (portrait and 4.6 or 2.7)
+        local title_width = available - 2*clock_width - 2*u
+        title_size = math.min(title_size, title_width / 10)
+        text(gutter,g.banner*.17,'Today’s Screens',title_size,white,7,true)
+        text(gutter,g.banner*.69,info.date,u*(portrait and 2 or 1.13),white,7)
+        local function clock(x, label, timestamp)
+            local parts = os.date('!*t', timestamp)
+            local hour = parts.hour % 12
+            local value = string.format('%d:%02d %s', hour == 0 and 12 or hour,
+                                        parts.min, parts.hour < 12 and 'AM' or 'PM')
+            text(x,g.banner*.24,label,u*(portrait and 1.45 or .85),gold,7,true)
+            text(x,g.banner*.43,value,clock_size,white,7)
         end
-        for i, row in ipairs(info.rows or {}) do
-            local y = top+g.headings+(i-1)*g.row_height
-            local cy = y+g.row_height/2
-            if i%2==1 then box(gutter,y,available,g.row_height,'F5F4F2','00') end
-            box(gutter,y+g.row_height-1,available,1,'E1DED9','00')
-            local function cell(index) return gutter+available*columns[index]+12*scale end
-            local badge = math.min(available*.09,82*scale)
-            box(cell(1),cy-29*scale,badge,58*scale,'D4CFC7','00')
-            box(cell(1)+1,cy-29*scale+1,badge-2,58*scale-2,'EFEDE9','00')
-            text(cell(1)+badge/2,cy,fit(row.screen,badge-10*scale,30*scale),30*scale,'413A30',5)
-            text(cell(2),cy,fit(row.paper,available*(columns[3]-columns[2])-20*scale,22*scale),22*scale,'3B3630',4,false,'DejaVu Sans')
-            local author_width=available*(columns[4]-columns[3])-24*scale
-            text(cell(3),cy-14*scale,fit(row.author,author_width,22*scale),22*scale,'3B3630',4,false,'DejaVu Sans')
-            text(cell(3),cy+17*scale,fit(row.title,author_width,16*scale),16*scale,'726B60',4,false,'DejaVu Sans')
-            if not portrait then text(cell(4),cy,row.session,20*scale,'3B3630',4,false,'DejaVu Sans') end
-            local starts = tostring(row.status):match('^Starts in (%d+) min$')
-            if starts and portrait then
-                text(cell(#columns),cy-12*scale,'Starts in',18*scale,'5E574C',4,false,'DejaVu Sans')
-                text(cell(#columns),cy+12*scale,starts .. ' min',18*scale,'5E574C',4,false,'DejaVu Sans')
-            else
-                text(cell(#columns),cy,fit(row.status,available*(1-columns[#columns])-16*scale,18*scale),18*scale,'5E574C',4,false,'DejaVu Sans')
+        clock(lw-gutter-2*clock_width,'GMT+5:30',now+19800)
+        clock(lw-gutter-clock_width,'GMT',now)
+
+        local rows = info.rows or {}
+        if #rows == 0 then
+            text(lw/2,lh/2-24*scale,'No presentations scheduled.',32*scale,navy,5,false)
+            text(lw/2,lh/2+24*scale,'Sessions from all screens appear here.',18*scale,muted,5)
+        else
+            box(gutter,g.top,available,g.headings,gold,'00')
+            local heading_size = u * (portrait and 1.37 or .85)
+            for i, label in ipairs({'SCREEN','PAPER ID','PAPER / AUTHOR','TIME (GMT+5:30)'}) do
+                text(cell(i),g.top+g.headings/2,label,heading_size,navy,4,true)
             end
+
+            fade = page_fade
+            local striped = false
+            for i, row in ipairs(rows) do
+                local y = g.top + g.headings + (i-1)*g.row_height
+                local cy = y + g.row_height/2
+                if row.screen_span > 0 then
+                    striped = not striped
+                    local group_height = g.row_height*row.screen_span
+                    if striped then box(gutter,y,available,group_height,tint,'00') end
+                    local center_x = gutter + available*columns[2]/2
+                    local center_y = y + group_height/2
+                    local badge_width = u * (portrait and 8.2 or 5.1)
+                    local badge_height = u * (portrait and 6 or 3.5)
+                    local number = row.screen
+                    if number:match('^%d$') then number = '0' .. number end
+                    local badge_size = u * (portrait and 3.6 or 2)
+                    badge_size = math.min(badge_size, (badge_width-u) / math.max(1,#number) / .66)
+                    box(center_x-badge_width/2,center_y-badge_height/2,badge_width,badge_height,gold,'00')
+                    text(center_x,center_y,number,badge_size,navy,5,true)
+                end
+
+                local paper_size = u * (portrait and 2.4 or 1.2)
+                text(cell(2),cy,fit(row.paper,cell_width(2),paper_size),paper_size,ink,4)
+                local title_font = u * (portrait and 2.4 or 1.2)
+                local author_font = u * (portrait and 1.95 or 1)
+                local title = fit(row.title,cell_width(3),title_font)
+                local author = fit(row.author,cell_width(3),author_font)
+                if portrait and title ~= row.title then
+                    local prefix = title:gsub('…$', '')
+                    local first = prefix:match('^(.*)%s+%S*$') or prefix
+                    local rest = row.title:sub(#first+1):gsub('^%s+', '')
+                    text(cell(3),cy-2.5*u,first,title_font,ink,4,true)
+                    text(cell(3),cy,fit(rest,cell_width(3),title_font),title_font,ink,4,true)
+                    text(cell(3),cy+2.6*u,author,author_font,muted,4)
+                else
+                    local gap = u * (portrait and 1.6 or .9)
+                    text(cell(3),cy-gap,title,title_font,ink,4,true)
+                    text(cell(3),cy+gap,author,author_font,muted,4)
+                end
+
+                local time_size = u * (portrait and 2 or 1.2)
+                local time_chars = #(row.session:gsub('–','-'))
+                time_size = math.min(time_size, cell_width(4)/math.max(1,time_chars)/.64)
+                local date_gap = row.session_date ~= '' and u*(portrait and 1.4 or .8) or 0
+                text(cell(4),cy-date_gap,row.session,time_size,navy,4,true)
+                if date_gap > 0 then
+                    local date_size = u*(portrait and 1.55 or .86)
+                    text(cell(4),cy+date_gap,fit(row.session_date,cell_width(4),date_size),date_size,muted,4)
+                end
+            end
+            fade = 0
         end
-        fade = 0
-        if #(info.rows or {})==0 then
-            text(lw/2,lh/2-24*scale,'No presentations scheduled.',32*scale,'3B3630',5,false,'DejaVu Sans')
-            text(lw/2,lh/2+24*scale,'Running sessions and those starting within 5 minutes appear here.',18*scale,'736B61',5,false,'DejaVu Sans')
-        end
-        local my = lh-footer_height-g.meta/2
-        text(gutter,my,fit(info.notice,available*.60,15*scale),15*scale,'736B61',4,false,'DejaVu Sans')
-        text(lw-gutter,my,info.label,15*scale,'736B61',6,false,'DejaVu Sans')
+        local meta_y = lh-footer_height-g.meta/2
+        local meta_size = u*(portrait and 1.55 or .84)
+        text(gutter,meta_y,fit(info.notice,available*.60,meta_size),meta_size,muted,4)
+        text(lw-gutter,meta_y,info.label,meta_size,muted,6)
     end
     -- Thin, fixed footer: screen at left, paper in the center, access URL at right.
     local center_y = lh-footer_height/2
     box(0,lh-footer_height,lw,footer_height,'FAFAFA','00')
-    box(0,lh-footer_height,lw,math.max(1,math.floor(scale)),'DAD8D4','00')
+    if not state.information then
+        box(0,lh-footer_height,lw,math.max(1,math.floor(scale)),'DAD8D4','00')
+    end
     local padding = 32*scale
     local paper = state.information and 'Session directory' or ('Paper ID  ' .. (state.paper_id or ''))
     if not state.paper_id and state.footer_left then paper=state.footer_left end
     local address = state.access_url or state.footer_right or ''
     local screen = 'Screen no.  ' .. (state.screen_number or '—')
     local function footer_text(x,value,alignment,width,preferred)
+        if state.information then
+            local size = math.min(preferred*scale, width/math.max(1,#value)/.66)
+            text(x,center_y,value,size,'3B3630',alignment,true)
+            return
+        end
         local size = math.min(preferred*scale, width/math.max(1,#tostring(value))/.62)
         size = math.max(12*scale,size)
         text(x,center_y,fit(value,width,size),size,'3B3630',alignment,true,'DejaVu Sans')
     end
-    footer_text(padding,screen,4,lw*.29,24)
-    footer_text(lw/2,paper,5,lw*.34,26)
-    footer_text(lw-padding,address,6,lw*.29-padding,20)
+    footer_text(padding,screen,4,lw*.29,state.information and 19 or 24)
+    footer_text(lw/2,paper,5,lw*.34,state.information and 19 or 26)
+    footer_text(lw-padding,address,6,lw*.29-padding,state.information and 15 or 20)
     -- Session timer stays live at the top right even while mpv is paused.
     if deadline then
         local value = string.format('%02d:%02d', math.floor(left/60), left%60)

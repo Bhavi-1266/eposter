@@ -77,7 +77,7 @@
           {{ field('auto_scroll', 'Default scroll duration (seconds)', settings.display.Auto_Scroll, 'number', 'Fallback duration. Videos may use their API duration.', 1, 3600) }}
         </div>
         <fieldset id="info-options" class="advanced"><legend>Information directory</legend>
-          {{ field('info_page_seconds', 'Page hold (seconds)', settings.display.info_page_seconds, 'number', 'Current presentations first, then those starting within 5 minutes. Pages loop automatically without scrolling. A single page never repeats its rows.', 3, 60) }}
+          {{ field('info_page_seconds', 'Page hold (seconds)', settings.display.info_page_seconds, 'number', 'Today’s Screens groups the full schedule by screen number. Pages loop automatically without scrolling.', 3, 60) }}
         </fieldset>
         <details class="advanced"><summary>Playback controls</summary><p class="help">In Time schedule mode, the paired remote’s OK button pauses and resumes video. A small pause indicator appears at the bottom left. The session clock continues and the next session starts on time.</p></details>
       </section>

@@ -100,7 +100,7 @@ All configuration is done through `config.json`. Here's what each setting does:
   including zero. The unrelated top-level `ID` is preserved.
 - `rotation_degree`: 0, 90, 180, or 270 clockwise, applied to media and overlays.
 - `Mode`: `Time`, `Scroll`, `Menu`, or `Info`.
-- `info_page_seconds`: information-directory page hold, 3–60 seconds (default 6).
+- `info_page_seconds`: information-directory page hold, 3–60 seconds (default 11).
 - Still images fill the media area above a separate footer, including 3840×2160
   UHD and portrait rotation. Different image aspect ratios stretch to fit so
   poster text is not cropped. Videos/GIFs retain their aspect ratio within that
@@ -240,12 +240,17 @@ There is no on-screen playback button. The deadline continues and a new session
 starts unpaused, even when it uses the same video file.
 
 Choose **Display → Playback mode → Information directory** in the portal to show
-the public author, paper and screen assignments across all screens in the API.
-This view includes running sessions and those starting within **5 minutes**, with
-“Starts in N min” labels. It excludes expired sessions and contact details.
-Rows fit the screen without scrolling. Pages fade every 6 seconds by default;
-set **Page hold** to change this. A partial final page wraps into the beginning
-of the list; when all entries fit on one page, rows appear once without paging.
+**Today’s Screens** with the navy banner, gold screen numbers, and borderless rows.
+The directory includes the full API schedule, grouped by screen number and ordered
+by start time within each screen. Each row shows the paper title above the author,
+its paper ID and a GMT+5:30 time range such as **4:00 PM–5:00 PM**. A date appears
+under the range when a session falls outside the header date. The header shows
+both GMT+5:30 and GMT clocks. Contact details stay private.
+
+Pages fit the display without scrolling and fade every 11 seconds by default.
+Set **Page hold** to change this. Screen groups stay together when they fit a full
+page. The final page wraps to the beginning when another group fits. If all
+entries fit on one page, each appears once without paging.
 If the saved feed becomes unreadable, the last valid schedule stays visible,
 with its original deadlines and a notice. The displayed update time refers to
 the saved feed, not proof of a live API connection.

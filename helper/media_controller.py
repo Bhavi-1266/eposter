@@ -9,7 +9,7 @@ from pathlib import Path
 from helper import cache_handler
 from helper.display_handler import (Display, get_local_ip, is_video_file, logical_point,
                                     logical_size, menu_geometry, menu_scale, footer_height)
-from helper.information_board import InformationBoard
+from helper.information_board import DEFAULT_INFO_PAGE_SECONDS, InformationBoard
 from helper.schedule import active_record, record_deadline
 from helper.json_utils import atomic_write_json
 from helper.mpv_player import playback_settings
@@ -378,7 +378,8 @@ class Controller:
         if self.mode == "Info":
             mono = time.monotonic()
             self.information.read(mono, self.config.get("api", {}).get("timezone"))
-            hold = min(60, positive_seconds(self.config.get("display", {}).get("info_page_seconds"), 6, 3))
+            hold = min(60, positive_seconds(self.config.get("display", {}).get("info_page_seconds"),
+                                            DEFAULT_INFO_PAGE_SECONDS, 3))
             self.info_state = self.information.page(now, mono, logical_size(self.display.size, self.rotation), hold)
         if self.display.error:
             status = "Media unavailable; retrying"

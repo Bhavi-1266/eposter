@@ -51,7 +51,8 @@ the next connection attempt.
 
 The compact interface groups controls into Display, Content API, Network, and
 Device & updates tabs. Display includes Information directory mode and its
-3–60 second page hold. Upcoming sessions use a fixed five-minute window.
+3–60 second page hold (11 seconds by default). The directory groups the full API
+schedule by screen number and shows both GMT+5:30 and GMT.
 The Display status uses the existing `.playback-status.json` heartbeat, considering
 it current for 90 seconds; this also supports foreground RunThis.py processes.
 Service state alone is not evidence that video is playing.

@@ -1,5 +1,13 @@
 # Playback migration validation
 
+## Navy Banner information directory — 2026-11-25
+
+119 automated tests passed on Fedora. Real mpv rendered the grouped, borderless
+directory at all four rotations in a 960×540 window. The first page held for 11
+seconds before fading into the next. Time, Scroll, Menu, and Info also passed
+with the downloaded two-media, 12-screen API snapshot. Radxa display hardware
+and the physical remote were not part of these runs.
+
 ## UI update — 2026-11-25
 
 The approved white/grey UI replaces the earlier footer and coloured timer design.
@@ -13,7 +21,7 @@ copy of the supplied 12-screen feed, including its downloaded MOV and PNG files.
 JavaScript syntax and Git whitespace checks passed. Test media and
 screenshots stayed outside tracked source; no packages or services were installed.
 
-Directory tests cover all-screen data, five-minute inclusion boundaries, expiry,
+The directory tests for that release covered all-screen data, five-minute inclusion boundaries, expiry,
 wrapped full pages, no duplicates for one page, malformed feeds and retained cache.
 The current visual smoke assertions expect a thin footer and top-right white timer.
 Native UHD, Radxa hardware rendering, and a physical remote still need validation

@@ -405,7 +405,8 @@ class Display:
                             self.player.command("set_property", "mute", False)
                             self.player.command("set_property", "pause", paused)
                         self.shown, self.rotation = key, rotation
-                    LOG.info("Showing %s at rotation %s", "menu" if menu else path.name, rotation)
+                    name = menu.get("kind", "menu") if menu else path.name
+                    LOG.info("Showing %s at rotation %s", name, rotation)
                 except (PlayerError, OSError, ValueError) as error:
                     LOG.error("Display failed: %s", error)
                     if self.player.alive:

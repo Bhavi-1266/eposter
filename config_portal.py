@@ -23,6 +23,7 @@ from werkzeug.exceptions import HTTPException
 
 from helper.json_utils import atomic_write_json
 from helper.configuration import normalize_config
+from helper.information_board import DEFAULT_INFO_PAGE_SECONDS
 from device_update import UNIT, update_status, write_status
 
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -31,7 +32,8 @@ DEFAULTS = {
     "hardware_id": 0,
     "wifi": {"ssid1": "", "password1": "", "ssid2": "", "password2": "", "connect_timeout": 20},
     "api": {"poster_api_url": "", "poster_token": "", "request_timeout": 15, "max_media_size_mb": 512},
-    "display": {"screen_number": 1, "rotation_degree": 0, "Mode": "Menu", "Auto_Scroll": 5, "cache_refresh": 60, "info_page_seconds": 6},
+    "display": {"screen_number": 1, "rotation_degree": 0, "Mode": "Menu", "Auto_Scroll": 5,
+                "cache_refresh": 60, "info_page_seconds": DEFAULT_INFO_PAGE_SECONDS},
 }
 
 
