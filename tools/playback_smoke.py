@@ -266,28 +266,17 @@ def visual_test(args):
             bands = [band.point(lambda v: 255 if v < 4 else 0) for band in diff.split()]
             return ImageChops.multiply(ImageChops.multiply(bands[0], bands[1]), bands[2])
 
-        def check_timer(logical, state):
+        def check_timer(logical):
+            # The approved timer is a fixed white card at the top right.
             w, h = logical.size
-            strip = footer_height(screen_size)
-            footer = logical.crop((0, h-strip, w, h))
-            background, foreground = {'normal': ((255,255,255), (0,0,0)),
-                                      'warning': ((254,240,138), (0,0,0)),
-                                      'urgent': ((185,28,28), (0,0,0))}[state]
-            bounds = color_mask(footer, background).getbbox()
-            assert bounds, ('Missing countdown background', state)
-            x0, y0, x1, y1 = bounds
             scale = overlay_scale(screen_size)
-            assert abs((x0+x1)/2-w/2) <= 2*scale, ('Timer not horizontally centered', bounds)
-            assert abs((y0+y1)/2-strip/2) <= 2*scale, ('Timer not vertically centered', bounds)
-            digits = footer.crop(bounds)
-            ink = color_mask(digits, foreground).getbbox()
+            region = logical.crop((round(w-104*scale), round(8*scale),
+                                   round(w-8*scale), round(44*scale)))
+            assert color_mask(region, (255,255,255)).getbbox(), 'Missing timer card'
+            digits = region
+            ink = digits.convert('L').point(lambda v:255 if v<140 else 0).getbbox()
             assert ink, 'Missing countdown text'
-            assert ink[3]-ink[1] >= 26*scale, ('Countdown text too small', ink)
-            assert abs((ink[0]+ink[2])/2-digits.width/2) <= 3*scale, ('Digits not centered', ink)
-            # ASS aligns line boxes; visible digits should also be near center.
-            assert abs((ink[1]+ink[3])/2-digits.height/2) <= 5*scale, ('Digits not vertically centered', ink)
-
-            assert digits.getpixel((0, 0)) == (245,245,245), 'Timer corners are not rounded'
+            assert ink[3]-ink[1] >= 16*scale, ('Countdown text too small', ink)
             return ink[3]-ink[1]
 
         for rotation in (0,90,180,270):
@@ -312,25 +301,23 @@ def visual_test(args):
                     assert max(abs(a-b) for a,b in zip(pixel, (180,40,50))) < 8, (rotation, point, pixel)
                 pixel = logical.getpixel((w//2,h-strip-3))
                 assert max(abs(a-b) for a,b in zip(pixel,(20,180,60))) < 8, (rotation,pixel)
-                assert logical.getpixel((w//2,h-strip+2)) == (245,245,245)
+                assert logical.getpixel((w//2,h-strip+2)) == (250,250,250)
                 footer = logical.crop((0,h-strip,w,h)).convert('L')
                 ink = footer.point(lambda value: 255 if value < 150 else 0)
-                assert ink.crop((0,0,w//4,strip)).getbbox(), 'Missing left Paper ID'
+                assert ink.crop((0,0,w//4,strip)).getbbox(), 'Missing left screen number'
                 right = ink.crop((w*3//4,0,w,strip)).getbbox()
                 assert right, 'Missing right address'
                 right_gap = w-(w*3//4+right[2])
                 assert 8*overlay_scale(screen_size) <= right_gap <= 32*overlay_scale(screen_size), (rotation,right_gap)
-                normal_height = check_timer(logical, 'normal')
+                normal_height = check_timer(logical)
             for name, remaining in (('warning', 120), ('urgent', 60), ('expired', 0)):
                 display.overlay(deadline=int(time.time())+remaining,paper_id='3263',ip='192.0.2.10',rotation=rotation)
                 time.sleep(.15)
                 filename = output/f'timer-{name}-{rotation}.png'
                 player.command('screenshot-to-file',str(filename),'window')
                 with Image.open(filename) as snapshot:
-                    height = check_timer(snapshot.rotate(rotation,expand=True).convert('RGB'),
-                                         'warning' if name == 'warning' else 'urgent')
-                    if name != 'warning':
-                        assert height > normal_height, 'Final-minute digits did not grow'
+                    height = check_timer(snapshot.rotate(rotation,expand=True).convert('RGB'))
+                    assert abs(height-normal_height) <= 3*overlay_scale(screen_size), 'Timer changed size'
         menu={'key':(1,0,0),'items':[{'path':first,'paper_id':42},{'path':video,'paper_id':43}], 'offset':0,'selected':0}
         display.overlay(ip='192.0.2.10',rotation=0,menu=True)
         show(None,0,menu)
@@ -346,7 +333,7 @@ def visual_test(args):
             assert color_mask(footer, (185,28,28)).getbbox() is None
             assert color_mask(footer, (248,240,222)).getbbox() is None
         assert dark == 0, f'{dark}/{frames} frames went black at the center'
-        (output/'result.txt').write_text(f'PASS: {args.resolution}; {frames} captured transition frames at {capture_fps} fps, {dark} black center frames; all test media observed; same window {window} and PID {pid}; reserved footer, centered large timer, white/yellow/red/expired states, left Paper ID/right address at four rotations; menu input and no unscheduled timer.\n')
+        (output/'result.txt').write_text(f'PASS: {args.resolution}; {frames} captured transition frames at {capture_fps} fps, {dark} black center frames; all test media observed; same window {window} and PID {pid}; reserved thin footer, top-right timer through expiry, left screen number/center Paper ID/right address at four rotations; menu input and no unscheduled timer.\n')
         print((output/'result.txt').read_text())
     finally:
         if display:

@@ -7,6 +7,7 @@ thread.  Motion is coalesced separately so a burst cannot delay button input.
 import logging
 import queue
 import threading
+import termios
 import time
 
 from radxa.channel_control import ControlSocket
@@ -77,7 +78,7 @@ class RemoteInput:
         while not self.stop.is_set():
             try:
                 self._run_connection()
-            except (OSError, ValueError) as error:
+            except (OSError, ValueError, termios.error) as error:
                 if not self.stop.is_set():
                     LOG.warning("Presenter UART unavailable (%s); retrying", error)
             self.clear_motion()

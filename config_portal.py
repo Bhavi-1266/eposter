@@ -31,7 +31,7 @@ DEFAULTS = {
     "hardware_id": 0,
     "wifi": {"ssid1": "", "password1": "", "ssid2": "", "password2": "", "connect_timeout": 20},
     "api": {"poster_api_url": "", "poster_token": "", "request_timeout": 15, "max_media_size_mb": 512},
-    "display": {"screen_number": 1, "rotation_degree": 0, "Mode": "Menu", "Auto_Scroll": 5, "cache_refresh": 60},
+    "display": {"screen_number": 1, "rotation_degree": 0, "Mode": "Menu", "Auto_Scroll": 5, "cache_refresh": 60, "info_page_seconds": 6},
 }
 
 
@@ -123,8 +123,15 @@ def validate_form(form):
     if "rotation" not in errors and values["rotation"] not in (0, 90, 180, 270):
         errors["rotation"] = "Choose 0, 90, 180, or 270 degrees."
     values["mode"] = form.get("mode")
-    if values["mode"] not in ("Time", "Menu", "Scroll"):
+    if values["mode"] not in ("Time", "Menu", "Scroll", "Info"):
         errors["mode"] = "Choose a supported display mode."
+    if "info_page_seconds" in form:
+        try:
+            values["info_page_seconds"] = int(form["info_page_seconds"])
+            if not 3 <= values["info_page_seconds"] <= 60:
+                raise ValueError
+        except (ValueError, TypeError):
+            errors["info_page_seconds"] = "Enter a whole number from 3 to 60."
     values["poster_api_url"] = form.get("poster_api_url", "").strip()
     try:
         url = urlsplit(values["poster_api_url"])
@@ -176,6 +183,8 @@ def save_config(project_dir, form):
                 "cache_refresh": values["cache_refresh"],
             })
             config["api"].update({key: values[key] for key in ("poster_api_url", "request_timeout", "max_media_size_mb")})
+            if "info_page_seconds" in values:
+                config["display"]["info_page_seconds"] = values["info_page_seconds"]
             config["wifi"].update({key: values[key] for key in ("ssid1", "ssid2", "connect_timeout")})
             for field, section, key in (("pass1", "wifi", "password1"), ("pass2", "wifi", "password2"), ("poster_token", "api", "poster_token")):
                 if form.get("clear_" + field) == "1":
@@ -258,7 +267,21 @@ def device_snapshot(project_dir):
                 result["display_service"] = state
         except (OSError, subprocess.TimeoutExpired):
             pass
-    if result["display_service"] in ("failed", "inactive"):
+    result["playback_state"] = "Unknown"
+    result["playback_note"] = "No recent playback heartbeat"
+    try:
+        health_path = project_dir / ".playback-status.json"
+        if health_path.stat().st_size <= 16384:
+            health = json.loads(health_path.read_text(encoding="utf-8"))
+            age = time.time() - float(health.get("checked_at", 0))
+            if 0 <= age < 90:
+                result["playback_state"] = "Needs attention" if health.get("error") else ("Running" if health.get("ready") else "Starting")
+                result["playback_note"] = "Playback heartbeat received"
+                if health.get("error"):
+                    warnings.append("Playback reported an error. Check the RunThis.py terminal or service journal.")
+    except (OSError, ValueError, TypeError, AttributeError):
+        pass
+    if result["playback_state"] == "Unknown" and result["display_service"] in ("failed", "inactive"):
         warnings.append("Display service is {}. Check its journal on the board.".format(result["display_service"]))
     result["warnings"] = warnings
     return result

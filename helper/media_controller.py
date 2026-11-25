@@ -1,4 +1,4 @@
-"""Responsive scheduling for Time, Scroll and Menu using one display backend."""
+"""Time, Scroll, Menu and Info modes using one persistent display backend."""
 import logging
 import math
 import signal
@@ -8,7 +8,8 @@ from pathlib import Path
 
 from helper import cache_handler
 from helper.display_handler import (Display, get_local_ip, is_video_file, logical_point,
-                                    logical_size, menu_geometry, menu_scale)
+                                    logical_size, menu_geometry, menu_scale, footer_height)
+from helper.information_board import InformationBoard
 from helper.schedule import active_record, record_deadline
 from helper.json_utils import atomic_write_json
 from helper.mpv_player import playback_settings
@@ -107,6 +108,9 @@ class Controller:
         self.worker = None
         self.remote = None
         self.remote_key = None
+        self.information = InformationBoard(self.root / "api_data.json")
+        self.info_state = None
+        self.slot_identity = None
         self.applied_hwdec = None
         self.pointer_x = None
         self.pointer_y = None
@@ -142,7 +146,7 @@ class Controller:
         self.config = config
         settings = config.get("display", {})
         mode = settings.get("Mode", "Time")
-        if mode not in ("Time", "Scroll", "Menu"):
+        if mode not in ("Time", "Scroll", "Menu", "Info"):
             mode = "Time"
         try:
             rotation = int(settings.get("rotation_degree", 0)) % 360
@@ -174,6 +178,10 @@ class Controller:
 
     def input(self, event, now):
         key = event[0]
+        if key == "SPACE" and self.mode == "Time":
+            # Laptop testing follows the exact presenter OK action and guards.
+            self.remote_input({"type": "button", "key": "OK"}, now)
+            return
         if key == "q":
             self.running = False
             return
@@ -260,7 +268,7 @@ class Controller:
 
     def move_pointer(self, dx, dy, now):
         width, height = logical_size(self.display.size, self.rotation)
-        content_height = max(1, height - round(72 * max(0.75, min(self.display.size) / 1080)))
+        content_height = max(1, height - footer_height(self.display.size))
         if self.pointer_x is None or self.pointer_y is None:
             self.pointer_x, self.pointer_y = width / 2, content_height / 2
         # The receiver reports physical right/down motion. Store logical
@@ -272,6 +280,8 @@ class Controller:
         self.pointer_visible_until = now + 1.0
 
     def remote_input(self, event, now):
+        if self.mode == "Info":
+            return
         kind = event.get("type")
         if kind == "motion":
             self.move_pointer(event.get("dx", 0), event.get("dy", 0), now)
@@ -293,7 +303,7 @@ class Controller:
                 self.change_mode("Time")
             return
         if key == "OK":
-            if self.mode == "Menu":
+            if self.mode != "Time":
                 # The existing library is screen-wide, not author-scoped. Do
                 # not let a presenter remote open or act on another paper.
                 return
@@ -311,6 +321,8 @@ class Controller:
 
     def choose(self, now):
         """Return path, API deadline, paper ID, status, menu specification."""
+        if self.mode == "Info":
+            return None, None, None, "", {"key": ("information",), "kind": "information"}
         if self.mode == "Time":
             record = active_record(self.records, now)
             if not record:
@@ -351,18 +363,31 @@ class Controller:
         return self.scroll_path["path"], record_deadline(record), self.scroll_path.get("paper_id"), "", None
 
     def tick(self, now):
+        record = active_record(self.records, now) if self.mode == "Time" else None
+        identity = (record.get("id"), record.get("paper_id"), media_url(record), record["start_dt"]) if record else None
+        if identity != self.slot_identity:
+            self.display.reset_pause()
+            self.slot_identity = identity
         for event in self.display.inputs():
             self.input(event, now)
         if self.remote:
             for event in self.remote.read():
                 self.remote_input(event, now)
         path, deadline, paper, status, menu = self.choose(now)
+        self.info_state = None
+        if self.mode == "Info":
+            mono = time.monotonic()
+            self.information.read(mono, self.config.get("api", {}).get("timezone"))
+            hold = min(60, positive_seconds(self.config.get("display", {}).get("info_page_seconds"), 6, 3))
+            self.info_state = self.information.page(now, mono, logical_size(self.display.size, self.rotation), hold)
         if self.display.error:
             status = "Media unavailable; retrying"
+        self.display.show(path, self.rotation, menu)
         self.display.overlay(deadline=deadline, paper_id=paper, ip=self.ip, status=status,
                              rotation=self.rotation, menu=self.mode == "Menu",
-                             pointer=self.pointer_state(now))
-        self.display.show(path, self.rotation, menu)
+                             pointer=self.pointer_state(now) if self.mode != "Info" else None,
+                             screen_number=self.config.get("display", {}).get("screen_number"),
+                             information=self.info_state)
         upcoming = None
         if self.mode == "Time":
             future = [r for r in self.records if r["start_dt"].timestamp() > now]

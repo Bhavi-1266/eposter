@@ -20,6 +20,18 @@ def input_without_thread(size=1):
 
 
 class RemoteQueueTests(unittest.TestCase):
+    def test_uart_io_error_reconnects_instead_of_killing_worker(self):
+        import termios
+        from unittest.mock import Mock
+        owner = input_without_thread()
+        owner.stop = Mock()
+        owner.stop.is_set.side_effect = [False, False, True]
+        owner.reconnect_delay = 2
+        owner._run_connection = Mock(side_effect=termios.error(5, 'Input/output error'))
+        with self.assertLogs('helper.remote_input', level='WARNING'):
+            owner._run()
+        owner.stop.wait.assert_called_once_with(2)
+
     def test_ack_is_withheld_until_bounded_queue_accepts_button(self):
         owner = input_without_thread()
         receiver = Receiver(owner._accept)

@@ -58,7 +58,7 @@ def overlay_scale(size):
 
 
 def footer_height(size):
-    return round(72*overlay_scale(size))
+    return round(48*overlay_scale(size))
 
 
 def media_size(size, rotation):
@@ -235,6 +235,16 @@ def uncover_overlays(image, rotation):
     # Clear the physical footer directly, avoiding a rotated mask and another
     # full-screen RGBA copy. Zero RGB also keeps transparent pixels premultiplied.
     ImageDraw.Draw(image).rectangle(bounds, fill=(0, 0, 0, 0))
+    # The countdown now sits at the logical top-right; keep it live during holds.
+    lw, lh = logical_size((w, h), rotation)
+    scale = overlay_scale((w, h))
+    # Allow longer hour-scale countdowns without retaining old timer pixels.
+    x, y = max(0, lw-round(164*scale)), min(lh, round(46*scale))
+    timer = {0: (x, 0, w-1, y),
+             90: (w-y, x, w-1, h-1),
+             180: (0, h-y, w-x, h-1),
+             270: (0, 0, y, h-x)}[rotation % 360]
+    ImageDraw.Draw(image).rectangle(timer, fill=(0, 0, 0, 0))
     return image
 
 
@@ -295,10 +305,14 @@ class Display:
             self.wake.set()
 
     def overlay(self, deadline=None, paper_id=None, ip="", status="", rotation=0, menu=False,
-                pointer=None):
+                pointer=None, screen_number=None, information=None):
         state = {"deadline": deadline, "rotation": rotation, "status": status,
                  "footer_left": f"Paper ID: {paper_id}" if paper_id is not None else "",
-                 "footer_right": ip, "pointer": pointer}
+                 "footer_right": ip, "pointer": pointer,
+                 "paper_id": str(paper_id) if paper_id is not None else "",
+                 "screen_number": str(screen_number) if screen_number is not None else "—",
+                 "access_url": f"http://{ip}" if ip else "",
+                 "paused": self.paused and information is None, "information": information}
         if state != self.overlay_state:
             self.player.set_overlay(**state)
             self.overlay_state = state
@@ -310,12 +324,20 @@ class Display:
     def toggle_pause(self, path=None):
         """Toggle only the visible media; a replacement always starts playing."""
         with self.lock:
-            if self.shown is None or (path is not None and self.shown[0] != str(Path(path))):
+            if (self.shown is None or (path is not None and self.shown[0] != str(Path(path)))
+                    or (getattr(self, "requested", self.shown) != self.shown)):
                 return False
             self.paused = not self.paused
             paused = self.paused
-        self.player.command("set_property", "pause", paused)
+            self.player.command("set_property", "pause", paused)
         return paused
+
+    def reset_pause(self):
+        with self.lock:
+            if self.paused:
+                self.paused = False
+                if self.shown == self.requested:
+                    self.player.command("set_property", "pause", False)
 
     def _set_viewport(self, size, rotation, menu=False):
         key = (size, rotation, menu)
@@ -356,7 +378,10 @@ class Display:
                     if menu:
                         self.menu_serial += 1
                         prepared = self.directory / f"menu-{self.menu_serial % 2}.png"
-                        render_menu(menu["items"], menu["offset"], menu["selected"], logical_size(size, rotation)).save(prepared, compress_level=1)
+                        if menu.get("kind") == "information":
+                            Image.new("RGB", (8, 8), "white").save(prepared)
+                        else:
+                            render_menu(menu["items"], menu["offset"], menu["selected"], logical_size(size, rotation)).save(prepared, compress_level=1)
                     else:
                         prepared = self.prepared.prepare(path, media_size(size, rotation))
                     with self.lock:
@@ -374,12 +399,12 @@ class Display:
                     with self.lock:
                         superseded = key != self.requested
                         paused = self.paused
-                    if superseded:
-                        self.player.command("set_property", "pause", True)
-                    else:
-                        self.player.command("set_property", "mute", False)
-                        self.player.command("set_property", "pause", paused)
-                    self.shown, self.rotation = key, rotation
+                        if superseded:
+                            self.player.command("set_property", "pause", True)
+                        else:
+                            self.player.command("set_property", "mute", False)
+                            self.player.command("set_property", "pause", paused)
+                        self.shown, self.rotation = key, rotation
                     LOG.info("Showing %s at rotation %s", "menu" if menu else path.name, rotation)
                 except (PlayerError, OSError, ValueError) as error:
                     LOG.error("Display failed: %s", error)

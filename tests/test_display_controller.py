@@ -200,13 +200,34 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(self.controller.mode, 'Time')
         self.controller.set_mode.assert_not_called()
 
+    def test_space_uses_remote_ok_for_video_and_ignores_stills(self):
+        for extension, calls in (('mp4', 1), ('png', 0)):
+            self.display.toggle_pause.reset_mock()
+            path = self.root / ('talk.' + extension)
+            self.controller.choose = Mock(return_value=(path, 400, 'a', '', None))
+            self.controller.input(['SPACE'], 200)
+            self.assertEqual(self.display.toggle_pause.call_count, calls)
+            if calls:
+                self.display.toggle_pause.assert_called_with(path)
+
+    def test_space_keeps_menu_selection_and_does_not_pause_info(self):
+        self.config['display']['Mode'] = 'Menu'
+        self.controller.apply_config(self.config)
+        self.controller.input(['SPACE'], 200)
+        self.assertIsNotNone(self.controller.preview)
+        self.config['display']['Mode'] = 'Info'
+        self.controller.apply_config(self.config)
+        self.controller.input(['SPACE'], 200)
+        self.display.toggle_pause.assert_not_called()
+
     def test_remote_motion_is_rotated_bounded_and_added_to_overlay(self):
         self.controller.rotation = 90
         self.controller.remote_key = (True, '/dev/null', 64, 2.0)
         self.controller.remote_input({'type': 'motion', 'dx': 10, 'dy': -5}, 200)
-        self.assertEqual((self.controller.pointer_x, self.controller.pointer_y), (260, 433))
+        expected_y = (960 - footer_height(self.display.size)) / 2 - 20
+        self.assertEqual((self.controller.pointer_x, self.controller.pointer_y), (260, expected_y))
         self.controller.tick(200.5)
-        self.assertEqual(self.display.overlay.call_args.kwargs['pointer'], {'x': 260, 'y': 433})
+        self.assertEqual(self.display.overlay.call_args.kwargs['pointer'], {'x': 260, 'y': expected_y})
         self.controller.tick(201.1)
         self.assertIsNone(self.display.overlay.call_args.kwargs['pointer'])
 
@@ -218,6 +239,28 @@ class ControllerTests(unittest.TestCase):
         self.controller.pointer_visible_until = 300
         self.controller.remote_input({'type': 'button', 'key': 'OK'}, 200)
         self.assertIsNone(self.controller.preview)
+
+    def test_info_mode_runs_without_current_device_media_or_remote_actions(self):
+        self.config['display']['Mode'] = 'Info'
+        self.controller.apply_config(self.config)
+        self.controller.records = []
+        self.controller.remote_input({'type': 'button', 'key': 'OK'}, 200)
+        self.controller.tick(200)
+        self.display.toggle_pause.assert_not_called()
+        overlay = self.display.overlay.call_args.kwargs
+        self.assertEqual(overlay['information']['rows'], [])
+        self.assertEqual(overlay['screen_number'], 7)
+        self.assertIsNone(overlay['deadline'])
+        self.assertEqual(self.display.show.call_args.args[2]['kind'], 'information')
+
+    def test_pause_resets_on_new_slot_even_when_media_is_shared(self):
+        self.controller.records = [record(end=300), record('b', start=300, end=500) | {'file': 'a'}]
+        self.controller.tick(250)
+        self.display.reset_pause.reset_mock()
+        self.controller.tick(260)
+        self.display.reset_pause.assert_not_called()
+        self.controller.tick(300)
+        self.display.reset_pause.assert_called_once()
 
 
 class PreparationTests(unittest.TestCase):

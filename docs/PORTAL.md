@@ -49,6 +49,13 @@ the next connection attempt.
 
 ## Resource limits
 
+The compact interface groups controls into Display, Content API, Network, and
+Device & updates tabs. Display includes Information directory mode and its
+3–60 second page hold. Upcoming sessions use a fixed five-minute window.
+The Display status uses the existing `.playback-status.json` heartbeat, considering
+it current for 90 seconds; this also supports foreground RunThis.py processes.
+Service state alone is not evidence that video is playing.
+
 - Four Waitress request threads and 32 open connections.
 - 16 KB request body and header limits; 256 KB configuration read limit.
 - Status is cached in memory for 30 seconds, shared across browser tabs.

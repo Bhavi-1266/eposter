@@ -75,6 +75,31 @@ class PortalTests(unittest.TestCase):
             self.assertEqual(device['screen_number'], 42)
             self.assertEqual(device['hardware_id'], 55)
 
+    def test_info_mode_duration_saves_and_legacy_form_preserves_it(self):
+        self.login()
+        form = self.form() | {'mode': 'Info', 'info_page_seconds': '9'}
+        self.assertEqual(self.client.post('/save', data=form).status_code, 200)
+        saved = json.loads(self.path.read_text())
+        self.assertEqual(saved['display']['Mode'], 'Info')
+        self.assertEqual(saved['display']['info_page_seconds'], 9)
+        self.assertEqual(self.client.post('/save', data=self.form()).status_code, 200)
+        self.assertEqual(json.loads(self.path.read_text())['display']['info_page_seconds'], 9)
+        for value in ('0', '61', 'invalid'):
+            response = self.client.post('/save', data=self.form() | {'info_page_seconds': value})
+            self.assertEqual(response.status_code, 422)
+            self.assertIn('info_page_seconds', response.json['fields'])
+
+    def test_foreground_heartbeat_and_stale_status(self):
+        health = self.root / '.playback-status.json'
+        with patch('config_portal.shutil.which', return_value=None):
+            health.write_text(json.dumps(dict(checked_at=time.time(), ready=True, error=None)))
+            result = portal.device_snapshot(self.root)
+            self.assertEqual(result['playback_state'], 'Running')
+            health.write_text(json.dumps(dict(checked_at=time.time()-100, ready=True)))
+            self.assertEqual(portal.device_snapshot(self.root)['playback_state'], 'Unknown')
+            health.write_text('[]')
+            self.assertEqual(portal.device_snapshot(self.root)['playback_state'], 'Unknown')
+
     def test_previous_portal_field_still_updates_only_screen_number(self):
         self.config['hardware_id'] = 55
         self.path.write_text(json.dumps(self.config))

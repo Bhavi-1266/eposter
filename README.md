@@ -99,7 +99,8 @@ All configuration is done through `config.json`. Here's what each setting does:
   the existing API screen/device fields. If both exist, `hardware_ID` wins,
   including zero. The unrelated top-level `ID` is preserved.
 - `rotation_degree`: 0, 90, 180, or 270 clockwise, applied to media and overlays.
-- `Mode`: `Time`, `Scroll`, or `Menu`.
+- `Mode`: `Time`, `Scroll`, `Menu`, or `Info`.
+- `info_page_seconds`: information-directory page hold, 3–60 seconds (default 6).
 - Still images fill the media area above a separate footer, including 3840×2160
   UHD and portrait rotation. Different image aspect ratios stretch to fit so
   poster text is not cropped. Videos/GIFs retain their aspect ratio within that
@@ -228,6 +229,31 @@ Set `enabled` to `false` on a non-presenter station. See
 contract](UART_AND_INTEGRATION.txt), and [the handoff](HANDOFF.txt).
 
 ### Playback and countdown
+
+The display uses a white/grey interface with a thin footer: screen number on the
+left, paper ID in the middle, and the local portal address on the right. The
+compact, digits-only session timer is at the top right. In Time mode, the paired remote's **OK** button
+pauses/resumes the current video. Only a small pause symbol appears at the bottom
+left while paused. For laptop testing, focus the player window and press **Space**
+to trigger the same remote OK action in Time mode; holding Space does not repeat.
+There is no on-screen playback button. The deadline continues and a new session
+starts unpaused, even when it uses the same video file.
+
+Choose **Display → Playback mode → Information directory** in the portal to show
+the public author, paper and screen assignments across all screens in the API.
+This view includes running sessions and those starting within **5 minutes**, with
+“Starts in N min” labels. It excludes expired sessions and contact details.
+Rows fit the screen without scrolling. Pages fade every 6 seconds by default;
+set **Page hold** to change this. A partial final page wraps into the beginning
+of the list; when all entries fit on one page, rows appear once without paging.
+If the saved feed becomes unreadable, the last valid schedule stays visible,
+with its original deadlines and a notice. The displayed update time refers to
+the saved feed, not proof of a live API connection.
+
+The portal's Display, Content API, Network, and Device & updates tabs retain the
+existing login, password confirmation, saved-secret handling and conflict checks.
+Display status uses the playback heartbeat, including when RunThis.py runs in a
+terminal without systemd. No new Python packages or frontend libraries are needed.
 
 Images, GIFs, videos, the menu, and the countdown use one persistent mpv window.
 The existing cache/download algorithm is unchanged and runs in one background

@@ -1,5 +1,24 @@
 # Playback migration validation
 
+## UI update — 2026-11-25
+
+The approved white/grey UI replaces the earlier footer and coloured timer design.
+Current checks on the Fedora laptop: 117 unit tests passed; real mpv HTTP/cache/
+scheduler integration passed; information-page rendering and page changes checked
+at all four rotations in a 960×540 window; video pause froze playback while the
+session countdown continued. Desktop and mobile portal layouts were inspected in
+Firefox. The subsequent compact digits-only timer and Space-to-remote-OK binding
+were also checked in real mpv. All four modes were tested with a local time-shifted
+copy of the supplied 12-screen feed, including its downloaded MOV and PNG files.
+JavaScript syntax and Git whitespace checks passed. Test media and
+screenshots stayed outside tracked source; no packages or services were installed.
+
+Directory tests cover all-screen data, five-minute inclusion boundaries, expiry,
+wrapped full pages, no duplicates for one page, malformed feeds and retained cache.
+The current visual smoke assertions expect a thin footer and top-right white timer.
+Native UHD, Radxa hardware rendering, and a physical remote still need validation
+on the board. The results below describe earlier releases, not new hardware tests.
+
 Initially validated locally on 2026-09-15 and rechecked on 2026-09-16 with
 mpv 0.40.0, FFmpeg 7.1.x, and private
 960×540, 1920×1080, and 3840×2160 Xvfb displays using software OpenGL rendering.

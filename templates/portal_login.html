@@ -2,16 +2,9 @@
 {% block title %}Sign in | ePoster Manager{% endblock %}
 {% block body %}
 <main id="main" class="login-layout">
-  <section class="login-intro">
-    <span class="brand-mark" aria-hidden="true">eP</span>
-    <p class="eyebrow">YOUR DISPLAY, CONNECTED</p>
-    <h1>A little control.<br>A clearer display.</h1>
-    <p>Manage content, timing, and connectivity from one place.</p>
-    <span class="pill">Local device management</span>
-  </section>
   <section class="card login-card">
     <p class="eyebrow">EPOSTER MANAGER</p>
-    <h2>Welcome back.</h2>
+    <h2>Device sign in</h2>
     <p class="muted">Sign in with this board's admin credentials.</p>
     {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
     <form action="{{ url_for('login') }}" method="post" id="login-form">

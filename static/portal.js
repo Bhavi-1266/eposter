@@ -52,6 +52,49 @@
 
   const form = byId("settings-form");
   if (!form) return;
+  const sectionLinks = [...document.querySelectorAll('.section-nav a')];
+  document.querySelector('.section-nav').setAttribute('role', 'tablist');
+  sectionLinks.forEach((link) => {
+    const id = link.hash.slice(1);
+    link.id = 'tab-' + id;
+    link.setAttribute('role', 'tab');
+    link.setAttribute('aria-controls', id);
+    byId(id).setAttribute('role', 'tabpanel');
+    byId(id).setAttribute('aria-labelledby', link.id);
+    link.addEventListener('keydown', (event) => {
+      let index = sectionLinks.indexOf(link);
+      if (event.key === 'ArrowRight') index++;
+      else if (event.key === 'ArrowLeft') index--;
+      else if (event.key === 'Home') index = 0;
+      else if (event.key === 'End') index = sectionLinks.length - 1;
+      else return;
+      event.preventDefault();
+      const next = sectionLinks[(index + sectionLinks.length) % sectionLinks.length];
+      showSection(next.hash.slice(1));
+      next.focus();
+    });
+  });
+  function showSection(id) {
+    sectionLinks.forEach((link) => {
+      const selected = link.hash === '#' + id;
+      byId(link.hash.slice(1)).hidden = !selected;
+      link.setAttribute('aria-selected', String(selected));
+      link.tabIndex = selected ? 0 : -1;
+      if (selected) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  }
+  sectionLinks.forEach((link) => link.addEventListener('click', (event) => {
+    event.preventDefault();
+    showSection(link.hash.slice(1));
+  }));
+  showSection('display-settings');
+  function updateModeFields() {
+    byId('info-options').hidden = byId('mode').value !== 'Info';
+    byId('auto_scroll').readOnly = byId('mode').value !== 'Scroll';
+  }
+  byId('mode').addEventListener('change', updateModeFields);
+  updateModeFields();
   const state = {dirty: false, busy: false, statusBusy: false, failures: 0, timer: null, power: null};
   const ignored = new Set(["csrf_token", "revision", "admin_password"]);
   const controls = () => Array.from(form.elements).filter((el) => el.name && !ignored.has(el.name));
@@ -76,6 +119,9 @@
   }
 
   function revealField(input) {
+    const section = input.closest('.settings-card[id]');
+    if (section) showSection(section.id);
+    if (input.closest('#info-options')) byId('info-options').hidden = false;
     let parent = input.parentElement;
     while (parent) {
       if (parent.tagName === "DETAILS") parent.open = true;
@@ -207,6 +253,7 @@
   byId("discard").addEventListener("click", () => {
     if (!state.dirty || !window.confirm("Discard your unsaved settings?")) return;
     form.reset();
+    updateModeFields();
     clearErrors();
     byId("feedback").hidden = true;
     updateDirty();
@@ -251,7 +298,8 @@
       byId("connection").textContent = "Portal connected";
       byId("connection").className = "pill success";
       byId("connection-notice").hidden = true;
-      byId("service-state").textContent = data.display_service;
+      byId("service-state").textContent = data.playback_state || data.display_service;
+      byId("playback-note").textContent = data.playback_note || 'No recent playback heartbeat';
       byId("memory-state").textContent = data.memory_used_percent == null ? "Unknown" : data.memory_used_percent + "%";
       byId("uptime-state").textContent = formatUptime(data.uptime_seconds);
       byId("disk-state").textContent = data.disk_free_mb == null ? "Unknown" : (data.disk_free_mb / 1024).toFixed(1) + " GB";

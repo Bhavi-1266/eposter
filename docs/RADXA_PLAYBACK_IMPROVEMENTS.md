@@ -2,6 +2,10 @@
 
 Recorded: September 17, 2026.
 
+UI note (2026-11-25): the current design supersedes this guide's coloured,
+footer-centered timer with a white top-right timer and a thin identity footer.
+See README.md for the information-directory mode and remote pause indicator.
+
 This guide collects the changes made to ePoster, the tests performed on the
 Radxa, and the instructions for enabling the improved playback settings.
 The user reported smoother playback with the final command, but the last
