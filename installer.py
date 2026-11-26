@@ -362,6 +362,9 @@ polkit.addRule(function(action, subject) {{
     # Disable Hotspot Autostart
     print("Disabling Hotspot autoconnect...")
     run("nmcli connection modify Hotspot connection.autoconnect no", ignore_fail=True)
+
+    if not run(["bash", str(BASE_DIR / "tools" / "setup_uart6.sh")], ignore_fail=True):
+        print("Warning: UART6 setup failed. Run sudo bash tools/setup_uart6.sh to inspect the error.")
     
     # --- 4. Systemd Services ---
     restarted_after = time.time()

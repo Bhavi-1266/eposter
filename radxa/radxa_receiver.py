@@ -6,8 +6,10 @@ import os
 import re
 try:
     from .channel_control import ControlSocket
+    from .uart_protocol import JsonInputReceiver, decode_message
 except ImportError:  # Direct execution from the standalone radxa/ deployment.
     from channel_control import ControlSocket
+    from uart_protocol import JsonInputReceiver, decode_message
 from collections import OrderedDict
 from time import monotonic
 
@@ -100,9 +102,10 @@ def writeUart(fd, data):
         data = data[os.write(fd, data):]
 
 class StationFrames:
-    def __init__(self, receiver, control=None):
+    def __init__(self, receiver, control=None, json_input=None):
         self.control = control
         self.receiver = receiver
+        self.json_input = json_input
         self.pending = b""
         self.discard = False
 
@@ -111,12 +114,20 @@ class StationFrames:
         self.pending = lines.pop()
         for line in lines:
             if not self.discard and len(line) < 1400:
-                if self.control and line.startswith((b"CHANNEL ", b"RCFG ")):
+                if line.lstrip().startswith(b"{"):
+                    message = decode_message(line)
+                    if message and message["type"] == "input" and self.json_input:
+                        ack = self.json_input.process(message)
+                        if ack:
+                            write(ack)
+                    elif message and message["type"] == "config_result" and self.control:
+                        self.control.reply_json(message)
+                elif self.control and line.startswith((b"CHANNEL ", b"RCFG ")):
                     self.control.reply(line)
-                    continue
-                ack = self.receiver.process(line)
-                if ack:
-                    write(ack)
+                else:
+                    ack = self.receiver.process(line)
+                    if ack:
+                        write(ack)
             self.discard = False
         if len(self.pending) > 1400:
             self.pending = b""
@@ -129,23 +140,31 @@ def main():
     parser.add_argument("--summary-only", action="store_true", help="Print only listener startup and final totals")
     args = parser.parse_args()
     def accept(event):
-        if not (args.quiet and event["type"] == "probe"):
+        if not args.summary_only and not (args.quiet and event["type"] == "probe"):
             print(json.dumps(event, separators=(",", ":")), flush=True)
-    rx = Receiver((lambda event: None) if args.summary_only else accept)
+
+    def accept_json(buttons, motion):
+        for event in buttons:
+            accept(event)
+        if motion:
+            accept({"type": "motion", "dx": motion[0], "dy": motion[1]})
+
+    rx = Receiver(accept)
+    json_rx = JsonInputReceiver(accept_json)
     with openPort(args.port) as (read, write):
         print(f"Listening on {args.port} at 115200 8N1", flush=True)
         last = monotonic()
         control = ControlSocket(write)
-        frames = StationFrames(rx, control)
+        frames = StationFrames(rx, control, json_rx)
         try:
             while True:
                 control.poll()
                 frames.feed(read(), write)
                 if not args.summary_only and monotonic() - last >= 5:
-                    print(f"accepted={rx.count} duplicates={rx.duplicates}", flush=True)
+                    print(f"accepted={rx.count + json_rx.count} duplicates={rx.duplicates + json_rx.duplicates}", flush=True)
                     last = monotonic()
         except KeyboardInterrupt:
-            print(f"Final accepted={rx.count} duplicates={rx.duplicates}", flush=True)
+            print(f"Final accepted={rx.count + json_rx.count} duplicates={rx.duplicates + json_rx.duplicates}", flush=True)
 
         finally:
             control.close()

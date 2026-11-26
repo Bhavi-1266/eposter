@@ -12,6 +12,7 @@ import time
 
 from radxa.channel_control import ControlSocket
 from radxa.radxa_receiver import Receiver, StationFrames, openPort
+from radxa.uart_protocol import JsonInputReceiver
 
 LOG = logging.getLogger(__name__)
 
@@ -30,6 +31,7 @@ class RemoteInput:
         self.motion = [0, 0]
         self.motion_at = 0.0
         self.stop = threading.Event()
+        self.json_receiver = JsonInputReceiver(self._accept_json)
         self.thread = threading.Thread(target=self._run, name="presenter-uart", daemon=True)
         self.thread.start()
 
@@ -45,8 +47,15 @@ class RemoteInput:
             # A diagnostic probe has no application action and must not occupy
             # capacity needed by ordered presenter button presses.
             return
-        # Receiver remembers and ACKs the frame only after this succeeds.
-        self.events.put_nowait(event)
+        self.events.put_nowait((event,))
+
+    def _accept_json(self, buttons, motion):
+        # Accept all presses in this line together. A failed enqueue leaves
+        # everything untouched so a retry cannot repeat a partial action.
+        if buttons:
+            self.events.put_nowait(buttons)
+        if motion:
+            self._accept({"type": "motion", "dx": motion[0], "dy": motion[1]})
 
     def _feed_chunk(self, frames, chunk, write):
         """Keep parsing later frames if one button cannot enter the queue."""
@@ -66,7 +75,7 @@ class RemoteInput:
         with openPort(self.port) as (read, write):
             LOG.info("Presenter remote listening on %s at 115200 8N1", self.port)
             control = ControlSocket(write)
-            frames = StationFrames(receiver, control)
+            frames = StationFrames(receiver, control, self.json_receiver)
             try:
                 while not self.stop.is_set():
                     control.poll()
@@ -88,7 +97,7 @@ class RemoteInput:
         """Yield queued buttons/probes followed by one fresh coalesced motion."""
         while True:
             try:
-                yield self.events.get_nowait()
+                yield from self.events.get_nowait()
             except queue.Empty:
                 break
         with self.motion_lock:

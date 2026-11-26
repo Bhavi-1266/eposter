@@ -1,6 +1,38 @@
 UART CONTRACT / ACK SEMANTICS
-Source of truth: firmware/main/station.c, handheld.c, buttons.h;
-radxa/radxa_receiver.py and channel_control.py. Reuse these parsers.
+
+JSON V1 (supported by the ePoster UART owner)
+ROCK 5C UART6-M1: pin 19 TX -> ESP RX, pin 21 RX <- ESP TX, pin 20 GND.
+115200 baud, 8 data bits, no parity, 1 stop bit, 3.3 V logic.
+One UTF-8 JSON object per line ending in LF. All messages carry v=1.
+
+Receiver -> ePoster input:
+  {"v":1,"type":"input","id":"8f2a1c90:00000042","data":[1,0,0,0,0,0,0,0,0,12,23]}
+Array order: AIM, UP, DOWN, LEFT, RIGHT, OK, HOME, BACK, MODE, CURSOR_X, CURSOR_Y.
+The first nine entries are integer press flags (0 or 1). X and Y are signed
+16-bit relative deltas. Only AIM=1 applies cursor deltas. Positive X is right,
+positive Y is down. A report containing multiple presses is accepted as a unit.
+
+ePoster -> receiver ACK:
+  {"v":1,"type":"ack","id":"8f2a1c90:00000042"}
+ACK means accepted by the application, including motion. A retried input ID
+gets another ACK without repeating the action within the replay history.
+Motion can be coalesced and continues streaming without waiting for ACKs.
+Malformed input or an input that cannot enter the bounded queue receives no ACK.
+
+ePoster -> receiver settings:
+  {"v":1,"type":"config","id":"00000002","op":"set","target":"remote-001","data":{"device_id":"remote-012","channel":6}}
+target is the current device ID. Supply either setting or both. An omitted
+setting is left unchanged. The supported radio channels are 1 through 11.
+
+Receiver -> ePoster settings result:
+  {"v":1,"type":"config_result","id":"00000002","status":"ok","data":{"device_id":"remote-012","channel":6}}
+The result echoes the request ID. ok requires both ESPs to have confirmed the
+resulting settings. The application validates the returned values before
+reporting success. An ordinary ACK or mismatched reply cannot complete settings.
+
+LEGACY UART (bundled firmware)
+Source: firmware/main/station.c, handheld.c, buttons.h, and the legacy paths
+in radxa/radxa_receiver.py and radxa/channel_control.py.
 
 Receiver ESP -> Radxa, ASCII newline-terminated:
   EV ssssssss qqqqqqqq kind x y battery_mv\n

@@ -207,11 +207,22 @@ the remote cannot enter or navigate the screen-wide poster library, use a deskto
 mouse, open a shell, or browse unrestricted URLs. The API slot deadline continues
 while a video is paused.
 
-UART6-M1 must be enabled. Wire ROCK 5C physical pins 19/21/20 to the receiver's
-RX/TX/GND at 115200 8N1, 3.3 V logic, and add the display user to `dialout`.
-Only the integrated display may own the UART; stop standalone `radxa/remote
-start` or `video` first. Staff configuration still connects through the owner's
-local control socket with `python3 radxa/configure.py`.
+Wire ROCK 5C physical pins **19 TX**, **21 RX**, and **20 GND** to receiver
+**RX**, **TX**, and **GND** at 115200 8N1 with 3.3 V logic. The installer adds
+the display user to `dialout` and runs `tools/setup_uart6.sh` on the ROCK 5C.
+Run the UART step separately with `sudo bash tools/setup_uart6.sh`. Reboot when
+the script reports that `/dev/ttyS6` needs activation.
+
+The display can receive JSON v1 lines and the legacy `EV` frames. With a JSON v1
+receiver, change its current ID and/or radio channel through the running display:
+
+```bash
+python3 radxa/remote set-config remote-001 --device-id remote-012 --channel 6
+```
+
+Use the current ID as the target. The command reports success after a matching
+`config_result` confirms the requested values. The legacy receiver uses
+`python3 radxa/configure.py` for staff settings. Keep one UART owner at a time.
 
 Configuration defaults are:
 
