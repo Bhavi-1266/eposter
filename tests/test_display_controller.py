@@ -231,6 +231,26 @@ class ControllerTests(unittest.TestCase):
         self.controller.tick(201.1)
         self.assertIsNone(self.display.overlay.call_args.kwargs['pointer'])
 
+    def test_touchpad_aim_uses_rotated_remote_pointer_and_respects_info_mode(self):
+        self.controller.rotation = 90
+        self.controller.pointer_x, self.controller.pointer_y = (100, 150)
+        self.display.inputs.return_value = [['TOUCHPAD_AIM_START']]
+        self.controller.tick(199.5)
+        center_y = (960 - footer_height(self.display.size)) / 2
+        self.assertEqual(self.display.overlay.call_args.kwargs['pointer'], {'x': 270, 'y': center_y})
+        self.display.inputs.return_value = [['TOUCHPAD_AIM', '10', '-5']]
+        self.controller.tick(200)
+        self.assertEqual(self.display.overlay.call_args.kwargs['pointer'], {'x': 265, 'y': center_y - 10})
+        self.display.inputs.return_value = [['TOUCHPAD_AIM_START']]
+        self.controller.tick(200.1)
+        self.assertEqual(self.display.overlay.call_args.kwargs['pointer'], {'x': 270, 'y': center_y})
+        self.config['display']['Mode'] = 'Info'
+        self.controller.apply_config(self.config)
+        self.display.inputs.return_value = [['TOUCHPAD_AIM_START'], ['TOUCHPAD_AIM', '10', '-5']]
+        self.controller.tick(200.2)
+        self.assertEqual((self.controller.pointer_x, self.controller.pointer_y), (270, center_y))
+        self.assertIsNone(self.display.overlay.call_args.kwargs['pointer'])
+
     def test_remote_ok_cannot_open_screen_wide_library_item(self):
         self.config['display']['Mode'] = 'Menu'
         self.controller.apply_config(self.config)

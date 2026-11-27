@@ -30,6 +30,19 @@ Accepted button presses appear as `Remote button pressed: OK` in the
 `RunThis.py` terminal or the display service journal, even when the display
 mode has no action for that button.
 
+For a laptop test, start the display in your desktop session:
+
+```sh
+EPOSTER_TOUCHPAD_AIM=1 ./venv/bin/python RunThis.py
+```
+
+Focus the player and hold **A** while moving the touchpad. Each press starts
+the red AIM dot at the center of the playback area. Movement uses the same
+rotation, speed, and fade behavior as the remote AIM pointer. Test in
+Time mode, including on the screensaver. **Space** simulates OK during an
+active scheduled video. The environment flag also works with the local
+time-shifted preview launcher.
+
 ## JSON v1 receiver settings
 
 Run the command as the display user on the station while the display service

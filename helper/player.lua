@@ -229,16 +229,11 @@ local function render()
     if state.pointer and state.pointer.x and state.pointer.y then
         local x, y = tonumber(state.pointer.x), tonumber(state.pointer.y)
         if x and y then
-            local radius = math.max(12, math.floor(16*scale))
-            -- Application-local AIM cursor: high-contrast rings plus crosshair.
-            lines[#lines+1] = '{' .. tags(x,y,5) .. '\\1c&H000000&\\3c&H000000&\\bord0\\p1}' ..
-                string.format('m %d 0 b %d %d %d %d 0 %d b %d %d %d %d %d 0 m %d %d l %d %d m %d %d l %d %d',
-                    radius, radius, 0, radius, radius, radius*2, -radius, radius*2, -radius, 0, radius, 0,
-                    -radius-7, radius, radius+7, radius, radius, -7, radius, radius*2+7) .. '{\\p0}'
-            lines[#lines+1] = '{' .. tags(x,y,5) .. '\\1c&HFFFFFF&\\3c&HFFFFFF&\\bord0\\p1}' ..
-                string.format('m %d 2 b %d %d %d %d 2 %d b %d %d %d %d %d 2',
-                    radius, radius-2, 2, radius-2, radius, radius*2-2,
-                    -radius+2, radius*2-2, -radius+2, 2, radius, 2) .. '{\\p0}'
+            local dot_scale = 100*scale
+            local dot = 'm 0 7 b 0 3 3 0 7 0 11 0 14 3 14 7 14 11 11 14 7 14 3 14 0 11 0 7'
+            lines[#lines+1] = '{' .. tags(x,y,5) ..
+                string.format('\\fscx%.2f\\fscy%.2f\\1c&H2727EE&\\3c&HFFFFFF&\\bord%.2f\\p1}',
+                    dot_scale, dot_scale, math.max(1, scale)) .. dot .. '{\\p0}'
         end
     end
     local data = table.concat(lines, '\n')
@@ -291,6 +286,43 @@ end
 for _, key in ipairs({'m', 'M'}) do
     mp.add_forced_key_binding(key, 'eposter-menu-' .. key, function() send('M') end)
 end
+
+-- Opt-in laptop test. Read only pointer motion inside the mpv window and
+-- sample at the receiver's approximate motion rate.
+if os.getenv('EPOSTER_TOUCHPAD_AIM') == '1' then
+    local last = nil
+    local function sample()
+        local position = mp.get_property_native('mouse-pos')
+        if not position or not position.hover then
+            last = nil
+            return
+        end
+        if last and (position.x ~= last.x or position.y ~= last.y) then
+            send('TOUCHPAD_AIM', position.x-last.x, position.y-last.y)
+        end
+        last = position
+    end
+    local aim_timer = mp.add_periodic_timer(.02, sample)
+    aim_timer:kill()
+    local function stop_aim()
+        aim_timer:kill()
+        last = nil
+    end
+    mp.add_forced_key_binding('a', 'eposter-touchpad-aim', function(event)
+        if event.event == 'up' or event.canceled then
+            stop_aim()
+        elseif event.event == 'down' then
+            last = nil
+            send('TOUCHPAD_AIM_START')
+            sample()
+            aim_timer:resume()
+        end
+    end, {complex=true})
+    mp.observe_property('focused', 'bool', function(_, focused)
+        if focused == false then stop_aim() end
+    end)
+end
+
 local press = nil
 mp.add_forced_key_binding('MBTN_LEFT', 'eposter-click', function(event)
     local x, y = mp.get_mouse_pos()

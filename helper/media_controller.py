@@ -178,6 +178,13 @@ class Controller:
 
     def input(self, event, now):
         key = event[0]
+        if key == "TOUCHPAD_AIM_START":
+            if self.mode != "Info":
+                self.move_pointer(0, 0, now, recenter=True)
+            return
+        if key == "TOUCHPAD_AIM":
+            self.remote_input({"type": "motion", "dx": float(event[1]), "dy": float(event[2])}, now)
+            return
         if key == "SPACE" and self.mode == "Time":
             # Laptop testing follows the exact presenter OK action and guards.
             self.remote_input({"type": "button", "key": "OK"}, now)
@@ -266,10 +273,10 @@ class Controller:
             from helper.remote_input import RemoteInput
             self.remote = RemoteInput(port=key[1], queue_size=key[2])
 
-    def move_pointer(self, dx, dy, now):
+    def move_pointer(self, dx, dy, now, *, recenter=False):
         width, height = logical_size(self.display.size, self.rotation)
         content_height = max(1, height - footer_height(self.display.size))
-        if self.pointer_x is None or self.pointer_y is None:
+        if recenter or self.pointer_x is None or self.pointer_y is None:
             self.pointer_x, self.pointer_y = width / 2, content_height / 2
         # The receiver reports physical right/down motion. Store logical
         # coordinates so the Lua overlay and menu hit-testing share rotation.
