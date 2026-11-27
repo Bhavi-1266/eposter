@@ -244,8 +244,13 @@ class ControllerTests(unittest.TestCase):
         self.config['display']['Mode'] = 'Info'
         self.controller.apply_config(self.config)
         self.controller.records = []
-        self.controller.remote_input({'type': 'button', 'key': 'OK'}, 200)
-        self.controller.tick(200)
+        self.controller.remote = Mock()
+        self.controller.remote.read.return_value = [
+            {'type': 'button', 'key': 'OK'}, {'type': 'motion', 'dx': 3, 'dy': -1},
+        ]
+        with self.assertLogs('helper.media_controller', level='INFO') as messages:
+            self.controller.tick(200)
+        self.assertEqual([record.getMessage() for record in messages.records], ['Remote button pressed: OK'])
         self.display.toggle_pause.assert_not_called()
         overlay = self.display.overlay.call_args.kwargs
         self.assertEqual(overlay['information']['rows'], [])

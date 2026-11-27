@@ -26,6 +26,9 @@ reboot automatically when activation needs it.
 After reboot, confirm `presenter_remote.enabled` is `true` and the port is
 `/dev/ttyS6` in `config.json`. The display journal should show that it opened the
 UART. Press OK during an active video in Time mode to test pause and resume.
+Accepted button presses appear as `Remote button pressed: OK` in the
+`RunThis.py` terminal or the display service journal, even when the display
+mode has no action for that button.
 
 ## JSON v1 receiver settings
 

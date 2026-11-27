@@ -372,6 +372,8 @@ class Controller:
             self.input(event, now)
         if self.remote:
             for event in self.remote.read():
+                if event["type"] == "button":
+                    LOG.info("Remote button pressed: %s", event["key"])
                 self.remote_input(event, now)
         path, deadline, paper, status, menu = self.choose(now)
         self.info_state = None
