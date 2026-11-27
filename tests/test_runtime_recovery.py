@@ -108,6 +108,19 @@ class FeedRecoveryTests(unittest.TestCase):
 
 
 class CacheRecoveryTests(unittest.TestCase):
+    def test_schedule_with_no_poster_urls_preserves_cached_media(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cache = Path(tmp)
+            saved = cache / 'previous.mp4'
+            saved.write_bytes(b'cached video')
+            records = [{'eposter_file': None, 'abstract_file': 'https://example.test/abstract.pdf'},
+                       {'eposter_file': ''}, {'file': '  '}, {}]
+            with patch.object(cache_handler, 'CACHE_DIR', cache), \
+                    patch.object(cache_handler.requests, 'Session') as session:
+                self.assertEqual(cache_handler.sync_cache(records), [])
+            session.assert_not_called()
+            self.assertEqual(saved.read_bytes(), b'cached video')
+
     def test_removed_media_is_treated_as_missing(self):
         with patch.object(cache_handler, 'ensure_cache'), \
                 patch.object(Path, 'is_file', return_value=True), \

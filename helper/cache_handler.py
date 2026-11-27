@@ -114,8 +114,11 @@ def sync_cache(records, timeout=None):
     unique_media = {}
     for r in records:
         media_url = r.get("eposter_file") or r.get("file")
-        if media_url and media_url not in unique_media:
+        if isinstance(media_url, str) and media_url.strip() and media_url not in unique_media:
             unique_media[media_url] = r
+    if not unique_media:
+        print("[cache] API records contain no poster media URLs. Keeping existing media.")
+        return []
     valid_keys = {_media_key_from_url(url) for url in unique_media}
             
     # 2. Cleanup Old Files
